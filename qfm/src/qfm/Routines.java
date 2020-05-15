@@ -6,7 +6,6 @@ import java.util.Random;
 import java.util.Scanner;
 
 
-
 public class Routines {
 	//I will change this variable type later
 		public static int partSat = 0;
@@ -25,7 +24,8 @@ public class Routines {
 				while (scanner.hasNext()) {
 					count++;
 					String singleQuartet = scanner.next();				
-					String[] qq = singleQuartet.split(",|\\|");
+					//String[] qq = singleQuartet.split(",|\\|");/// for quartet format q1,q2|q3,q4
+					String[] qq = singleQuartet.split(",|\\||:");// For both quartet format q1,q2|q3,q4 and q1,q2|q3,q4:weight
 					quartet.qnext = new Quartet(qq[0], qq[1], qq[2], qq[3], count);
 					quartet = quartet.qnext;
 					//now taxa assigning code
@@ -64,55 +64,109 @@ public class Routines {
 			return new MultyReturnType(sortQuaret(countQuaret(listOfQuartet)), listOfTaxa);
 			
 		}
-		public static MultyReturnType readQuartetC(String fileName) {
+		public static MultyReturnType readQuartetC(String fileName) { // count will be done at the time of reading
 			Quartet quartet = new Quartet();
 			Quartet listOfQuartet = quartet;
+			Quartet qtemp;
 			Taxa taxa = new Taxa();
 			Taxa taxa1 = new Taxa(); 
 			Taxa listOfTaxa = taxa;
 			
 			try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
-				int count=0;
+				int qcount=0, tcount = 0;
 				while (scanner.hasNext()) {
-					count++;
+					
 					String singleQuartet = scanner.next();				
-					String[] qq = singleQuartet.split(",|\\|");
-					quartet.qnext = new Quartet(qq[0], qq[1], qq[2], qq[3], count);
-					quartet = quartet.qnext;
-					//now taxa assigning code
-					int sk[] = new int[] {0,0,0,0};
-					taxa1 = listOfTaxa;
-					while(taxa1!=null) {
-						for (int i = 0; i < qq.length; i++) {
-							if(qq[i].contentEquals(taxa1.getName()) && sk[i]==0) {
-								sk[i]=1;
-								break;
+					//String[] qq = singleQuartet.split(",|\\|");/// for quartet format q1,q2|q3,q4
+					String[] qq = singleQuartet.split(",|\\||:");// For both quartet format q1,q2|q3,q4 and q1,q2|q3,q4:weight
+					qtemp = listOfQuartet;
+					int avail = 0;
+					while(qtemp.qnext!= null)
+		            {	
+						avail = 0;
+						qtemp = qtemp.qnext;
+		               
+		                if(qq[0].contentEquals(qtemp.getQ1()) && qq[1].contentEquals(qtemp.getQ2())){
+		                   
+		                    if(qq[2].contentEquals(qtemp.getQ3())&& qq[3].contentEquals(qtemp.getQ4())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[2].contentEquals(qtemp.getQ4())&& qq[3].contentEquals(qtemp.getQ3())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[0].contentEquals(qtemp.getQ2())&& qq[1].contentEquals(qtemp.getQ1())){
+		                   
+		                    if(qq[2].contentEquals(qtemp.getQ3())&& qq[3].contentEquals(qtemp.getQ4())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[2].contentEquals(qtemp.getQ4())&& qq[3].contentEquals(qtemp.getQ3())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[0].contentEquals(qtemp.getQ3())&& qq[1].contentEquals(qtemp.getQ4())){
+		                    
+		                    if(qq[2].contentEquals(qtemp.getQ1())&& qq[3].contentEquals(qtemp.getQ2())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[2].contentEquals(qtemp.getQ2())&& qq[3].contentEquals(qtemp.getQ1())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[0].contentEquals(qtemp.getQ4())&& qq[1].contentEquals(qtemp.getQ3())){
+		                   
+		                    if(qq[2].contentEquals(qtemp.getQ1())&& qq[3].contentEquals(qtemp.getQ2())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[2].contentEquals(qtemp.getQ2())&& qq[3].contentEquals(qtemp.getQ1())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+
+
+
+		             
+		            }
+					if (avail == 0) {
+						qcount++;
+						quartet.qnext = new Quartet(qq[0], qq[1], qq[2], qq[3], qcount);
+						quartet = quartet.qnext;
+						//now taxa assigning code
+						int sk[] = new int[] {0,0,0,0};
+						taxa1 = listOfTaxa;
+						while(taxa1!=null) {
+							for (int i = 0; i < qq.length; i++) {
+								if(qq[i].contentEquals(taxa1.getName()) && sk[i]==0) {
+									sk[i]=1;
+									break;
+								}
+							}
+							taxa1 = taxa1.tnext;
+						}
+						for (int i = 0; i < 4; i++) {
+							if(sk[i]==0) {
+								taxa.tnext = new Taxa(qq[i]);
+								taxa = taxa.tnext;
+								tcount++;
 							}
 						}
-						taxa1 = taxa1.tnext;
 					}
-					for (int i = 0; i < 4; i++) {
-						if(sk[i]==0) {
-							taxa.tnext = new Taxa(qq[i]);
-							taxa = taxa.tnext;
-						}
-					}
+					
 					
 					
 					
 				}
+				System.out.println("Number of unique Quartet = "+ qcount);
+				System.out.println("Number of taxa = "+ tcount);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-//			System.out.println("*********************Before Counting***********************");
-//			printQuartet(listOfQuartet);
-//			listOfQuartet = countQuaret(listOfQuartet);
-//			System.out.println("*********************After Counting***********************");
-//			printQuartet(listOfQuartet);
-//			System.out.println("*********************After Sorting***********************");
-//			listOfQuartet = sortQuaret(listOfQuartet);
-//			printQuartet(listOfQuartet);
-			return new MultyReturnType(sortQuaret(countQuaret(listOfQuartet)), listOfTaxa);
+
+			return new MultyReturnType(sortQuaret((listOfQuartet)), listOfTaxa);
 			
 		}
 		private static Quartet sortQuaret(Quartet quartetList) {
@@ -350,6 +404,7 @@ public class Routines {
 		                		quartetList.getQ4(), quartetList.getQuartet_id());
 		                
 		                qtemp.setStatus(quartetList.getStatus());
+		                qtemp.setQFrequency(quartetList.getQFrequency());
 //		                if(debug)
 //		                    cout << "....q1 ="<<Q->q1<<"....q2 ="<<Q->q2<<"....q3 ="<<Q->q3<<"....q4 ="<<Q->q4<<".......\n";
 
@@ -1011,7 +1066,8 @@ public class Routines {
 		        quartetScore = checkQuartet(partB, q, "null");
 		        if(quartetScore == 6)
 		        {
-		            csat++;
+		           // csat++;
+		        	csat += q.getQFrequency();
 
 
 		            //Satisfied_quartets[q->quartet_id]=1;
@@ -1040,9 +1096,9 @@ public class Routines {
 		        {
 		            q.setStatus("");
 		            qscore  = checkQuartet(partB, q, tempTaxa);
-		            if(qscore == 6) s ++;
-		            else if(qscore == 2) v++;
-		            else if(qscore == 3) d++;
+		            if(qscore == 6) s = s + q.getQFrequency();
+		            else if(qscore == 2) v = v + q.getQFrequency();
+		            else if(qscore == 3) d = d + q.getQFrequency();
 		        }
 		        else if(q.getQ1().contentEquals(tempTaxa) || q.getQ2().contentEquals(tempTaxa) ||
 		        		q.getQ3().contentEquals(tempTaxa) || q.getQ4().contentEquals(tempTaxa))
@@ -1050,30 +1106,30 @@ public class Routines {
 		            c = q.getStatus().charAt(0);//status[0];
 		            //System.out.println("c = "+ c);
 
-		            if(c=='s' && qscore == 2) { s--; v++; } // s v
+		            if(c=='s' && qscore == 2) { s = s - q.getQFrequency(); v = v + q.getQFrequency(); } // s v
 
-		            else if(c=='s' && qscore==3){ s--; d++;} // s d
+		            else if(c=='s' && qscore==3){ s = s - q.getQFrequency(); d = d + q.getQFrequency();} // s d
 
-		            else if(c=='v' && qscore == 6){v--; s++;} // v s
+		            else if(c=='v' && qscore == 6){v = v - q.getQFrequency(); s = s + q.getQFrequency();} // v s
 
-		            else if(c=='v' && qscore==3){v--;d++;}  // v d
+		            else if(c=='v' && qscore==3){v = v - q.getQFrequency();d = d + q.getQFrequency();}  // v d
 
-		            else if(c=='d' && qscore==2){d--;v++;} // d v
+		            else if(c=='d' && qscore==2){d = d - q.getQFrequency();v = v + q.getQFrequency();} // d v
 
-		            else if(c=='d' && qscore==6){d--;s++;} // d s
+		            else if(c=='d' && qscore==6){d = d - q.getQFrequency();s = s + q.getQFrequency();} // d s
 
 		            else if(qscore==1)
 		            {
-		                if(c=='s') s--;
-		                else if(c=='v') v--;
-		                else if(c=='d') d--;
+		                if(c=='s') s = s - q.getQFrequency();
+		                else if(c=='v') v = v - q.getQFrequency();
+		                else if(c=='d') d = d - q.getQFrequency();
 
 		            }
 		            else if(c=='b')
 		            {
-		                if(qscore==6) s++;
-		                else if(qscore==2) v++;
-		                else if(qscore==3) d++;
+		                if(qscore==6) s = s + q.getQFrequency();
+		                else if(qscore==2) v = v + q.getQFrequency();
+		                else if(qscore==3) d = d + q.getQFrequency();
 		            }
 
 		        }
