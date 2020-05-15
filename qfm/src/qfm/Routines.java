@@ -7,10 +7,10 @@ import java.util.Scanner;
 
 
 public class Routines {
-	//I will change this variable type later
-		public static int partSat = 0;
-		public static int partSatCount = 0;
-		public static int extraTaxa = 1000; // it should be #of taxa + 1 initially
+	//I will try to eliminate these static variables later
+		//public static int partSat = 0;
+		//public static int partSatCount = 0;
+		//public static int extraTaxa = 1000; // it should be #of taxa + 1 initially
 		//public static int rtt = 1;
 		public static MultyReturnType readQuartet(String fileName) {
 			Quartet quartet = new Quartet();
@@ -321,7 +321,7 @@ public class Routines {
 			return listOfQuartet;
 			
 		}
-		public static String SQP(Quartet quartetList, Taxa taxaList) {
+		public static String SQP(Quartet quartetList, Taxa taxaList, int extraTaxa, int partSatCount) {
 			int taxacount = taxaCount(taxaList);
 			String s, s1, s2, extra = "extra";
 			Taxa pa, pb, partA, partB;
@@ -334,14 +334,19 @@ public class Routines {
 			if (quartetList.qnext == null || taxacount <3) {
 				s = depthOneTree(taxaList);
 			} else {
-				Taxa p = FM(taxaList, quartetList);
+				MultyReturnType mrl = FM(taxaList, quartetList);
+				//Taxa p = FM(taxaList, quartetList);
+				Taxa p = mrl.getTaxa();
 				//printTaxa(p);
 				//System.out.println("partSat = "+ partSat);
+				int partSat = mrl.getAnyCount(); // It returns # of satisfied quartets
 				if(partSat==0){
 
 		            partSatCount++;
 		            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
-		            {	partSatCount = 0;
+		            {	
+		            	System.out.println("partSatCount value = "+ partSatCount);
+		            	partSatCount = 0;
 		                s = depthOneTree(taxaList);
 		                return s;
 		            }
@@ -499,8 +504,8 @@ public class Routines {
 		        System.out.println("****************SQP*************");
 		        printTaxa(partA);
 		        printTaxa(partB);
-		        s1 = SQP(quartetA, partA);
-		        s2 = SQP(quartetB, partB);
+		        s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
+		        s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
 		        s = merge(s1,s2,extra);
 		        System.out.println("Merged Tree = "+s);
 		        //	cout<< "Merged tree\n = "<<s<<endl; //taxa list er end er ta newly added
@@ -511,7 +516,7 @@ public class Routines {
 			
 			return s;
 		}
-		private static Taxa FM(Taxa taxaList, Quartet quartetList) {
+		private static MultyReturnType FM(Taxa taxaList, Quartet quartetList) {
 			// code for counting and sorting will be given in readQuartet() method
 			/********************Initial Partition************** */
 			Quartet quartetList1 = quartetList;
@@ -657,10 +662,10 @@ public class Routines {
 //			System.out.println("*************inside fm**********");
 //			printTaxa(partA);
 //			printTaxa(partB);
-			taxaList = FM_algo(partA, partB, quartetList);
-			return taxaList;
+			//taxaList = FM_algo(partA, partB, quartetList);
+			return FM_algo(partA, partB, quartetList);
 		}
-		private static Taxa FM_algo(Taxa partA, Taxa partB, Quartet quartetList) {
+		private static MultyReturnType FM_algo(Taxa partA, Taxa partB, Quartet quartetList) {
 			boolean loopAgain = true;
 			Taxa pa, pb, temp, temp2, finalTaxalist, part;
 			String taxaToMove = null;
@@ -1022,7 +1027,7 @@ public class Routines {
 		        }
 		        //************end of Loop Again**********//
 		        //***********Merge Two list***************//
-		        partSat = countSatisfiedQuartets(partA, partB,quartetList);
+		        int partSat = countSatisfiedQuartets(partA, partB,quartetList);
 //		        System.out.println("After loop again part a nd b");
 //		        printTaxa(partA);
 //		        printTaxa(partB);
@@ -1048,7 +1053,7 @@ public class Routines {
 		        }
 //		        System.out.println("Final taxa list");
 //			printTaxa(finalTaxalist);
-			return finalTaxalist;
+			return new MultyReturnType(finalTaxalist, partSat);
 			//return null;
 			
 		}

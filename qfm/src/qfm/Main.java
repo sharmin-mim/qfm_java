@@ -16,7 +16,9 @@ public class Main {
 //				Routines.printTaxa(quartetTaxa.getTaxa());
 //				
 //				
-		String s= Routines.SQP(quartetTaxa.getQuartet(), quartetTaxa.getTaxa());
+		String s= Routines.SQP(quartetTaxa.getQuartet(), quartetTaxa.getTaxa(), 1000, 0);
+		//extraTaxa = 1000. Initially, it should be (# of taxa + 1). any number is also fine. And partSatCount = 0
+		
 		s = s.replace("(O,", "(0,");
 		s = s.replace(",O,", ",0,");
 		s = s.replace(",O)", ",0)");
@@ -27,7 +29,7 @@ public class Main {
 			e.printStackTrace();
 		}
 		long estimatedTime = System.currentTimeMillis() - startTime;
-		System.out.println("Elapsed Time : "+ estimatedTime);
+		System.out.println("Elapsed Time : "+ estimatedTime/60000 + " minutes");
 	}
 
 }
