@@ -139,7 +139,7 @@ public class Routines {
 						int sk[] = new int[] {0,0,0,0};
 						taxa1 = listOfTaxa;
 						while(taxa1!=null) {
-							for (int i = 0; i < qq.length; i++) {
+							for (int i = 0; i < 4; i++) {
 								if(qq[i].contentEquals(taxa1.getName()) && sk[i]==0) {
 									sk[i]=1;
 									break;
@@ -172,8 +172,8 @@ public class Routines {
 		private static Quartet sortQuaret(Quartet quartetList) {
 			boolean tag  = true;
 			Quartet q, qtemp;
-			String tq1, tq2, tq3, tq4, tstat;
-			int tqid, tqFrequency, tmod;
+			String tq1, tq2, tq3, tq4;// tstat;
+			int tqid, tqFrequency;// tmod;
 	        while(tag)
 	        {
 	            q  = quartetList;
@@ -294,31 +294,115 @@ public class Routines {
 			System.out.println();
 		}
 		//I will write this function later
-		public static Quartet readQuartetNewick(String fileName) {//incomplete
+		public static MultyReturnType readQuartetNewick(String fileName) {//incomplete
 			Quartet quartet = new Quartet();
 			Quartet listOfQuartet = quartet;
+			Quartet qtemp;
+			Taxa taxa = new Taxa();
+			Taxa taxa1 = new Taxa(); 
+			Taxa listOfTaxa = taxa;
 			
 			
 			//Scanner scanner = null;
 			try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
 				//scanner = new Scanner(new BufferedReader(new FileReader("sample.txt")));
-				int count=0;
+				int tcount=0, qcount = 0;
 				String loc;
 				while ((loc = br.readLine())!=null) {
-					count++;
-					//loc = scanner.next();				
-					String[] qq = loc.split(",|\\|");
-					quartet.qnext = new Quartet(qq[0], qq[1], qq[2], qq[3], count);
-					quartet = quartet.qnext;
+					if(loc.equals("")) {
+						//remove extra new line/white space
+						continue;
+					}
+			
+					String[] qq = loc.split("\\(\\(|,|\\),\\(|\\)\\)");
+					qtemp = listOfQuartet;
+					int avail = 0;
+					while(qtemp.qnext!= null)
+		            {	
+						avail = 0;
+						qtemp = qtemp.qnext;
+		               
+		                if(qq[1].contentEquals(qtemp.getQ1()) && qq[2].contentEquals(qtemp.getQ2())){
+		                   
+		                    if(qq[3].contentEquals(qtemp.getQ3())&& qq[4].contentEquals(qtemp.getQ4())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[3].contentEquals(qtemp.getQ4())&& qq[4].contentEquals(qtemp.getQ3())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[1].contentEquals(qtemp.getQ2())&& qq[2].contentEquals(qtemp.getQ1())){
+		                   
+		                    if(qq[3].contentEquals(qtemp.getQ3())&& qq[4].contentEquals(qtemp.getQ4())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[3].contentEquals(qtemp.getQ4())&& qq[4].contentEquals(qtemp.getQ3())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[1].contentEquals(qtemp.getQ3())&& qq[2].contentEquals(qtemp.getQ4())){
+		                    
+		                    if(qq[3].contentEquals(qtemp.getQ1())&& qq[4].contentEquals(qtemp.getQ2())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[3].contentEquals(qtemp.getQ2())&& qq[4].contentEquals(qtemp.getQ1())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+		                else if(qq[1].contentEquals(qtemp.getQ4())&& qq[2].contentEquals(qtemp.getQ3())){
+		                   
+		                    if(qq[3].contentEquals(qtemp.getQ1())&& qq[4].contentEquals(qtemp.getQ2())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+		                    else if(qq[3].contentEquals(qtemp.getQ2())&& qq[4].contentEquals(qtemp.getQ1())){
+		                    	avail++; qtemp.increase_count(); break;
+		                    }
+
+		                }
+
+
+
+		             
+		            }
+					if (avail == 0) {
+						qcount++;
+						quartet.qnext = new Quartet(qq[1], qq[2], qq[3], qq[4], qcount);
+						quartet = quartet.qnext;
+						//now taxa assigning code
+						int sk[] = new int[] {0,0,0,0,0};
+						taxa1 = listOfTaxa;
+						while(taxa1!=null) {
+							for (int i = 1; i <= 4; i++) {
+								if(qq[i].contentEquals(taxa1.getName()) && sk[i]==0) {
+									sk[i]=1;
+									break;
+								}
+							}
+							taxa1 = taxa1.tnext;
+						}
+						for (int i = 1; i <= 4; i++) {
+							if(sk[i]==0) {
+								taxa.tnext = new Taxa(qq[i]);
+								taxa = taxa.tnext;
+								tcount++;
+							}
+						}
+					}
 					
 					
-					//loc.split("", limit);
+					
 					
 				}
+				System.out.println("Number of unique Quartet = "+ qcount);
+				System.out.println("Number of taxa = "+ tcount);
+					
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return listOfQuartet;
+			return new MultyReturnType(sortQuaret((listOfQuartet)), listOfTaxa);
 			
 		}
 		public static String SQP(Quartet quartetList, Taxa taxaList, int extraTaxa, int partSatCount) {
@@ -670,7 +754,7 @@ public class Routines {
 			Taxa pa, pb, temp, temp2, finalTaxalist, part;
 			String taxaToMove = null;
 			int prevScore, prevS, prevD, prevV;
-			Listt gl, gainList, g, m, movedList, dl;
+			Listt gl, gainList, g, m, movedList;//, dl;
 			int cumulativeGain, gainmax;
 		
 			//Random rand = new Random(); 

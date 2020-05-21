@@ -8,7 +8,7 @@ public class Quartet {
 	private String q3;
 	private String q4;
 	private int quartet_id;
-	public String status;
+	private String status;
 	private int qFrequency;
 	private int modified;
 	Quartet qnext;
