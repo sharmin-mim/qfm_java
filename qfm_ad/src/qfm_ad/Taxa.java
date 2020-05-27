@@ -7,7 +7,7 @@ public class Taxa {
 	private int partition; //0 = A, 1 = B
     //private int state; //0 = unmoved, 1 = moved
     //private int taxaScore;
-    //private int locked;
+    private boolean locked;
     //Taxa tnext;
 
 	public Taxa(String name) {
@@ -15,8 +15,22 @@ public class Taxa {
 	}
 	
 	 public Taxa(String name, int partition) {
-			this.name = name;
-			this.partition = partition;
+		 this(name, partition, false);
+	}
+	
+	 
+	public Taxa(String name, int partition, boolean locked) {
+		this.name = name;
+		this.partition = partition;
+		this.locked = locked;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(boolean locked) {
+		this.locked = locked;
 	}
 
 	public String getName() {
@@ -26,6 +40,24 @@ public class Taxa {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+
+	public int getPartition() {
+		return partition;
+	}
+
+	public void setPartition(int partition) {
+		this.partition = partition;
+	}
+	
+
+//	public int getState() {
+//		return state;
+//	}
+//
+//	public void setState(int state) {
+//		this.state = state;
+//	}
 
 	@Override
 	public int hashCode() {

@@ -7,8 +7,9 @@ public class Quartet {
 	private Taxa t2;
 	private Taxa t3;
 	private Taxa t4;
-	//private String status;
+	private String status;
 	private int qFrequency;
+	private boolean increaseFrequency;
 	public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
 		super();
 		this.t1 = t1;
@@ -16,21 +17,9 @@ public class Quartet {
 		this.t3 = t3;
 		this.t4 = t4;
 		this.qFrequency = 1;
+		this.increaseFrequency = true;
+		this.status = "";
 	}
-	
-	public int getQFrequency() {
-		return qFrequency;
-	}
-
-	public void setQFrequency(int qFrequency) {
-		this.qFrequency = qFrequency;
-	}
-	public void increase_count() {
-		System.out.println("increasedf");
-		this.qFrequency += 1;
-		
-	}
-
 	public Taxa getT1() {
 		return t1;
 	}
@@ -46,11 +35,27 @@ public class Quartet {
 	public Taxa getT4() {
 		return t4;
 	}
-
-	public int getqFrequency() {
+	public int getQFrequency() {
 		return qFrequency;
 	}
 
+	public void setQFrequency(int qFrequency) {
+		this.qFrequency = qFrequency;
+	}
+	
+
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public boolean isIncreaseFrequency() {
+		return increaseFrequency;
+	}
+	public void setIncreaseFrequency(boolean increaseFrequency) {
+		this.increaseFrequency = increaseFrequency;
+	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(t1, t2, t3, t4);
@@ -68,9 +73,9 @@ public class Quartet {
 		Quartet other = (Quartet) obj;
 		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2) && Objects.equals(t3, other.t3)
 				&& Objects.equals(t4, other.t4)) {
-			//increase_count();
-			other.setQFrequency(other.getqFrequency()+1);
-			//System.out.println("increasede");
+			if (other.isIncreaseFrequency()) {
+				other.setQFrequency(other.getQFrequency()+1);
+			}
 			return true;
 		} else {
 			return false;
