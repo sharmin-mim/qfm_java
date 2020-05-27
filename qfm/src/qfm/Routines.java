@@ -743,9 +743,9 @@ public class Routines {
 	            else {pb.tnext = new Taxa(p.getName(), 1); pb= pb.tnext;cb++;}
 
 	        }
-//			System.out.println("*************inside fm**********");
-//			printTaxa(partA);
-//			printTaxa(partB);
+			System.out.println("*************inside fm**********");
+			printTaxa(partA);
+			printTaxa(partB);
 			//taxaList = FM_algo(partA, partB, quartetList);
 			return FM_algo(partA, partB, quartetList);
 		}
@@ -842,13 +842,14 @@ public class Routines {
 						}
 						
 					}
-					//System.out.println("**********gainlist**********");
-//					gl= gainList.next;
-//		            while (gl!= null){
-//		                System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-//		                		gl.getDef()+" "+gl.getBel0w());
-//		                gl= gl.next;
-//		            }
+					System.out.println("**********gainlist**********");
+					gl= gainList.next;
+		            while (gl!= null){
+		                System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
+		                		gl.getDef()+" "+gl.getBel0w());
+		                gl= gl.next;
+		            }
+		            System.out.println("**********end of gainlist**********");
 		           
 		            
 		            gl = gainList.next;
@@ -997,14 +998,14 @@ public class Routines {
 		       } 
 		         // no more iteration
 				
-				
-//				m= movedList.next;
-//	            while (m!= null){
-//	                System.out.println(m.getTaxaToMove()+" "+m.getVal()+" "+m.getPart()+" "+m.getSat()+" "+m.getVat()+" "+
-//	                		m.getDef()+" "+m.getBel0w());
-//	                m= m.next;
-//	            }
-
+				System.out.println("***************Moved List******************");
+				m= movedList.next;
+	            while (m!= null){
+	                System.out.println(m.getTaxaToMove()+" "+m.getVal()+" "+m.getPart()+" "+m.getSat()+" "+m.getVat()+" "+
+	                		m.getDef()+" "+m.getBel0w());
+	                m= m.next;
+	            }
+	            System.out.println("***************Moved List******************");
 		            //***********Cumulative gain compute*************//
 		            gainmax= 0;
 		            String back = "Initial";
@@ -1021,12 +1022,12 @@ public class Routines {
 		                m = m.next;
 		            }
 		           
-//		            System.out.println("cumulative gain = "+ cumulativeGain);
-//		            System.out.println(" taxa to move = "+ taxaToMove);
-//		            System.out.println(" back taxa = "+ back);
-//		            System.out.println("partA and partB");
-//		            printTaxa(partA);
-//		            printTaxa(partB);
+		            System.out.println("cumulative gain = "+ cumulativeGain);
+		            System.out.println(" taxa to move = "+ taxaToMove);
+		            System.out.println(" back taxa = "+ back);
+		            System.out.println("partA and partB");
+		            printTaxa(partA);
+		            printTaxa(partB);
 		   
 		            //***********Update Partition*******************//
 		            m = movedList.next;
@@ -1112,9 +1113,9 @@ public class Routines {
 		        //************end of Loop Again**********//
 		        //***********Merge Two list***************//
 		        int partSat = countSatisfiedQuartets(partA, partB,quartetList);
-//		        System.out.println("After loop again part a nd b");
-//		        printTaxa(partA);
-//		        printTaxa(partB);
+		        System.out.println("After loop again part a nd b");
+		        printTaxa(partA);
+		        printTaxa(partB);
 
 		        finalTaxalist = new Taxa();
 		        part = finalTaxalist;
@@ -1135,8 +1136,8 @@ public class Routines {
 		            part = part.tnext;
 		            //pb= pb->tnext;
 		        }
-//		        System.out.println("Final taxa list");
-//			printTaxa(finalTaxalist);
+	        System.out.println("Final taxa list");
+			printTaxa(finalTaxalist);
 			return new MultyReturnType(finalTaxalist, partSat);
 			//return null;
 			
@@ -1176,6 +1177,7 @@ public class Routines {
 		    Quartet q = quartetList.qnext;
 		    int s = 0, v = 0, d = 0;
 		    char c;
+		    
 		   
 
 		  
@@ -1246,7 +1248,7 @@ public class Routines {
 			return scores;
 		}
 		private static int checkQuartet(Taxa partB, Quartet q, String tempTaxa) {
-			//partA is never used. Only partB is used. So later I will skip partA in method signature
+			//partA is never used. Only partB is used. So later I will skip partA from method signature
 			int a = 0, b = 0, c = 0, d = 0, score = 0;
 			String s1,qstat;
 		    partB = partB.tnext;
