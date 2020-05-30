@@ -1,22 +1,21 @@
 package qfm_ad;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
 
 
 public class Routines {
-	public static MultiReturnType readQuartetQMC(String fileName) { // count will be done at the time of reading
+	public static String readQuartetQMC(String fileName) { // count will be done at the time of reading
 
 		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
 		HashSet<Quartet> quartetList = new HashSet<Quartet>();
@@ -77,57 +76,35 @@ public class Routines {
 		//LinkedHashSet<Quartet> nql = new LinkedHashSet<Quartet>(sortedList);
 		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
 				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));
-//		for (Quartet quartet : sortedList) {
-//			nql.add(quartet);
-//		}
+
 		double estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("Elapsed Time : "+ estimatedTime/1000 + " seconds");
 		for (Taxa taxa : taxaList) {
 			System.out.print(taxa.getName()+"->");
 		}
 		
-		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
+		
 		System.out.println();
-//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("out.txt"))) {//args[1] is output file
-//			for(Quartet quartets : countedSortedQL) {
-//				
-//				bw.write(quartets.getT1().getName()+","+quartets.getT2().getName()+"|"+quartets.getT3().getName()
-//						+","+quartets.getT4().getName()+":"+quartets.getQFrequency()+"->"+quartets.isIncreaseFrequency()+"\n");
-//				
-////				System.out.println(quartets.getT1().getName()+","+quartets.getT2().getName()+"|"+quartets.getT3().getName()
-////						+","+quartets.getT4().getName()+":"+quartets.getQFrequency());
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+
 		for (Quartet quartet : countedSortedQL) {
 			quartet.setIncreaseFrequency(false);;
 		}
 		
-//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("out1.txt"))) {//args[1] is output file
-//			for(Quartet quartets : countedSortedQL) {
-//				
-//				bw.write(quartets.getT1().getName()+","+quartets.getT2().getName()+"|"+quartets.getT3().getName()
-//						+","+quartets.getT4().getName()+":"+quartets.getQFrequency()+"->"+quartets.isIncreaseFrequency()+"\n");
-//				
-////				System.out.println(quartets.getT1().getName()+","+quartets.getT2().getName()+"|"+quartets.getT3().getName()
-////						+","+quartets.getT4().getName()+":"+quartets.getQFrequency());
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+
 		System.out.println("\n elements : "+taxaList.size());
-		
-		FM(taxaList, countedSortedQL);
-		return new MultiReturnType(countedSortedQL, taxaList);
+
+		String s = SQP(countedSortedQL, taxaList, 1000, 0);
+		s = s.replace("(O,", "(0,");
+		s = s.replace(",O,", ",0,");
+		s = s.replace(",O)", ",0)");
+		return s;
 		
 	}
 	
 	public static String SQP(LinkedHashSet<Quartet> quartetList, LinkedHashSet<Taxa> taxaList, int extraTaxa, int partSatCount) {
 		int taxacount = taxaList.size();
-		String s, s1, s2, extra = "extra";
-		Taxa pa, pb, partA, partB;
-		Quartet qa, qb, quartetA, quartetB, qtemp;
+		String s, extra = "extra";
+
 		
 		if (taxacount == 0) {
 			s = ("");
@@ -135,191 +112,350 @@ public class Routines {
 		}
 		//quartetList.size() == 0 diye check korte hobe
 		if (quartetList.isEmpty() || taxacount <3) {
+			System.out.println("Quartet list is empty");
 			s = depthOneTree(taxaList);
 		} else {
-			MultiReturnType mrl = FM(taxaList, quartetList);
-//			//Taxa p = FM(taxaList, quartetList);
-//			Taxa p = mrl.getTaxa();
-//			//printTaxa(p);
-//			//System.out.println("partSat = "+ partSat);
-//			int partSat = mrl.getAnyCount(); // It returns # of satisfied quartets
-//			if(partSat==0){
-//
-//	            partSatCount++;
-//	            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
-//	            {	
-//	            	System.out.println("partSatCount value = "+ partSatCount);
-//	            	partSatCount = 0;
-//	                s = depthOneTree(taxaList);
-//	                return s;
-//	            }
-//	        }
-//	        else partSatCount=0;
+			MultiReturnType mrt = FM(taxaList, quartetList);
+			LinkedHashSet<Taxa> partA = mrt.getPartA();
+			LinkedHashSet<Taxa> partB = mrt.getPartB();
+			System.out.println("****************************SQP****************");
+			System.out.println("*****************PartA**************************");
+			printTaxa(partA);
+			System.out.println("*****************PartB**************************");
+			printTaxa(partB);
+			int partSat = countSatisfiedQuartets(partA, partB, quartetList); // It returns # of satisfied quartets
+			System.out.println("partSat = "+ partSat);
+
+			if(partSat==0){
+
+	            partSatCount++;
+	            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
+	            {	
+	            	System.out.println("partSatCount value = "+ partSatCount);
+	            	partSatCount = 0;
+	                s = depthOneTree(taxaList);
+	                return s;
+	            }
+	        }
+	        else partSatCount=0;
 	        
 			extra = "extra"+ extraTaxa;
 	        System.out.println("extra = "+ extra);
 	        extraTaxa++;
+	        
+	        partA.add(new Taxa(extra, 0));// add extra taxa to partition A
+	        partB.add(new Taxa(extra, 1));// add extra taxa to parttion B
+//	        System.out.println("**************After Adding extra taxa****************");
+//			System.out.println("*****************PartA**************************");
+//			printTaxa(partA);
+//			System.out.println("*****************PartB**************************");
+//			printTaxa(partB);
+	        LinkedHashSet<Quartet> quartetA = new LinkedHashSet<Quartet>();
+	        LinkedHashSet<Quartet> quartetB = new LinkedHashSet<Quartet>();
+	      
+	        for (Quartet q : quartetList) {
+				int l = q.getStatus().length();
+				char c = q.getStatus().charAt(l-1);
+				Quartet qtemp = new Quartet(q.getT1(), q.getT2(), q.getT3(), q.getT4());
+				qtemp.setIncreaseFrequency(false);
+				qtemp.setStatus(q.getStatus());
+				qtemp.setQFrequency(q.getQFrequency());
+				if (c == 'b' || c == 'd' ) {
+					if (c == 'b') {
+						if (partA.contains(q.getT1())) {
+							quartetA.add(qtemp);
+						} else {
+							quartetB.add(qtemp);
+						}
+					} else {
+						int dcount = 0;
+						if (partA.contains(q.getT1()))dcount++;
+						if (partA.contains(q.getT2()))dcount++;
+						if (partA.contains(q.getT3()))dcount++;
+						if (partA.contains(q.getT4()))dcount++;
+						System.out.println("Quartet = "+ q.getT1().getName()+","+q.getT2().getName()
+								+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
+						System.out.println("dcount = "+ dcount);
+						if (dcount > 1) {
+							if (partB.contains(q.getT1()))qtemp.setT1(new Taxa(extra));
+							else if (partB.contains(q.getT2()))qtemp.setT2(new Taxa(extra));
+							else if (partB.contains(q.getT3()))qtemp.setT3(new Taxa(extra));
+							else qtemp.setT4(new Taxa(extra));
+							quartetA.add(qtemp);
+						} else {
+							if (partA.contains(q.getT1()))qtemp.setT1(new Taxa(extra));
+							else if (partA.contains(q.getT2()))qtemp.setT2(new Taxa(extra));
+							else if (partA.contains(q.getT3()))qtemp.setT3(new Taxa(extra));
+							else qtemp.setT4(new Taxa(extra));
+							quartetB.add(qtemp);
 
-//	        partA = new Taxa();
-//	        pa = partA;
-//	        partB = new Taxa();
-//	        pb = partB;
-//	        
-//	        while(p.tnext!= null)
-//	        {
-//	            p = p.tnext;
-//	            if(p.getPartition() == 0){
-//	                pa.tnext = new Taxa(p.getName(), 0);
-//	                pa= pa.tnext;
-//	            }
-//
-//	            else{
-//	                
-//	                pb.tnext = new Taxa(p.getName(), 1);
-//	                pb= pb.tnext;
-//	            }
-//
-//	        }
-////	        System.out.println("***************partA*****************");
-////	        printTaxa(partA);
-////	        System.out.println("***************partB*****************");
-////	        printTaxa(partB);
-//	        pa.tnext = new Taxa(extra, 0); ///add extra taxa to partition A
-//	        pa= pa.tnext;
-//	        pb.tnext = new Taxa(extra, 1);// add extra taxa to parttion B
-//	        pb= pb.tnext;
-//
-////	        printTaxa(partA);
-////	        printTaxa(partB);
-//	        quartetA = new Quartet();
-//	        qa = quartetA;
-//	        quartetB = new Quartet();
-//	        qb = quartetB;
-//	        String t1,t2,t3,t4;
-//	        char c;
-//	        int l,dcount=0;
-//	        while(quartetList.qnext !=  null)
-//	        {
-//	            quartetList = quartetList.qnext;
-//	            l = quartetList.getStatus().length();
-//	            c = quartetList.getStatus().charAt(l-1);
-////	            if(debug)
-////	                cout<< "Status of Quartet "<<Q->quartet_id<<"= "<<c<<endl;
-//	            if(c == 'b' || c == 'd' )
-//	            {
-//	                //Q = Q->qnext;
-//	                qtemp =  new Quartet(quartetList.getQ1(), quartetList.getQ2(), quartetList.getQ3(),
-//	                		quartetList.getQ4(), quartetList.getQuartet_id());
-//	                
-//	                qtemp.setStatus(quartetList.getStatus());
-//	                qtemp.setQFrequency(quartetList.getQFrequency());
-////	                if(debug)
-////	                    cout << "....q1 ="<<Q->q1<<"....q2 ="<<Q->q2<<"....q3 ="<<Q->q3<<"....q4 ="<<Q->q4<<".......\n";
-//
-//	                if(c=='b')
-//	                {
-//	                    pa = partA.tnext;
-//	                    while(pa!= null && (pa.getName().contentEquals(quartetList.getQ1())) != true ) // logic error
-//	                    {
-//	                        pa = pa.tnext;
-//	                        //if(debug)
-//	                        //	cout<<"both side\n";
-//	                    }
-//
-//	                    if(pa== null)
-//	                    {	//if(debug)
-//	                        //	cout<< "........else.......\n";
-//	                        qb.qnext = qtemp;
-//	                        qb = qb.qnext;
-//	                        //place Q to QB
-//	                    }
-//	                    else //((pa->name.compare(Q->q1))==0)// q1 on part A
-//	                    {
-//	                        //if(debug)
-//	                        //	cout<< "........if.......\n";
-//	                        qa.qnext = qtemp;
-//	                        qa = qa.qnext;
-//	                        //place Q to QA
-//	                    }
-//	                }
-//	                else // deferred
-//	                {	qtemp.setModified(1);
-//	                    dcount =0 ;
-//	                    pa = partA.tnext;
-//	                    while(pa!= null)
-//	                    {
-//	                        if(pa.getName().contentEquals(quartetList.getQ1()) || pa.getName().contentEquals(quartetList.getQ2())||
-//	                        		pa.getName().contentEquals(quartetList.getQ3())|| pa.getName().contentEquals(quartetList.getQ4()))
-//	                            dcount++;
-//	                        pa = pa.tnext;
-//	                        if(dcount==3)
-//	                        {
-//	                            //cout<<"dcount  =  "<<dcount<<endl;
-//	                            break;
-//	                        }
-//	                    }
-//	                    if (dcount == 1) { // find for either mathch for q1, q2, q3, q4 on partB, change it
-//	                    	pa = partA.tnext;
-//	                    	 while(pa.getName().contentEquals(quartetList.getQ1()) != true && 
-//		                        		pa.getName().contentEquals(quartetList.getQ2()) != true && 
-//		                        				pa.getName().contentEquals(quartetList.getQ3()) != true && 
-//		                        				pa.getName().contentEquals(quartetList.getQ4()) != true)
-//		                        {
-//		                            pa = pa.tnext;
-//		                        }
-//	                    	 if (pa.getName().contentEquals(quartetList.getQ1())) qtemp.setQ1(extra);
-//	                    	 else if (pa.getName().contentEquals(quartetList.getQ2())) qtemp.setQ2(extra);
-//	                    	 else if (pa.getName().contentEquals(quartetList.getQ3())) qtemp.setQ3(extra);
-//	                    	 else qtemp.setQ4(extra);
-//	                    	 
-//	                    	 qb.qnext = qtemp;
-//		                     qb = qb.qnext;//place Q to QB
+						}
+//						if (dcount == 1) {
+//							if (partA.contains(q.getT1()))q.setT1(new Taxa(extra));
+//							else if (partA.contains(q.getT2()))q.setT2(new Taxa(extra));
+//							else if (partA.contains(q.getT3()))q.setT3(new Taxa(extra));
+//							else q.setT4(new Taxa(extra));
+//							
+//							quartetB.add(q);
+//						} else {
+//							if (partB.contains(q.getT1()))q.setT1(new Taxa(extra));
+//							else if (partB.contains(q.getT2()))q.setT2(new Taxa(extra));
+//							else if (partB.contains(q.getT3()))q.setT3(new Taxa(extra));
+//							else q.setT4(new Taxa(extra));
+//							
+//							quartetA.add(q);
 //						}
-//	                    else{// find for either mathch for q1, q2, q3, q4 on partB, change it
-//
-//	                        pb = partB.tnext;
-//	                        while(pb.getName().contentEquals(quartetList.getQ1()) != true && 
-//	                        		pb.getName().contentEquals(quartetList.getQ2()) != true && 
-//	                        				pb.getName().contentEquals(quartetList.getQ3()) != true && 
-//	                        				pb.getName().contentEquals(quartetList.getQ4()) != true)
-//	                        {
-//	                            pb = pb.tnext;
-//	                        }
-//                    	 if (pb.getName().contentEquals(quartetList.getQ1())) qtemp.setQ1(extra);
-//                    	 else if (pb.getName().contentEquals(quartetList.getQ2())) qtemp.setQ2(extra);
-//                    	 else if (pb.getName().contentEquals(quartetList.getQ3())) qtemp.setQ3(extra);
-//                    	 else qtemp.setQ4(extra);
-//                    	 
-//                    	 qa.qnext = qtemp;
-//	                     qa = qa.qnext;
-//	                        //place Q to QA
-//	                    }
-//
-//	                }
-//	                //if(debug)
-//	                //	cout<< "........endIF.......\n";
-//
-//	            }
-//	            //if(debug)
-//	            //	cout<< "........endwhile.......\n";
-//
-//	        }
-//	        System.out.println("****************SQP*************");
+					}
+				}
+			}
+//	        System.out.println("**************After partitioning quartet****************");
 //	        printTaxa(partA);
+//	        printQuartet(quartetA);
 //	        printTaxa(partB);
-//	        s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
-//	        s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
-//	        s = merge(s1,s2,extra);
-//	        System.out.println("Merged Tree = "+s);
-//	        //	cout<< "Merged tree\n = "<<s<<endl; //taxa list er end er ta newly added
+//	        printQuartet(quartetB);
+	        
+	        String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
+	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+	        s = merge(s1,s2,extra);
+	        //System.out.println("Merged Tree = "+s);
+
+	       
 
 	    }
 
 	
 		
-		//return s;
-		return null;
+		return s;
+		//return null;
+	
 	}
+
+	private static String merge(String s1, String s2, String extra) {
+		
+		s1 = reroot(s1, extra);
+		s2 = reroot(s2, extra);
+		if (s1 != null && s2 != null) {
+			return s1+","+s2;
+		} else if (s1 == null && s2 != null) {
+			return s2;
+		} else if (s1 != null && s2 == null) {
+			return s1;
+		} else
+			return null;
+	}
+	private static String reroot(String s, String extra) {
+
+		String fileName = "reroot.txt";
+		boolean brkt;
+		brkt = bracket(s);
+		if(!brkt)
+	    {
+	        s = "(" + s + ")";
+
+	    }
+		//perl script consider 0 as false. so we have to replace zero
+		s = s.replace("(0,", "(O,");
+		s = s.replace(",0,", ",O,");
+		s = s.replace(",0)", ",O)");
+		//s = '"'+s+";"+'"';
+		//System.out.println("**************** s= "+s);
+		String cmd = "perl reroot_tree_new.pl -t "+ s+";"+ " -r "+extra+ " -o "+ fileName;
+		//System.out.println(cmd);
+		try {
+			Process p = Runtime.getRuntime().exec(cmd);
+			p.waitFor();
+			p.destroy();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			System.out.println("Problem in cmd");
+		}
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
+			s = br.readLine();
+			System.out.println("br = "+s);
+			//String extra = "extra1000";
+			System.out.println(s);
+			if (s != null) {
+				s = s.replace(":", "");
+				s = s.replace(";", "");
+				int pos1 = s.indexOf(extra);
+				s = s.replace(extra, "");
+//				System.out.println("After removing extra s= "+s);
+//				System.out.println("pos1 = "+pos1);
+
+				int start = 0, i= 0, ob = 0, end = 0, cb = 0; String mystring; boolean removebr = false;
+				if(s.charAt(pos1-1) =='('&& s.charAt(pos1) ==',')
+			     {
+					
+					try{
+
+						s = s.substring(0, pos1)+s.substring(pos1+1);
+						 start = pos1-1;
+						System.out.println("inside s= "+ s+ " and start = "+start );
+
+			           
+			            i = start; ob = 0;
+			            while(true)
+			            {
+			                if(s.charAt(i) == '(')
+			                    ob++;
+			                else if(s.charAt(i) == ')')
+			                {
+			                    ob--;
+			                    if(ob==0)
+			                    {	end = i;
+			                        break;
+			                    }
+
+
+			                }
+			                i++;
+			            }
+			        }
+			        catch (Exception e) {
+
+			        }
+					//System.out.println("start = "+ start + " and end = "+ end);
+			        mystring = s.substring(start, end+1);
+			        //System.out.println("mystring = "+mystring);
+			        removebr = balance(mystring);
+			        //System.out.println(removebr);
+			        if(removebr)
+			        {
+			            try{
+
+
+			                s = s.substring(0, end) + s.substring(end+1);
+			                //System.out.println(s);
+			                s = s.substring(0,start) + s.substring(start+1);
+
+			            }
+			            catch (Exception e) {
+
+			            }
+
+			        }
+
+			    
+			     }
+			    else if(s.charAt(pos1-1) == ',' && s.charAt(pos1) == ')')
+			    {
+
+			        try{
+			        	s = s.substring(0, pos1-1) + s.substring(pos1);
+		
+			            end = pos1-1;
+			            i = end; cb = 0;
+			            while(true)
+			            {
+			                if(s.charAt(i) == ')')
+			                    cb++;
+			                else if(s.charAt(i) == '(')
+			                {
+			                    cb--;
+			                    if(cb==0)
+			                    { 	start = i;
+			                        break;
+			                    }
+			                }
+			                i--;
+			            }
+			        }
+			        catch (Exception e) {
+			 
+			        }
+			        mystring = s.substring(start, end+1);
+			        removebr = balance(mystring);
+			        if(removebr)
+			        {
+			            try{
+
+			            	s = s.substring(0, end) + s.substring(end + 1);
+			                s = s.substring(0,start) + s.substring(start+1);
+
+			            }
+			            catch (Exception e) {
+
+			            }
+
+			        }
+
+
+
+			    
+			    }
+			    else if(s.charAt(pos1-1) == ',' && s.charAt(pos1) == ',')
+			    {
+
+			        try{
+			            s = s.substring(0, pos1-1) + s.substring(pos1);
+			        	//s1.assign(s1.replace(pos1-1,1,""));
+			        }
+			        catch (Exception e) {
+			            //cerr << "Out of Range error: " << oor.what() << endl;
+			        }
+			        if(s.charAt(pos1-2) == '(' && s.charAt(pos1) == ')')
+			        {
+			            try{
+			                s = s.substring(0, pos1) + s.substring(pos1 + 1);
+			                s = s.substring(0, pos1 - 2) + s.substring(pos1 - 1);
+//			            	s2.assign(s2.replace(pos1,1,""));
+//			                s2.assign(s2.replace(pos1-2,1,""));
+
+			            }
+			            catch (Exception e) {
+			               // cerr << "Out of Range error: " << oor.what() << endl;
+			            }
+			        }
+
+
+
+			    
+			    }
+			}
+		
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("before return s= "+s);
+		return s;
+	}
+	private static boolean balance(String s) {
+		// TODO Auto-generated method stub
+		int i, l, ob = 0, com = 0;
+		l = s.length();
+		//System.out.println(" length = "+l);
+		
+		for(i = 1; i<l-1; i++)
+		{
+			
+			if(s.charAt(i) == '(') ob++;
+			else if(s.charAt(i) == ')') ob--;
+			else if(s.charAt(i) == ',') com = 1;
+			if(ob<0) return false; // don't remove bracket;
+		} 
+		if((s.charAt(1)=='('&& s.charAt(l-2) ==')' && ob==0) || com==0)return true; //remove unnecessary bracket
+		else return false;
+		
+	}
+	private static boolean bracket(String s) {
+	    int l;
+	    l=s.length();
+	    if(s.charAt(0)!='(')
+	        return false;
+	    if(s.charAt(l-1)!=')')
+	        return false;
+
+	    for(int i = 1; i<l-1;i++ )
+	    {
+	        if(s.charAt(i) == '(' || s.charAt(i) == ')')
+	            return false;
+	    }
+	    return true;
+		
+	}
+
 
 	private static MultiReturnType FM(LinkedHashSet<Taxa> taxaList, LinkedHashSet<Quartet> quartetList) {
 		LinkedHashSet<Taxa> partA = new LinkedHashSet<Taxa>();
@@ -425,29 +561,37 @@ public class Routines {
 				
 		}
 		int c = 0;
-		for (Taxa taxa : taxaList) {
-			if(ca<cb)
-                c=2;
-            else if(cb<ca)
-                c=1;
-            else c++;
-            if(c%2==0){
-            	taxa.setPartition(0);
-            	partA.add(taxa);
-            	taxaList.remove(taxa);
-            	ca++;
-            }else {
-            	taxa.setPartition(1);
-            	partB.add(taxa);
-            	taxaList.remove(taxa);
-            	cb++;
-            }
+//		System.out.println("*********FM taxalist*********");
+//		printTaxa(taxaList);
+		if (!taxaList.isEmpty()) {
+			
+			for (Taxa taxa : taxaList) {
+				
+				if(ca<cb)
+	                c=2;
+	            else if(cb<ca)
+	                c=1;
+	            else c++;
+				
+	            if(c%2==0){
+	            	taxa.setPartition(0);
+	            	partA.add(taxa);
+	            	//taxaList.remove(taxa);
+	            	ca++;
+	            }else {
+	            	taxa.setPartition(1);
+	            	partB.add(taxa);
+	            	//taxaList.remove(taxa);
+	            	cb++;
+	            }
 
+			}
 		}
+		
         
 		//printQuartet(quartetList);
-		printTaxa(partA);
-		printTaxa(partB);
+//		printTaxa(partA);
+//		printTaxa(partB);
 		return FM_algo(partA, partB, quartetList);
 	}
 
@@ -470,37 +614,41 @@ public class Routines {
 				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
 //				gainList = new Listt();
 				LinkedHashSet<GainList> gainList = new LinkedHashSet<GainList>();
-				Iterator iteratorA = partA.iterator();
-				Iterator iteratorB = partB.iterator();
+				Iterator<Taxa> iteratorA = partA.iterator();
+				Iterator<Taxa> iteratorB = partB.iterator();
+				//System.out.println("New Iteration");
 				while (flag) {
 					if (iteratorA.hasNext() && alt == 0) {
 						
-						Taxa taxaA = (Taxa) iteratorA.next();
+						Taxa taxaA = iteratorA.next();
 						if (!taxaA.isLocked()) {
 							taxaToMove = taxaA.getName();
+							//System.out.println("Flag taxa = "+ taxaToMove);
 	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
 							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
 							
 						}
-						if (tag2 == 0) {
-							alt = 1;
-						}
+//						if (tag2 == 0 && iteratorB.hasNext()) {
+//							alt = 1;
+//						}
 						
 						
 					} else if (iteratorB.hasNext() && alt == 1) {
-						Taxa taxaB = (Taxa) iteratorB.next();
+						Taxa taxaB = iteratorB.next();
 						if (!taxaB.isLocked()) {
 							taxaToMove = taxaB.getName();
+							//System.out.println("Flag taxa = "+ taxaToMove);
 	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
 							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
 							
 						}
-						if (tag1 == 0) {
-							alt = 0;
-						}
+//						if (tag1 == 0 && iteratorA.hasNext()) {
+//							alt = 0;
+//						}
 						
 						
 					} 
+					
 					if (!iteratorA.hasNext()) {
 						tag1 = 1;
 					}
@@ -510,19 +658,95 @@ public class Routines {
 					if (tag1 == 1 && tag2 == 1) {
 						flag = false;
 					}
+					if (tag2 == 0 && alt == 0) {
+						alt = 1;
+					}else if (tag1 == 0 && alt == 1) {
+						alt= 0;
+					}
 				}
-				System.out.println("********************Gain List*************");
-				for (GainList gl : gainList) {
-					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-		                		gl.getDef()+" "+gl.getBel0w());
-				}
+//				System.out.println("********************Gain List*************");
+//				for (GainList gl : gainList) {
+//					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
+//		                		gl.getDef()+" "+gl.getBel0w());
+//				}
 				
 //				quartetList.stream()
 //				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList())
 				///////Moving Taxa which have highest gain
+				int maxgain = -1000000000; //double
+				int glPart = 0;
+				taxaToMove = null;
 				GainList movedTaxa = new GainList();
 				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
+				
+				if (movedTaxa.getBel0w() >= 2) {
+					taxaToMove = movedTaxa.getTaxaToMove();
+					maxgain = movedTaxa.getVal();
+					glPart = movedTaxa.getPart();
+				} else {
+					maxgain = -1000000000; //double
+					int maxsat = 0;
+		            glPart = 0;
+		            int randnum = 0;
+					
+					for (GainList gl : gainList) {
+						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
+							taxaToMove = gl.getTaxaToMove();
+		                    maxgain = gl.getVal();               
+		                    maxsat = gl.getSat();
+		                    glPart = gl.getPart(); // current Partition
+						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+							 
+		                   
+		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+		                    {
+		                        taxaToMove = gl.getTaxaToMove();
+		                        maxgain = gl.getVal();
+		                        maxsat = gl.getSat();
+		                        glPart = gl.getPart();
+		                    }
+		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+		                    {
+		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+		                        if(randnum%2 == 0){
+		                            taxaToMove = gl.getTaxaToMove();
+		                            maxgain = gl.getVal();                       
+		                            maxsat = gl.getSat();
+		                            glPart = gl.getPart(); // current Partition
+		                        }
+		                        //}
+
+		                    }
+
+		                
+						}
+					}
+				}
+				
+			
+				if (taxaToMove != null) {
+					final String taxaMove = taxaToMove;
+					if (glPart == 1) {
+						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
+						partA.add(new Taxa(taxaToMove, 0, true));
+					} else {
+						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
+						partB.add(new Taxa(taxaToMove, 1, true));
+					}
+					movedList.add(new GainList(taxaToMove, maxgain, 1-glPart));
+					if (gainList.size() == 1)
+						iterationMore = false;
+				} else {
+					iterationMore = false;
+				}
+				
+				/*
+				 * I will check this portion of code later. This part is efficient. 
+				 * But gl.below() must be checked 
+				 * GainList movedTaxa = new GainList();
+				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat).).get();
 				taxaToMove = movedTaxa.getTaxaToMove();
+				System.out.println("Taxa to move = "+taxaToMove);
 				final String taxaMove = taxaToMove;
 				if (movedTaxa.getPart() == 1) {
 					partB.removeIf(i -> i.getName().contentEquals(taxaMove));
@@ -537,7 +761,10 @@ public class Routines {
 				
 				if (gainList.size() == 1) {
 					iterationMore = false;
+				}else {
+					System.out.println("Next Iteration");
 				}
+				*/
 				
 				
 			}///no more iteration
@@ -587,6 +814,7 @@ public class Routines {
             for (Taxa taxa : partB) {
 				taxa.setLocked(false);
 			}
+            
             if (gainMax <= 0) {
             	System.out.println("Looop again is finished");
             	loopAgain = false;
@@ -595,7 +823,8 @@ public class Routines {
 		}//no more loop
 		 //************end of Loop Again**********//
         //***********Merge Two list***************//
-        int partSat = countSatisfiedQuartets(partA, partB,quartetList);
+        /*
+         * int partSat = countSatisfiedQuartets(partA, partB,quartetList);
         System.out.println("PartSat = "+partSat);
         System.out.println("After loop again part a nd b");
         printTaxa(partA);
@@ -603,8 +832,9 @@ public class Routines {
         LinkedHashSet<Taxa> finalTaxaList = new LinkedHashSet<Taxa>(partA);
         finalTaxaList.addAll(partB);
         printTaxa(finalTaxaList);
+        */
 
-		return null;
+		return new MultiReturnType(partA, partB);
 	}
 
 	private static int countSatisfiedQuartets(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,

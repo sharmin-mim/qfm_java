@@ -1,6 +1,6 @@
 package qfm_ad;
 
-import java.util.Objects;
+
 
 public class Taxa {
 	private String name; // node name

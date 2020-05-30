@@ -35,6 +35,19 @@ public class Quartet {
 	public Taxa getT4() {
 		return t4;
 	}
+	
+	public void setT1(Taxa t1) {
+		this.t1 = t1;
+	}
+	public void setT2(Taxa t2) {
+		this.t2 = t2;
+	}
+	public void setT3(Taxa t3) {
+		this.t3 = t3;
+	}
+	public void setT4(Taxa t4) {
+		this.t4 = t4;
+	}
 	public int getQFrequency() {
 		return qFrequency;
 	}
