@@ -10,6 +10,7 @@ public class Quartet {
 	private String status;
 	private int qFrequency;
 	private boolean increaseFrequency;
+	private int quartetID;
 	public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
 		super();
 		this.t1 = t1;
@@ -19,6 +20,7 @@ public class Quartet {
 		this.qFrequency = 1;
 		this.increaseFrequency = true;
 		this.status = "";
+		this.quartetID = -1;
 	}
 	public Taxa getT1() {
 		return t1;
@@ -57,6 +59,9 @@ public class Quartet {
 	}
 	
 
+	public void setQuartetID(int quartetID) {
+		this.quartetID = quartetID;
+	}
 	public String getStatus() {
 		return status;
 	}
@@ -69,23 +74,49 @@ public class Quartet {
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
-	@Override
-	public int hashCode() {
-		return Objects.hash(t1, t2, t3, t4);
-	}
+//	@Override
+//	public int hashCode() {
+//		return Objects.hash(t1, t2, t3, t4);
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj) {
+//			//increase_count();
+//			//System.out.println("increased");
+//			return true;
+//		}
+//		if (!(obj instanceof Quartet))
+//			return false;
+//		Quartet other = (Quartet) obj;
+//		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2) && Objects.equals(t3, other.t3)
+//				&& Objects.equals(t4, other.t4)) {
+//			if (other.isIncreaseFrequency()) {
+//				other.setQFrequency(other.getQFrequency()+1);
+//			}
+//			return true;
+//		} else {
+//			return false;
+//
+//		}
+//	
+//	}
+//	
+	/////////////////////////////////////////
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(quartetID, t1, t2, t3, t4);
+	}
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			//increase_count();
-			//System.out.println("increased");
+		if (this == obj)
 			return true;
-		}
 		if (!(obj instanceof Quartet))
 			return false;
 		Quartet other = (Quartet) obj;
-		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2) && Objects.equals(t3, other.t3)
-				&& Objects.equals(t4, other.t4)) {
+		if (quartetID == other.quartetID && Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
+				&& Objects.equals(t3, other.t3) && Objects.equals(t4, other.t4)) {
 			if (other.isIncreaseFrequency()) {
 				other.setQFrequency(other.getQFrequency()+1);
 			}
@@ -94,13 +125,9 @@ public class Quartet {
 			return false;
 
 		}
-	
+		
 	}
-
-
-
-
-
+	
 	
 	
 
