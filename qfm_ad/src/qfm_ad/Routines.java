@@ -22,7 +22,8 @@ public class Routines {
 		HashSet<Quartet> quartetList = new HashSet<Quartet>();
 		double startTime = System.currentTimeMillis();
 		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
-			int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
+			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
+			int qc = 0;
 			while (scanner.hasNext()) {
 				
 				String singleQuartet = scanner.next();	
@@ -38,9 +39,10 @@ public class Routines {
 				taxaList.add(t3);
 				taxaList.add(t4);
 				
-				if(quartetList.contains(new Quartet(t1, t2, t3, t4))) {
-					qc++;
-				}else if (quartetList.contains(new Quartet(t2, t1, t3, t4))) {
+//				if(quartetList.contains(new Quartet(t1, t2, t3, t4))) {
+//					qc++;
+//				}else 
+				if (quartetList.contains(new Quartet(t2, t1, t3, t4))) {
 					qc++;
 				}else if (quartetList.contains(new Quartet(t1, t2, t4, t3))) {
 					qc++;
@@ -56,7 +58,7 @@ public class Routines {
 					qc++;
 				}else {
 					quartetList.add(new Quartet(t1, t2, t3, t4));
-					count++;
+					//count++;
 					qc++;
 				}
 				
@@ -66,7 +68,7 @@ public class Routines {
 				
 			}
 			System.out.println("number of quartet = "+ qc);
-			System.out.println("number of unique quartet = "+count);
+			System.out.println("number of unique quartet = "+quartetList.size());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,8 +93,8 @@ public class Routines {
 			quartet.setIncreaseFrequency(false);;
 		}
 		
-
-		System.out.println("\n elements : "+taxaList.size());
+		//printQuartet(countedSortedQL);
+		System.out.println("\n Number of taxa : "+taxaList.size());
 
 		String s = SQP(countedSortedQL, taxaList, 1000, 0);
 		s = s.replace("(O,", "(0,");
@@ -202,7 +204,7 @@ public class Routines {
 						if (partA.contains(q.getT1()))dcount++;
 						if (partA.contains(q.getT2()))dcount++;
 						if (partA.contains(q.getT3()))dcount++;
-						if (partA.contains(q.getT4()))dcount++;
+						//if (partA.contains(q.getT4()))dcount++;
 //						System.out.println("Quartet = "+ q.getT1().getName()+","+q.getT2().getName()
 //								+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
 //						System.out.println("dcount = "+ dcount);
@@ -254,13 +256,14 @@ public class Routines {
 	        System.out.println("QuartetB = "+quartetB.size());
 //	        System.out.println("QuartetAAA = "+quartetAAA.size());
 //	        System.out.println("QuartetBBB = "+quartetBBB.size());
-	        System.out.println("**************SQP After partitioning quartet****************");
-	        printTaxa(partA);
-	        System.out.println("**************SQP After partitioning quartetA****************");
-	        printQuartet(quartetA);
-	        printTaxa(partB);
-	        System.out.println("**************SQP After partitioning quartetB****************");
-	        printQuartet(quartetB);
+	        
+//	        System.out.println("**************SQP After partitioning quartet****************");
+//	        printTaxa(partA);
+//	        System.out.println("**************SQP After partitioning quartetA****************");
+//	        printQuartet(quartetA);
+//	        printTaxa(partB);
+//	        System.out.println("**************SQP After partitioning quartetB****************");
+//	        printQuartet(quartetB);
 	        
 	        String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
@@ -543,7 +546,8 @@ public class Routines {
 				if (partB.contains(quartet.getT2())) b = 1;
 				if (partB.contains(quartet.getT3())) c = 1;
 				if (partB.contains(quartet.getT4())) d = 1;
-		
+		///ei khane ekta else if condition use kora jay. if partA contains, then we wont have to chk partB
+				//I will chk this later
 				
 				if(a==-1 && b==-1 && c==-1 && d==-1) //all new
 			    {
@@ -736,95 +740,95 @@ public class Routines {
 				
 				/////////////////////
 
-				//maxgain = -1000000000; //double
-				int maxsat = 0;
-	            //glPart = 0;
-	            int randnum = 0;
-				
-				for (GainList gl : gainList) {
-					if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-						taxaToMove = gl.getTaxaToMove();
-	                    maxgain = gl.getVal();               
-	                    maxsat = gl.getSat();
-	                    glPart = gl.getPart(); // current Partition
-					} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-						 
-	                   
-	                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-	                    {
-	                        taxaToMove = gl.getTaxaToMove();
-	                        maxgain = gl.getVal();
-	                        maxsat = gl.getSat();
-	                        glPart = gl.getPart();
-	                    }
-	                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-	                    {
-	                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-	                        if(randnum%2 == 0){
-	                            taxaToMove = gl.getTaxaToMove();
-	                            maxgain = gl.getVal();                       
-	                            maxsat = gl.getSat();
-	                            glPart = gl.getPart(); // current Partition
-	                        }
-	                        //}
-
-	                    }
-
-	                
-					}
-				}
+//				//maxgain = -1000000000; //double
+//				int maxsat = 0;
+//	            //glPart = 0;
+//	            int randnum = 0;
+//				
+//				for (GainList gl : gainList) {
+//					if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
+//						taxaToMove = gl.getTaxaToMove();
+//	                    maxgain = gl.getVal();               
+//	                    maxsat = gl.getSat();
+//	                    glPart = gl.getPart(); // current Partition
+//					} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+//						 
+//	                   
+//	                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+//	                    {
+//	                        taxaToMove = gl.getTaxaToMove();
+//	                        maxgain = gl.getVal();
+//	                        maxsat = gl.getSat();
+//	                        glPart = gl.getPart();
+//	                    }
+//	                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+//	                    {
+//	                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+//	                        if(randnum%2 == 0){
+//	                            taxaToMove = gl.getTaxaToMove();
+//	                            maxgain = gl.getVal();                       
+//	                            maxsat = gl.getSat();
+//	                            glPart = gl.getPart(); // current Partition
+//	                        }
+//	                        //}
+//
+//	                    }
+//
+//	                
+//					}
+//				}
 			
 				
 				
 				//////////////////////
 				
-//				GainList movedTaxa = new GainList();
-//				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
-//				
-//				if (movedTaxa.getBel0w() >= 2) {
-//					taxaToMove = movedTaxa.getTaxaToMove();
-//					maxgain = movedTaxa.getVal();
-//					glPart = movedTaxa.getPart();
-//				} else {
-//					maxgain = -1000000000; //double
-//					int maxsat = 0;
-//		            glPart = 0;
-//		            int randnum = 0;
-//					
-//					for (GainList gl : gainList) {
-//						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-//							taxaToMove = gl.getTaxaToMove();
-//		                    maxgain = gl.getVal();               
-//		                    maxsat = gl.getSat();
-//		                    glPart = gl.getPart(); // current Partition
-//						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-//							 
-//		                   
-//		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-//		                    {
-//		                        taxaToMove = gl.getTaxaToMove();
-//		                        maxgain = gl.getVal();
-//		                        maxsat = gl.getSat();
-//		                        glPart = gl.getPart();
-//		                    }
-//		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-//		                    {
-//		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-//		                        if(randnum%2 == 0){
-//		                            taxaToMove = gl.getTaxaToMove();
-//		                            maxgain = gl.getVal();                       
-//		                            maxsat = gl.getSat();
-//		                            glPart = gl.getPart(); // current Partition
-//		                        }
-//		                        //}
-//
-//		                    }
-//
-//		                
-//						}
-//					}
-//				}
-//				
+				GainList movedTaxa = new GainList();
+				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
+				
+				if (movedTaxa.getBel0w() >= 2) {
+					taxaToMove = movedTaxa.getTaxaToMove();
+					maxgain = movedTaxa.getVal();
+					glPart = movedTaxa.getPart();
+				} else {
+					maxgain = -1000000000; //double
+					int maxsat = 0;
+		            glPart = 0;
+		            int randnum = 0;
+					
+					for (GainList gl : gainList) {
+						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
+							taxaToMove = gl.getTaxaToMove();
+		                    maxgain = gl.getVal();               
+		                    maxsat = gl.getSat();
+		                    glPart = gl.getPart(); // current Partition
+						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+							 
+		                   
+		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+		                    {
+		                        taxaToMove = gl.getTaxaToMove();
+		                        maxgain = gl.getVal();
+		                        maxsat = gl.getSat();
+		                        glPart = gl.getPart();
+		                    }
+		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+		                    {
+		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+		                        if(randnum%2 == 0){
+		                            taxaToMove = gl.getTaxaToMove();
+		                            maxgain = gl.getVal();                       
+		                            maxsat = gl.getSat();
+		                            glPart = gl.getPart(); // current Partition
+		                        }
+		                        //}
+
+		                    }
+
+		                
+						}
+					}
+				}
+				
 			
 				if (taxaToMove != null) {
 					final String taxaMove = taxaToMove;
@@ -1135,6 +1139,12 @@ public class Routines {
 	    System.out.println("Depth one tree = "+ s);
 		return s;
 	}
+	/*
+	 *Most of the time is consumed by FM_algo() method
+	 *After moving one taxa, I think we can reduce size of quartet list
+	 *reverse na korle, RF score better ashe naki dekhte hobe
+	 *adding maxgain in iterator loop may work. will ve to check
+	 **/
 	
 
 }
