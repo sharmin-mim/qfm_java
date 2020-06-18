@@ -1,6 +1,6 @@
 package qfm_ad;
 
-
+import java.util.HashSet;
 
 public class Taxa {
 	private String name; // node name
@@ -9,6 +9,7 @@ public class Taxa {
     //private int taxaScore;
     private boolean locked;
     //Taxa tnext;
+    public HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
 
 	public Taxa(String name) {
 		this(name, -1);
@@ -23,7 +24,33 @@ public class Taxa {
 		this.name = name;
 		this.partition = partition;
 		this.locked = locked;
+		
+		this.svdTable = new HashSet<SVD_Log>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean add(SVD_Log e) {
+				if(contains(e))
+		            remove(e);
+				return super.add(e);
+			}
+
+			
+		};
+		
 	}
+	
+
+
+	public HashSet<SVD_Log> getSvdTable() {
+		return svdTable;
+	}
+
+	
 
 	public boolean isLocked() {
 		return locked;

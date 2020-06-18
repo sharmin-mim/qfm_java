@@ -59,6 +59,9 @@ public class Quartet {
 	}
 	
 
+	public int getQuartetID() {
+		return quartetID;
+	}
 	public void setQuartetID(int quartetID) {
 		this.quartetID = quartetID;
 	}

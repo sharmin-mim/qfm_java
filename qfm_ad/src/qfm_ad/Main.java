@@ -11,7 +11,7 @@ public class Main {
 		//String fileName = "t25_q125_80_qmc.txt";
 		//String fileName = "27_ecoli.txt";
 		//String fileName = "sample.txt";
-		//String s= Routines.readQuartetQMC("sample.txt");
+		//String s= Routines.readQuartetQMC("sample50.txt");
 		String s= Routines.readQuartetQMC(args[0]);
 		System.out.println("("+s+")"+";");
 		try(BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
