@@ -684,332 +684,333 @@ public class Routines {
 		//return FM_algo(partA, partB, quartetList);
 	}
 
-	private static MultiReturnType FM_algo(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,
-			LinkedHashSet<Quartet> quartetList) {
-		String taxaToMove = null;
-		boolean loopAgain = true;
-		while (loopAgain) {
-			boolean iterationMore = true;
-			LinkedHashSet<GainList> movedList = new LinkedHashSet<GainList>();
-			while (iterationMore) {
-				System.out.println("****************Before Score and Gain**************");
-				printQuartet(quartetList);
-				int[] score= calculateScore(partB,quartetList,"null",0,0,0);
-				//score[0] -> partition score, score[1] -> noOfSat, score[2] -> noOfVat, score[3] -> noOfDef
-				int prevScore = score[0];//partition score
-	            int prevS = score[1];//noOfSat
-	            int prevV = score[2];//noOfVat
-	            int prevD = score[3];//noOfDef
-	            int ca = partA.size();
-				int cb = partB.size();
-				System.out.println("Before Flag: prevScore = "+prevScore+"  prevS = "+ prevS+"  prevV = "+prevV+"  prevD = "+ prevD);
-				printQuartet(quartetList);
-				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
-//				gainList = new Listt();
-				LinkedHashSet<GainList> gainList = new LinkedHashSet<GainList>();
-				Iterator<Taxa> iteratorA = partA.iterator();
-				Iterator<Taxa> iteratorB = partB.iterator();
-				//System.out.println("New Iteration");
-				while (flag) {
-					if (iteratorA.hasNext() && alt == 0) {
-						
-						Taxa taxaA = iteratorA.next();
-						if (!taxaA.isLocked()) {
-							taxaToMove = taxaA.getName();
-							System.out.println("Flag taxa = "+ taxaToMove);
-	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
-	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
-							
-						}
-//						if (tag2 == 0 && iteratorB.hasNext()) {
-//							alt = 1;
+//	private static MultiReturnType FM_algo(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,
+//			LinkedHashSet<Quartet> quartetList) {
+//		String taxaToMove = null;
+//		boolean loopAgain = true;
+//		while (loopAgain) {
+//			boolean iterationMore = true;
+//			LinkedHashSet<GainList> movedList = new LinkedHashSet<GainList>();
+//			while (iterationMore) {
+//				System.out.println("****************Before Score and Gain**************");
+//				printQuartet(quartetList);
+//				int[] score= calculateScore(partB,quartetList,"null",0,0,0);
+//				//score[0] -> partition score, score[1] -> noOfSat, score[2] -> noOfVat, score[3] -> noOfDef
+//				int prevScore = score[0];//partition score
+//	            int prevS = score[1];//noOfSat
+//	            int prevV = score[2];//noOfVat
+//	            int prevD = score[3];//noOfDef
+//	            int ca = partA.size();
+//				int cb = partB.size();
+//				System.out.println("Before Flag: prevScore = "+prevScore+"  prevS = "+ prevS+"  prevV = "+prevV+"  prevD = "+ prevD);
+//				printQuartet(quartetList);
+//				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
+////				gainList = new Listt();
+//				LinkedHashSet<GainList> gainList = new LinkedHashSet<GainList>();
+//				Iterator<Taxa> iteratorA = partA.iterator();
+//				Iterator<Taxa> iteratorB = partB.iterator();
+//				//System.out.println("New Iteration");
+//				while (flag) {
+//					if (iteratorA.hasNext() && alt == 0) {
+//						
+//						Taxa taxaA = iteratorA.next();
+//						if (!taxaA.isLocked()) {
+//							taxaToMove = taxaA.getName();
+//							System.out.println("Flag taxa = "+ taxaToMove);
+//	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
+//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
+//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
+//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
+//							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
+//							
 //						}
-						
-						
-					} else if (iteratorB.hasNext() && alt == 1) {
-						Taxa taxaB = iteratorB.next();
-						if (!taxaB.isLocked()) {
-							taxaToMove = taxaB.getName();
-							System.out.println("Flag taxa = "+ taxaToMove);
-	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
-	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
-							
-						}
-//						if (tag1 == 0 && iteratorA.hasNext()) {
-//							alt = 0;
+////						if (tag2 == 0 && iteratorB.hasNext()) {
+////							alt = 1;
+////						}
+//						
+//						
+//					} else if (iteratorB.hasNext() && alt == 1) {
+//						Taxa taxaB = iteratorB.next();
+//						if (!taxaB.isLocked()) {
+//							taxaToMove = taxaB.getName();
+//							System.out.println("Flag taxa = "+ taxaToMove);
+//	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
+//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
+//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
+//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
+//							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
+//							
 //						}
-						
-						
-					} 
-					
-					if (!iteratorA.hasNext()) {
-						tag1 = 1;
-					}
-					if (!iteratorB.hasNext()) {
-						tag2 = 1;
-					}
-					if (tag1 == 1 && tag2 == 1) {
-						flag = false;
-					}
-					if (tag2 == 0 && alt == 0) {
-						alt = 1;
-					}else if (tag1 == 0 && alt == 1) {
-						alt= 0;
-					}
-				}
-				System.out.println("********************Gain List*************");
-				for (GainList gl : gainList) {
-					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-		                		gl.getDef()+" "+gl.getBel0w());
-				}
-				printQuartet(quartetList);
-				
-//				quartetList.stream()
-//				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList())
-				///////Moving Taxa which have highest gain
-				int maxgain = -1000000000; //double
-				int glPart = 0;
-				taxaToMove = null;
-				
-				
-				/////////////////////
-
-//				//maxgain = -1000000000; //double
-//				int maxsat = 0;
-//	            //glPart = 0;
-//	            int randnum = 0;
-//				
-//				for (GainList gl : gainList) {
-//					if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-//						taxaToMove = gl.getTaxaToMove();
-//	                    maxgain = gl.getVal();               
-//	                    maxsat = gl.getSat();
-//	                    glPart = gl.getPart(); // current Partition
-//					} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-//						 
-//	                   
-//	                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-//	                    {
-//	                        taxaToMove = gl.getTaxaToMove();
-//	                        maxgain = gl.getVal();
-//	                        maxsat = gl.getSat();
-//	                        glPart = gl.getPart();
-//	                    }
-//	                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-//	                    {
-//	                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-//	                        if(randnum%2 == 0){
-//	                            taxaToMove = gl.getTaxaToMove();
-//	                            maxgain = gl.getVal();                       
-//	                            maxsat = gl.getSat();
-//	                            glPart = gl.getPart(); // current Partition
-//	                        }
-//	                        //}
-//
-//	                    }
-//
-//	                
+////						if (tag1 == 0 && iteratorA.hasNext()) {
+////							alt = 0;
+////						}
+//						
+//						
+//					} 
+//					
+//					if (!iteratorA.hasNext()) {
+//						tag1 = 1;
+//					}
+//					if (!iteratorB.hasNext()) {
+//						tag2 = 1;
+//					}
+//					if (tag1 == 1 && tag2 == 1) {
+//						flag = false;
+//					}
+//					if (tag2 == 0 && alt == 0) {
+//						alt = 1;
+//					}else if (tag1 == 0 && alt == 1) {
+//						alt= 0;
 //					}
 //				}
-			
-				
-				
-				//////////////////////
-				
-				GainList movedTaxa = new GainList();
-				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
-				
-				if (movedTaxa.getBel0w() >= 2) {
-					taxaToMove = movedTaxa.getTaxaToMove();
-					maxgain = movedTaxa.getVal();
-					glPart = movedTaxa.getPart();
-				} else {
-					maxgain = -1000000000; //double
-					int maxsat = 0;
-		            glPart = 0;
-		            int randnum = 0;
-					
-					for (GainList gl : gainList) {
-						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-							taxaToMove = gl.getTaxaToMove();
-		                    maxgain = gl.getVal();               
-		                    maxsat = gl.getSat();
-		                    glPart = gl.getPart(); // current Partition
-						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-							 
-		                   
-		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-		                    {
-		                        taxaToMove = gl.getTaxaToMove();
-		                        maxgain = gl.getVal();
-		                        maxsat = gl.getSat();
-		                        glPart = gl.getPart();
-		                    }
-		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-		                    {
-		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-		                        if(randnum%2 == 0){
-		                            taxaToMove = gl.getTaxaToMove();
-		                            maxgain = gl.getVal();                       
-		                            maxsat = gl.getSat();
-		                            glPart = gl.getPart(); // current Partition
-		                        }
-		                        //}
-
-		                    }
-
-		                
-						}
-					}
-				}
-				
-			
-				if (taxaToMove != null) {
-					final String taxaMove = taxaToMove;
-					if (glPart == 1) {
-						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
-						partA.add(new Taxa(taxaToMove, 0, true));
-					} else {
-						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
-						partB.add(new Taxa(taxaToMove, 1, true));
-					}
-					movedList.add(new GainList(taxaToMove, maxgain, 1-glPart));
-					if (gainList.size() == 1)
-						iterationMore = false;
-				} else {
-					iterationMore = false;
-				}
-				
-				/*
-				 * I will check this portion of code later. This part is efficient. 
-				 * But gl.below() must be checked 
-				 * GainList movedTaxa = new GainList();
-				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat).).get();
-				taxaToMove = movedTaxa.getTaxaToMove();
-				System.out.println("Taxa to move = "+taxaToMove);
-				final String taxaMove = taxaToMove;
-				if (movedTaxa.getPart() == 1) {
-					partB.removeIf(i -> i.getName().contentEquals(taxaMove));
-					partA.add(new Taxa(taxaToMove, 0, true));
-				} else {
-					partA.removeIf(i -> i.getName().contentEquals(taxaMove));
-					partB.add(new Taxa(taxaToMove, 1, true));
-
-				}
-				movedTaxa.setPart(1-movedTaxa.getPart());
-				movedList.add(movedTaxa);
-				
-				if (gainList.size() == 1) {
-					iterationMore = false;
-				}else {
-					System.out.println("Next Iteration");
-				}
-				*/
-				
-				
-			}///no more iteration
-			System.out.println("********************Moved List*************");
-			for (GainList gl : movedList) {
-				 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-	                		gl.getDef()+" "+gl.getBel0w());
-			}
-			int cumulativeGain = 0, gainMax = 0;
-			String back = "Initial";
-			for (GainList ml : movedList) {
-				cumulativeGain += ml.getVal();
-				if (cumulativeGain >= gainMax) {
-					gainMax = cumulativeGain;
-					back = ml.getTaxaToMove();
-				}
-			}
-			System.out.println("cumulative gain = "+ cumulativeGain);
-            System.out.println(" taxa to move = "+ taxaToMove);
-            System.out.println(" back taxa = "+ back);
-            System.out.println("partA and partB");
-            printTaxa(partA);
-            printTaxa(partB);
-            boolean isMove = false;
-            LinkedHashSet<Taxa> pa = new LinkedHashSet<Taxa>();
-            LinkedHashSet<Taxa> pb = new LinkedHashSet<Taxa>();
-            for (GainList ml : movedList) {
-            	String moveTaxa = ml.getTaxaToMove();
-            	if (isMove) {
-            		if (ml.getPart() == 1) {
-    					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
-    					pa.add(new Taxa(moveTaxa, 0));
-    					//partA.add(new Taxa(moveTaxa, 0));
-    				} else {
-    					partA.removeIf(i -> i.getName().contentEquals(moveTaxa));
-    					pb.add(new Taxa(moveTaxa, 1));
-    					//partB.add(new Taxa(moveTaxa, 1));
-
-    				}
-				}
-				if (moveTaxa.contentEquals(back)) {
-					isMove = true;
-				}
-			}
-            ///PartA
-            if (partA.size() == 1) {
-				pa.addAll(partA);
-			} else if (!partA.isEmpty()) {
-				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partA);
-	            Collections.reverse(reverseTaxaList);
-	            pa.addAll(reverseTaxaList);
-			}
-            //PartB
-            if (partB.size() == 1) {
-				pb.addAll(partB);
-			} else if (!partB.isEmpty()) {
-				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partB);
-	            Collections.reverse(reverseTaxaList);
-	            pb.addAll(reverseTaxaList);
-			}
-            ////
-            partA = new LinkedHashSet<Taxa>(pa);
-            partB = new LinkedHashSet<Taxa>(pb);
-            System.out.println("After moving partA and partB");
-            printTaxa(partA);
-            printTaxa(partB);
-            for (Taxa taxa : partA) {
-				taxa.setLocked(false);
-			}
-            for (Taxa taxa : partB) {
-				taxa.setLocked(false);
-			}
-            
-            
-          
-            if (gainMax <= 0) {
-            	System.out.println("Looop again is finished");
-            	loopAgain = false;
-			}
-			
-		}//no more loop
-		 //************end of Loop Again**********//
-        //***********Merge Two list***************//
-        /*
-         * int partSat = countSatisfiedQuartets(partA, partB,quartetList);
-        System.out.println("PartSat = "+partSat);
-        System.out.println("After loop again part a nd b");
-        printTaxa(partA);
-        printTaxa(partB);
-        LinkedHashSet<Taxa> finalTaxaList = new LinkedHashSet<Taxa>(partA);
-        finalTaxaList.addAll(partB);
-        printTaxa(finalTaxaList);
-        */
-		System.out.println("************************FM_algo Quartet List*************************");
-		printQuartet(quartetList);
-		return new MultiReturnType(partA, partB);
-	}
-	
-	
+//				System.out.println("********************Gain List*************");
+//				for (GainList gl : gainList) {
+//					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
+//		                		gl.getDef()+" "+gl.getBel0w());
+//				}
+//				printQuartet(quartetList);
+//				
+////				quartetList.stream()
+////				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList())
+//				///////Moving Taxa which have highest gain
+//				int maxgain = -1000000000; //double
+//				int glPart = 0;
+//				taxaToMove = null;
+//				
+//				
+//				/////////////////////
+//
+////				//maxgain = -1000000000; //double
+////				int maxsat = 0;
+////	            //glPart = 0;
+////	            int randnum = 0;
+////				
+////				for (GainList gl : gainList) {
+////					if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
+////						taxaToMove = gl.getTaxaToMove();
+////	                    maxgain = gl.getVal();               
+////	                    maxsat = gl.getSat();
+////	                    glPart = gl.getPart(); // current Partition
+////					} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+////						 
+////	                   
+////	                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+////	                    {
+////	                        taxaToMove = gl.getTaxaToMove();
+////	                        maxgain = gl.getVal();
+////	                        maxsat = gl.getSat();
+////	                        glPart = gl.getPart();
+////	                    }
+////	                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+////	                    {
+////	                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+////	                        if(randnum%2 == 0){
+////	                            taxaToMove = gl.getTaxaToMove();
+////	                            maxgain = gl.getVal();                       
+////	                            maxsat = gl.getSat();
+////	                            glPart = gl.getPart(); // current Partition
+////	                        }
+////	                        //}
+////
+////	                    }
+////
+////	                
+////					}
+////				}
+//			
+//				
+//				
+//				//////////////////////
+//				
+//				GainList movedTaxa = new GainList();
+//				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
+//				
+//				if (movedTaxa.getBel0w() >= 2) {
+//					taxaToMove = movedTaxa.getTaxaToMove();
+//					maxgain = movedTaxa.getVal();
+//					glPart = movedTaxa.getPart();
+//				} else {
+//					maxgain = -1000000000; //double
+//					int maxsat = 0;
+//		            glPart = 0;
+//		            int randnum = 0;
+//					
+//					for (GainList gl : gainList) {
+//						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
+//							taxaToMove = gl.getTaxaToMove();
+//		                    maxgain = gl.getVal();               
+//		                    maxsat = gl.getSat();
+//		                    glPart = gl.getPart(); // current Partition
+//						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+//							 
+//		                   
+//		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+//		                    {
+//		                        taxaToMove = gl.getTaxaToMove();
+//		                        maxgain = gl.getVal();
+//		                        maxsat = gl.getSat();
+//		                        glPart = gl.getPart();
+//		                    }
+//		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+//		                    {
+//		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+//		                        if(randnum%2 == 0){
+//		                            taxaToMove = gl.getTaxaToMove();
+//		                            maxgain = gl.getVal();                       
+//		                            maxsat = gl.getSat();
+//		                            glPart = gl.getPart(); // current Partition
+//		                        }
+//		                        //}
+//
+//		                    }
+//
+//		                
+//						}
+//					}
+//				}
+//				
+//			
+//				if (taxaToMove != null) {
+//					final String taxaMove = taxaToMove;
+//					if (glPart == 1) {
+//						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
+//						partA.add(new Taxa(taxaToMove, 0, true));
+//					} else {
+//						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
+//						partB.add(new Taxa(taxaToMove, 1, true));
+//					}
+//					movedList.add(new GainList(taxaToMove, maxgain, 1-glPart));
+//					if (gainList.size() == 1)
+//						iterationMore = false;
+//				} else {
+//					iterationMore = false;
+//				}
+//				
+//				/*
+//				 * I will check this portion of code later. This part is efficient. 
+//				 * But gl.below() must be checked 
+//				 * GainList movedTaxa = new GainList();
+//				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat).).get();
+//				taxaToMove = movedTaxa.getTaxaToMove();
+//				System.out.println("Taxa to move = "+taxaToMove);
+//				final String taxaMove = taxaToMove;
+//				if (movedTaxa.getPart() == 1) {
+//					partB.removeIf(i -> i.getName().contentEquals(taxaMove));
+//					partA.add(new Taxa(taxaToMove, 0, true));
+//				} else {
+//					partA.removeIf(i -> i.getName().contentEquals(taxaMove));
+//					partB.add(new Taxa(taxaToMove, 1, true));
+//
+//				}
+//				movedTaxa.setPart(1-movedTaxa.getPart());
+//				movedList.add(movedTaxa);
+//				
+//				if (gainList.size() == 1) {
+//					iterationMore = false;
+//				}else {
+//					System.out.println("Next Iteration");
+//				}
+//				*/
+//				
+//				
+//			}///no more iteration
+//			System.out.println("********************Moved List*************");
+//			for (GainList gl : movedList) {
+//				 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
+//	                		gl.getDef()+" "+gl.getBel0w());
+//			}
+//			int cumulativeGain = 0, gainMax = 0;
+//			String back = "Initial";
+//			for (GainList ml : movedList) {
+//				cumulativeGain += ml.getVal();
+//				if (cumulativeGain >= gainMax) {
+//					gainMax = cumulativeGain;
+//					back = ml.getTaxaToMove();
+//				}
+//			}
+//			System.out.println("cumulative gain = "+ cumulativeGain);
+//            System.out.println(" taxa to move = "+ taxaToMove);
+//            System.out.println(" back taxa = "+ back);
+//            System.out.println("partA and partB");
+//            printTaxa(partA);
+//            printTaxa(partB);
+//            boolean isMove = false;
+//            LinkedHashSet<Taxa> pa = new LinkedHashSet<Taxa>();
+//            LinkedHashSet<Taxa> pb = new LinkedHashSet<Taxa>();
+//            for (GainList ml : movedList) {
+//            	String moveTaxa = ml.getTaxaToMove();
+//            	if (isMove) {
+//            		if (ml.getPart() == 1) {
+//    					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
+//    					pa.add(new Taxa(moveTaxa, 0));
+//    					//partA.add(new Taxa(moveTaxa, 0));
+//    				} else {
+//    					partA.removeIf(i -> i.getName().contentEquals(moveTaxa));
+//    					pb.add(new Taxa(moveTaxa, 1));
+//    					//partB.add(new Taxa(moveTaxa, 1));
+//
+//    				}
+//				}
+//				if (moveTaxa.contentEquals(back)) {
+//					isMove = true;
+//				}
+//			}
+//            ///PartA
+//            if (partA.size() == 1) {
+//				pa.addAll(partA);
+//			} else if (!partA.isEmpty()) {
+//				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partA);
+//	            Collections.reverse(reverseTaxaList);
+//	            pa.addAll(reverseTaxaList);
+//			}
+//            //PartB
+//            if (partB.size() == 1) {
+//				pb.addAll(partB);
+//			} else if (!partB.isEmpty()) {
+//				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partB);
+//	            Collections.reverse(reverseTaxaList);
+//	            pb.addAll(reverseTaxaList);
+//			}
+//            ////
+//            partA = new LinkedHashSet<Taxa>(pa);
+//            partB = new LinkedHashSet<Taxa>(pb);
+//            System.out.println("After moving partA and partB");
+//            printTaxa(partA);
+//            printTaxa(partB);
+//            for (Taxa taxa : partA) {
+//				taxa.setLocked(false);
+//			}
+//            for (Taxa taxa : partB) {
+//				taxa.setLocked(false);
+//			}
+//            
+//            
+//          
+//            if (gainMax <= 0) {
+//            	System.out.println("Looop again is finished");
+//            	loopAgain = false;
+//			}
+//			
+//		}//no more loop
+//		 //************end of Loop Again**********//
+//        //***********Merge Two list***************//
+//        /*
+//         * int partSat = countSatisfiedQuartets(partA, partB,quartetList);
+//        System.out.println("PartSat = "+partSat);
+//        System.out.println("After loop again part a nd b");
+//        printTaxa(partA);
+//        printTaxa(partB);
+//        LinkedHashSet<Taxa> finalTaxaList = new LinkedHashSet<Taxa>(partA);
+//        finalTaxaList.addAll(partB);
+//        printTaxa(finalTaxaList);
+//        */
+//		System.out.println("************************FM_algo Quartet List*************************");
+//		printQuartet(quartetList);
+//		return new MultiReturnType(partA, partB);
+//	}
+//	
+//	
+//	
 	private static int countSatisfiedQuartets(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,
 			LinkedHashSet<Quartet> quartetList) {
 		int csat = 0;
@@ -1241,7 +1242,7 @@ public class Routines {
 //	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
 //	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
 //	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
+							gainList.add(new GainList(taxaA, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
 							
 						}
 //						if (tag2 == 0 && iteratorB.hasNext()) {
@@ -1264,7 +1265,7 @@ public class Routines {
 //	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
 //	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
 //	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
+							gainList.add(new GainList(taxaB, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
 							
 						}
 //						if (tag1 == 0 && iteratorA.hasNext()) {
@@ -1348,11 +1349,13 @@ public class Routines {
 				
 				//////////////////////
 				
-				GainList movedTaxa = new GainList();
-				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
+				GainList movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
+				Taxa taxa_to_move = new Taxa("");
 				
 				if (movedTaxa.getBel0w() >= 2) {
-					taxaToMove = movedTaxa.getTaxaToMove();
+					//taxaToMove = movedTaxa.getTaxaToMove();
+					taxaToMove = movedTaxa.getTaxa().getName();
+					taxa_to_move = movedTaxa.getTaxa();
 					maxgain = movedTaxa.getVal();
 					glPart = movedTaxa.getPart();
 	    	        prevS = movedTaxa.getSat() ;//score[1];//noOfSat
@@ -1368,7 +1371,8 @@ public class Routines {
 					
 					for (GainList gl : gainList) {
 						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-							taxaToMove = gl.getTaxaToMove();
+							taxaToMove = gl.getTaxa().getName();
+							taxa_to_move = gl.getTaxa();
 		                    maxgain = gl.getVal();               
 		                    maxsat = gl.getSat();
 		                    glPart = gl.getPart(); // current Partition
@@ -1380,7 +1384,8 @@ public class Routines {
 		                   
 		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
 		                    {
-		                        taxaToMove = gl.getTaxaToMove();
+		                        taxaToMove = gl.getTaxa().getName();
+		                    	taxa_to_move = gl.getTaxa();
 		                        maxgain = gl.getVal();
 		                        maxsat = gl.getSat();
 		                        glPart = gl.getPart();
@@ -1391,7 +1396,8 @@ public class Routines {
 		                    {
 		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
 		                        if(randnum%2 == 0){
-		                            taxaToMove = gl.getTaxaToMove();
+		                            taxaToMove = gl.getTaxa().getName();
+		                        	taxa_to_move = gl.getTaxa();
 		                            maxgain = gl.getVal();                       
 		                            maxsat = gl.getSat();
 		                            glPart = gl.getPart(); // current Partition
@@ -1412,7 +1418,7 @@ public class Routines {
 					
 				}
 				
-				
+				//taxaToMove = taxa_to_move.getName();
 				prevScore = prevS - prevV;//partition score
 				if (taxaToMove != null) {
 					if (gainList.size() == 1) {
@@ -1422,26 +1428,34 @@ public class Routines {
 					}
 					final String taxaMove = taxaToMove;
 					if (glPart == 1) {
+						taxa_to_move.setPartition(0);
 						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
 						partA.add(new Taxa(taxaToMove, 0, true));
+						//taxa_to_move.setPartition(0);
 					} else {
+						taxa_to_move.setPartition(1);
 						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
 						partB.add(new Taxa(taxaToMove, 1, true));
+						
 					}
-					movedList.add(new GainList(taxaToMove, maxgain, 1-glPart));
+					movedList.add(new GainList(taxa_to_move, maxgain, 1-glPart));
 					
 					////////////Extracting quartets which have moved_taxa
 					
 					rQuartetList.clear();
 				
-					for (Quartet q : quartetList) {
-						if(q.getT1().getName().contentEquals(taxaToMove) ||
-								q.getT2().getName().contentEquals(taxaToMove) ||
-								q.getT3().getName().contentEquals(taxaToMove) ||
-								q.getT4().getName().contentEquals(taxaToMove)) {
-							rQuartetList.add(q);
-						}
+					for (SVD_Log svd : taxa_to_move.getSvdTable()) {
+						rQuartetList.add(svd.getQuartet());
 					}
+					
+//					for (Quartet q : quartetList) {
+//						if(q.getT1().getName().contentEquals(taxaToMove) ||
+//								q.getT2().getName().contentEquals(taxaToMove) ||
+//								q.getT3().getName().contentEquals(taxaToMove) ||
+//								q.getT4().getName().contentEquals(taxaToMove)) {
+//							rQuartetList.add(q);
+//						}
+//					}
 //					System.out.println("************rQlist**********");
 //					printQuartet(rQuartetList);
 //					printQuartet(quartetList);
@@ -1493,7 +1507,7 @@ public class Routines {
 				cumulativeGain += ml.getVal();
 				if (cumulativeGain >= gainMax) {
 					gainMax = cumulativeGain;
-					back = ml.getTaxaToMove();
+					back = ml.getTaxa().getName();
 				}
 			}
 //			System.out.println("cumulative gain = "+ cumulativeGain);
@@ -1506,7 +1520,7 @@ public class Routines {
             LinkedHashSet<Taxa> pa = new LinkedHashSet<Taxa>();
             LinkedHashSet<Taxa> pb = new LinkedHashSet<Taxa>();
             for (GainList ml : movedList) {
-            	String moveTaxa = ml.getTaxaToMove();
+            	String moveTaxa = ml.getTaxa().getName();
             	if (isMove) {
             		if (ml.getPart() == 1) {
     					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
@@ -1630,7 +1644,7 @@ public class Routines {
 	                else if(qscore==3) d = q.getQFrequency();
 	            }
 	            
-	            svdTable.add(new SVD_Log(q.getQuartetID(), s, v, d));
+	            svdTable.add(new SVD_Log(q, s, v, d));
 	            
 
 	        }
