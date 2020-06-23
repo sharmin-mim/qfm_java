@@ -2,6 +2,8 @@ package qfm_ad;
 
 
 public class GainList {
+	/*
+	 //If I give Taxa instead of taxaToMove, space complexity becomes high. That's why I am rolling back to previous implementation
 	private Taxa taxa;
 	private int val;		
 	private int sat;
@@ -46,8 +48,8 @@ public class GainList {
 	public void setPart(int part) {
 		this.part = part;
 	}
+	*/
 	
-	/*
 	private String taxaToMove;
 	private int val;		
 	private int sat;
@@ -111,7 +113,7 @@ public class GainList {
 		this.part = part;
 	}
 	
-*/
+
 	
 
 
