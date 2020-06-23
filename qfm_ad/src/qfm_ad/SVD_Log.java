@@ -12,13 +12,25 @@ public class SVD_Log {
 	private int sat;//number of satisfied quartet
 	private int vat;//number of violated quartet
 	private int def;//number of deferred quartet
-	public SVD_Log(Quartet quartet, int sat, int vat, int def) {
+	private char qStat;
+	
+	public SVD_Log(Quartet quartet, int sat, int vat, int def, char qStat) {
 
 		this.quartet = quartet;
 		this.sat = sat;
 		this.vat = vat;
 		this.def = def;
+		this.qStat = qStat;
 	}
+
+	public char getqStat() {
+		return qStat;
+	}
+
+	public void setqStat(char qStat) {
+		this.qStat = qStat;
+	}
+
 	public Quartet getQuartet() {
 		return quartet;
 	}
