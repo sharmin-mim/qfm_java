@@ -9,7 +9,7 @@ public class Taxa {
     //private int taxaScore;
     private boolean locked;
     //Taxa tnext;
-    public HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
+    private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
 
 	public Taxa(String name) {
 		this(name, -1);
