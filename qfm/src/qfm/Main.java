@@ -10,8 +10,10 @@ public class Main {
 		long startTime = System.currentTimeMillis();
 		////String fileName1 = "t25_q125_80_qmc.txt";	
 		//MultyReturnType quartetTaxa = Routines.readQuartetC(fileName);//this method returns quartet & taxa
-		MultyReturnType quartetTaxa = Routines.readQuartetNewick(args[0]);
-		//MultyReturnType quartetTaxa = Routines.readQuartetC(args[0]);//this method returns quartet & taxa
+		//MultyReturnType quartetTaxa = Routines.readQuartetNewick(args[0]);
+		//MultyReturnType quartetTaxa = Routines.readQuartetNewick("out1.txt");
+		//MultyReturnType quartetTaxa = Routines.readQuartetCS(args[0]);
+		MultyReturnType quartetTaxa = Routines.readQuartetC(args[0]);//this method returns quartet & taxa. I will comment out it
 		//	args[0] is input file
 //				Routines.printQuartet(quartetTaxa.getQuartet());
 //				Routines.printTaxa(quartetTaxa.getTaxa());

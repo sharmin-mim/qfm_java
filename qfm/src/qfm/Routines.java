@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.Scanner;
 
 
+
+
 public class Routines {
 	//I will try to eliminate these static variables later
 		//public static int partSat = 0;
@@ -62,6 +64,62 @@ public class Routines {
 //			listOfQuartet = sortQuaret(listOfQuartet);
 //			printQuartet(listOfQuartet);
 			return new MultyReturnType(sortQuaret(countQuaret(listOfQuartet)), listOfTaxa);
+			
+		}
+		public static MultyReturnType readQuartetCS(String fileName) {
+			//////////This method read quartets which are already counted and sorted
+			Quartet quartet = new Quartet();
+			Quartet listOfQuartet = quartet;
+			Taxa taxa = new Taxa();
+			Taxa taxa1 = new Taxa(); 
+			Taxa listOfTaxa = taxa;
+			
+			try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
+				int count=0;
+				while (scanner.hasNext()) {
+					count++;
+					String singleQuartet = scanner.next();				
+					//String[] qq = singleQuartet.split(",|\\|");/// for quartet format q1,q2|q3,q4
+					String[] qq = singleQuartet.split(",|\\||:");// For both quartet format q1,q2|q3,q4 and q1,q2|q3,q4:weight
+					quartet.qnext = new Quartet(qq[0], qq[1], qq[2], qq[3], count);
+					int frequency;
+					try {
+						frequency = Integer.parseInt(qq[4]);
+						}
+					catch (NumberFormatException e)
+						{
+							frequency = 0;
+						}
+					quartet.qnext.setQFrequency(frequency);
+					quartet = quartet.qnext;
+					//now taxa assigning code
+					int sk[] = new int[] {0,0,0,0};
+					taxa1 = listOfTaxa;
+					while(taxa1!=null) {
+						for (int i = 0; i < 4; i++) {
+							if(qq[i].contentEquals(taxa1.getName()) && sk[i]==0) {
+								sk[i]=1;
+								break;
+							}
+						}
+						taxa1 = taxa1.tnext;
+					}
+					for (int i = 0; i < 4; i++) {
+						if(sk[i]==0) {
+							taxa.tnext = new Taxa(qq[i]);
+							taxa = taxa.tnext;
+						}
+					}
+					
+					
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			System.out.println("*********************After reading counted sorted quartet***********************");
+			printQuartet(listOfQuartet);
+			return new MultyReturnType(listOfQuartet, listOfTaxa);
 			
 		}
 		public static MultyReturnType readQuartetC(String fileName) { // count will be done at the time of reading
@@ -224,7 +282,8 @@ public class Routines {
 			while(listOfQuartet.qnext!=null) {
 				listOfQuartet = listOfQuartet.qnext;
 				System.out.println(listOfQuartet.getQuartet_id()+" : "+listOfQuartet.getQ1()+","+listOfQuartet.getQ2()+"|"
-								+listOfQuartet.getQ3()+","+listOfQuartet.getQ4()+"->"+listOfQuartet.getQFrequency());
+								+listOfQuartet.getQ3()+","+listOfQuartet.getQ4()+"->"+listOfQuartet.getQFrequency()
+								+" -> "+listOfQuartet.getStatus());
 				
 			}
 			
@@ -402,11 +461,16 @@ public class Routines {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			printQuartet(listOfQuartet);
 			return new MultyReturnType(sortQuaret((listOfQuartet)), listOfTaxa);
 			
 		}
 		public static String SQP(Quartet quartetList, Taxa taxaList, int extraTaxa, int partSatCount) {
 			int taxacount = taxaCount(taxaList);
+			System.out.println("**************************SQP**************");
+			System.out.println("taxacount = "+taxacount);
+			System.out.println("Quartet count = "+numberOfQuartet(quartetList));
+			
 			String s, s1, s2, extra = "extra";
 			Taxa pa, pb, partA, partB;
 			Quartet qa, qb, quartetA, quartetB, qtemp;
@@ -424,6 +488,7 @@ public class Routines {
 				//printTaxa(p);
 				//System.out.println("partSat = "+ partSat);
 				int partSat = mrl.getAnyCount(); // It returns # of satisfied quartets
+				System.out.println("partSat = "+ partSat);
 				if(partSat==0){
 
 		            partSatCount++;
@@ -476,9 +541,16 @@ public class Routines {
 		        qa = quartetA;
 		        quartetB = new Quartet();
 		        qb = quartetB;
-		        String t1,t2,t3,t4;
+		       // String t1,t2,t3,t4;
 		        char c;
 		        int l,dcount=0;
+		        int numOfBDQ = 0;
+		        int numOfB = 0;
+		        int numOfD = 0;
+		        int numOfBA = 0;
+		        int numOfBB = 0;
+		        int numOfDA = 0;
+		        int numOfDB = 0;
 		        while(quartetList.qnext !=  null)
 		        {
 		            quartetList = quartetList.qnext;
@@ -488,7 +560,8 @@ public class Routines {
 //		                cout<< "Status of Quartet "<<Q->quartet_id<<"= "<<c<<endl;
 		            if(c == 'b' || c == 'd' )
 		            {
-		                //Q = Q->qnext;
+		            	numOfBDQ++;
+		            	//Q = Q->qnext;
 		                qtemp =  new Quartet(quartetList.getQ1(), quartetList.getQ2(), quartetList.getQ3(),
 		                		quartetList.getQ4(), quartetList.getQuartet_id());
 		                
@@ -499,7 +572,8 @@ public class Routines {
 
 		                if(c=='b')
 		                {
-		                    pa = partA.tnext;
+		                	numOfB++;
+		                	pa = partA.tnext;
 		                    while(pa!= null && (pa.getName().contentEquals(quartetList.getQ1())) != true ) // logic error
 		                    {
 		                        pa = pa.tnext;
@@ -512,6 +586,7 @@ public class Routines {
 		                        //	cout<< "........else.......\n";
 		                        qb.qnext = qtemp;
 		                        qb = qb.qnext;
+		                        numOfBB++;
 		                        //place Q to QB
 		                    }
 		                    else //((pa->name.compare(Q->q1))==0)// q1 on part A
@@ -520,11 +595,14 @@ public class Routines {
 		                        //	cout<< "........if.......\n";
 		                        qa.qnext = qtemp;
 		                        qa = qa.qnext;
+		                        numOfBA++;
 		                        //place Q to QA
 		                    }
 		                }
 		                else // deferred
-		                {	qtemp.setModified(1);
+		                {	
+		                	numOfD++;
+		                	qtemp.setModified(1);
 		                    dcount =0 ;
 		                    pa = partA.tnext;
 		                    while(pa!= null)
@@ -555,6 +633,7 @@ public class Routines {
 		                    	 
 		                    	 qb.qnext = qtemp;
 			                     qb = qb.qnext;//place Q to QB
+			                     numOfDB++;
 							}
 		                    else{// find for either mathch for q1, q2, q3, q4 on partB, change it
 
@@ -574,20 +653,27 @@ public class Routines {
 	                    	 qa.qnext = qtemp;
 		                     qa = qa.qnext;
 		                        //place Q to QA
+		                     numOfDA++;
 		                    }
 
 		                }
-		                //if(debug)
-		                //	cout<< "........endIF.......\n";
+		                
 
 		            }
-		            //if(debug)
-		            //	cout<< "........endwhile.......\n";
+		           
 
 		        }
+		        System.out.println("numOfBDQ = "+numOfBDQ+"  QuartetA+B = "+(numberOfQuartet(quartetA)+numberOfQuartet(quartetB)));
+		        System.out.println("NumOfD = "+numOfD+"  numOfB = "+numOfB+ "  numOfD+B = "+(numOfD+numOfB));
+		        System.out.println("QuartetA = "+numberOfQuartet(quartetA)+"  numOfDA = "+ numOfDA + "  numOfBA = "+numOfBA);
+		        System.out.println("QuartetB = "+numberOfQuartet(quartetB)+"  numOfDB = "+ numOfDB + "  numOfBB = "+numOfBB);
 		        System.out.println("****************SQP*************");
 		        printTaxa(partA);
 		        printTaxa(partB);
+		        System.out.println("***************partA QuartetA***********");
+		        printQuartet(quartetA);
+		        System.out.println("***************partA QuartetB***********");
+		        printQuartet(quartetB);
 		        s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 		        s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
 		        s = merge(s1,s2,extra);
@@ -762,6 +848,9 @@ public class Routines {
 			
 			while (loopAgain) {
 				cumulativeGain = 0; gainmax  = 0; 
+				System.out.println("*********Loop again Before Iteration");
+				printTaxa(partA);
+				printTaxa(partB);
 
 		        movedList = new Listt();
 		        m = movedList;
@@ -774,6 +863,7 @@ public class Routines {
 		            prevS = score[1];//noOfSat
 		            prevV = score[2];//noOfVat
 		            prevD = score[3];//noOfDef
+		            System.out.println("Before Flag: prevScore = "+prevScore+"  prevS = "+ prevS+"  prevV = "+prevV+"  prevD = "+ prevD);
 
 					int ca = taxaCount(partA);
 					int cb = taxaCount(partB);
@@ -997,6 +1087,9 @@ public class Routines {
 
 		       } 
 		         // no more iteration
+				System.out.println("*********Loop again After Iteration**********");
+				printTaxa(partA);
+				printTaxa(partB);
 				
 				System.out.println("***************Moved List******************");
 				m= movedList.next;
@@ -1095,7 +1188,9 @@ public class Routines {
 		                pb.setState(0); pb.setLocked(0); pb.setTaxaScore(0); pb = pb.tnext;
 		            }
 		            //*******************************************************************//
-
+		            System.out.println("*********In Loop again After Moving*******");
+					printTaxa(partA);
+					printTaxa(partB);
 
 		            //*******************************************************************//
 		            if(gainmax <= 0)// || iteration>1)
@@ -1141,6 +1236,21 @@ public class Routines {
 			return new MultyReturnType(finalTaxalist, partSat);
 			//return null;
 			
+		}
+		private static int numberOfQuartet(Quartet quartetList) {
+			int count = 0;
+			Quartet q;
+		    
+		    q = quartetList.qnext;
+	
+		  
+		    while(q!= null){
+		    	count++;
+		        q = q.qnext;
+		    }
+		 
+		    return count;
+		
 		}
 		private static int countSatisfiedQuartets(Taxa partA, Taxa partB, Quartet quartetList) {
 			int csat = 0;
