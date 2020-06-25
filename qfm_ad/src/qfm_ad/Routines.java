@@ -1,8 +1,10 @@
 package qfm_ad;
 
 import java.io.BufferedReader;
+
 //import java.io.BufferedWriter;
 import java.io.FileReader;
+
 //import java.io.FileWriter;
 //import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Scanner;
@@ -21,6 +24,7 @@ public class Routines {
 	public static String readQuartetQMC(String fileName) { // count will be done at the time of reading
 
 		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
+		
 		
 		HashSet<Quartet> quartetList = new HashSet<Quartet>();
 		double startTime = System.currentTimeMillis();
@@ -36,7 +40,13 @@ public class Routines {
 				Taxa[] t = new Taxa[4];
 				for (int i = 0; i < 4; i++) {
 					t[i] = new Taxa(qq[i]);
-					taxaList.add(t[i]);
+					//taxaList.add(t[i]);
+					///////////recent change
+					if (!taxaList.add(t[i])) {
+						final String taxaName = t[i].getName();
+						t[i] = taxaList.stream().filter(j -> j.getName().contentEquals(taxaName)).findAny().get();
+					}
+					////recent change/////////
 				}
 
 				
@@ -100,17 +110,21 @@ public class Routines {
 		//printQuartet(countedSortedQL);
 		System.out.println("\n Number of taxa : "+taxaList.size());
 		///////////////////////////////will delete
-//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("sample50_70.txt"))) {//args[1] is output file
+//		FM(taxaList, countedSortedQL);
+//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("sample27.txt"))) {//args[1] is output file
 //			//bw.write("("+s+")"+";");
 //			for(Quartet quartets : countedSortedQL) {
 //				
-//				bw.write(quartets.getT1().getName()+","+quartets.getT2().getName()+"|"+quartets.getT3().getName()
-//						+","+quartets.getT4().getName()+":"+quartets.getQFrequency()+"\n");
+//				bw.write("("+quartets.getT1().getName()+","+quartets.getT1().getPartition()+")"+","
+//						+"("+quartets.getT2().getName()+","+quartets.getT1().getPartition()+")"+"|"
+//						+"("+quartets.getT3().getName()+","+quartets.getT1().getPartition()+")"+","
+//						+"("+quartets.getT4().getName()+","+quartets.getT1().getPartition()+")"+":"
+//						+quartets.getQFrequency()+"\n");
 //			}
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-		
+//		
 		
 		//////////////////////////////////
 
@@ -169,9 +183,10 @@ public class Routines {
 			extra = "extra"+ extraTaxa;
 //	        System.out.println("extra = "+ extra);
 	        extraTaxa++;
-	        
-	        partA.add(new Taxa(extra, 0));// add extra taxa to partition A
-	        partB.add(new Taxa(extra, 1));// add extra taxa to parttion B
+	        Taxa extraA = new Taxa(extra, 0);
+	        Taxa extraB = new Taxa(extra, 1);
+	        partA.add(extraA);// add extra taxa to partition A
+	        partB.add(extraB);// add extra taxa to parttion B
 //	        System.out.println("**************After Adding extra taxa****************");
 //			System.out.println("*****************PartA**************************");
 //			printTaxa(partA);
@@ -231,18 +246,26 @@ public class Routines {
 //						System.out.println("dcount = "+ dcount);
 						
 						if (dcount > 1) {
-							if (partB.contains(q.getT1()))q.setT1(new Taxa(extra));
+							if (partB.contains(q.getT1()))q.setT1(extraA);
+							else if (partB.contains(q.getT2()))q.setT2(extraA);
+							else if (partB.contains(q.getT3()))q.setT3(extraA);
+							else q.setT4(extraA);
+							/*if (partB.contains(q.getT1()))q.setT1(new Taxa(extra));
 							else if (partB.contains(q.getT2()))q.setT2(new Taxa(extra));
 							else if (partB.contains(q.getT3()))q.setT3(new Taxa(extra));
-							else q.setT4(new Taxa(extra));
+							else q.setT4(new Taxa(extra));*/
 							quartetA.add(q);
 //							quartetAAA.add(qtemp);
 //							numOfDA++;
 						} else {
-							if (partA.contains(q.getT1()))q.setT1(new Taxa(extra));
+							if (partA.contains(q.getT1()))q.setT1(extraB);
+							else if (partA.contains(q.getT2()))q.setT2(extraB);
+							else if (partA.contains(q.getT3()))q.setT3(extraB);
+							else q.setT4(extraB);
+							/*if (partA.contains(q.getT1()))q.setT1(new Taxa(extra));
 							else if (partA.contains(q.getT2()))q.setT2(new Taxa(extra));
 							else if (partA.contains(q.getT3()))q.setT3(new Taxa(extra));
-							else q.setT4(new Taxa(extra));
+							else q.setT4(new Taxa(extra));*/
 							quartetB.add(q);
 //							quartetBBB.add(qtemp);
 //							numOfDB++;
@@ -679,6 +702,7 @@ public class Routines {
 //		System.out.println("*********************FM*****************");
 //		printTaxa(partA);
 //		printTaxa(partB);
+		//return null;
 		return MFM_algo(partA, partB, quartetList);
 		//return FM_algo(partA, partB, quartetList);
 	}
@@ -1104,10 +1128,10 @@ public class Routines {
 		char qstat;
 		//following code should work. will investigate later
 //		if(q.getT1().getPartition() == 1) a = 1;
-//		if(q.getT2().getPartition() == 1) a = 1;
-//		if(q.getT3().getPartition() == 1) a = 1;
-//		if(q.getT4().getPartition() == 1) a = 1;
-		//above code does not work. I have checked
+//		if(q.getT2().getPartition() == 1) b = 1;
+//		if(q.getT3().getPartition() == 1) c = 1;
+//		if(q.getT4().getPartition() == 1) d = 1;
+		
 		// i think parB na dileo hobe
 		if(partB.contains(q.getT1())) a = 1;
 		if(partB.contains(q.getT2())) b = 1;
@@ -1384,22 +1408,22 @@ public class Routines {
 						
 //						partA.add(t);
 						partB.remove(t);
-//						t.setPartition(0);
-//						t.setLocked(true);
-//						
-//						partA.add(t);
+						t.setPartition(0);
+						t.setLocked(true);
+						
+						partA.add(t);
 //						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
-						partA.add(new Taxa(taxaToMove, 0, true));
+						//partA.add(new Taxa(taxaToMove, 0, true));
 					} else {
 						t = partA.stream().filter(i -> i.getName().contentEquals(taxaMove)).findAny().get();
 						
 //						partB.add(t);
 						partA.remove(t);
-//						t.setPartition(1);
-//						t.setLocked(true);
-//						partB.add(t);
+						t.setPartition(1);
+						t.setLocked(true);
+						partB.add(t);
 //						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
-						partB.add(new Taxa(taxaToMove, 1, true));
+						//partB.add(new Taxa(taxaToMove, 1, true));
 					}
 					
 //					t.setLocked(true);
@@ -1468,12 +1492,20 @@ public class Routines {
             	String moveTaxa = ml.getTaxaToMove();
             	if (isMove) {
             		if (ml.getPart() == 1) {
-    					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
-    					pa.add(new Taxa(moveTaxa, 0));
+            			Taxa t = partB.stream().filter(i -> i.getName().contentEquals(moveTaxa)).findAny().get();
+            			partB.remove(t);
+            			t.setPartition(0);
+            			pa.add(t);
+//    					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
+//    					pa.add(new Taxa(moveTaxa, 0));
     					//partA.add(new Taxa(moveTaxa, 0));
     				} else {
-    					partA.removeIf(i -> i.getName().contentEquals(moveTaxa));
-    					pb.add(new Taxa(moveTaxa, 1));
+    					Taxa t = partA.stream().filter(i -> i.getName().contentEquals(moveTaxa)).findAny().get();
+            			partA.remove(t);
+            			t.setPartition(1);
+            			pb.add(t);
+//    					partA.removeIf(i -> i.getName().contentEquals(moveTaxa));
+//    					pb.add(new Taxa(moveTaxa, 1));
     					//partB.add(new Taxa(moveTaxa, 1));
 
     				}
@@ -1623,12 +1655,25 @@ public class Routines {
 	 
 	}
 	private static char mCheckQuartet(LinkedHashSet<Taxa> partB, Quartet q, String tempTaxa) {
-		int a = 0, b = 0, c = 0, d = 0;
+		//int a = 0, b = 0, c = 0, d = 0;
 		char qstat;
+		///////will delete
+		//following code should work. will investigate later
+//		if(q.getT1().getPartition() == 1) a = 1;
+//		if(q.getT2().getPartition() == 1) b = 1;
+//		if(q.getT3().getPartition() == 1) c = 1;
+//		if(q.getT4().getPartition() == 1) d = 1;
+		int a = q.getT1().getPartition();
+		int b = q.getT2().getPartition();
+		int c = q.getT3().getPartition();
+		int d = q.getT4().getPartition();
+		/////////////
+		/*
 		if(partB.contains(q.getT1())) a = 1;
 		if(partB.contains(q.getT2())) b = 1;
 		if(partB.contains(q.getT3())) c = 1;
 		if(partB.contains(q.getT4())) d = 1;
+		*/
 		////////will change above block of code later
 //		if (!tempTaxa.contentEquals("null")) {
 			if(tempTaxa.contentEquals(q.getT1().getName())) a = 1 - a;
