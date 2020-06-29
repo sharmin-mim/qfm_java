@@ -2,7 +2,7 @@ package qfm_ad;
 
 
 public class GainList {
-	/*
+	
 	 //If I give Taxa instead of taxaToMove, space complexity becomes high. That's why I am rolling back to previous implementation
 	private Taxa taxa;
 	private int val;		
@@ -10,11 +10,11 @@ public class GainList {
 	private int vat;
 	private int def;
 	private int bel0w;
-	private int part; // part means partition. part = 0 means partA; part = 1 means partB;
-	public GainList(Taxa taxa, int val, int part) {
-		this(taxa, val, -1, -1, -1, 0, part);
+	//private int part; // part means partition. part = 0 means partA; part = 1 means partB;
+	public GainList(Taxa taxa, int val) {
+		this(taxa, val, -1, -1, -1, 0);
 	}
-	public GainList(Taxa taxa, int val, int sat, int vat, int def, int bel0w, int part) {
+	public GainList(Taxa taxa, int val, int sat, int vat, int def, int bel0w) {
 		
 		this.taxa = taxa;
 		this.val = val;
@@ -22,7 +22,7 @@ public class GainList {
 		this.vat = vat;
 		this.def = def;
 		this.bel0w = bel0w;
-		this.part = part;
+		//this.part = part;
 	}
 	public Taxa getTaxa() {
 		return taxa;
@@ -42,14 +42,14 @@ public class GainList {
 	public int getBel0w() {
 		return bel0w;
 	}
-	public int getPart() {
-		return part;
-	}
-	public void setPart(int part) {
-		this.part = part;
-	}
-	*/
+//	public int getPart() {
+//		return part;
+//	}
+//	public void setPart(int part) {
+//		this.part = part;
+//	}
 	
+	/*
 	private String taxaToMove;
 	private int val;		
 	private int sat;
@@ -112,7 +112,7 @@ public class GainList {
 	public void setPart(int part) {
 		this.part = part;
 	}
-	
+	*/
 
 	
 
