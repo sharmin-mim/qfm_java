@@ -7,7 +7,7 @@ public class Taxa {
 	private int partition; //0 = A, 1 = B
     //private int state; //0 = unmoved, 1 = moved
     //private int taxaScore;
-    private boolean locked;
+    //private boolean locked;//dont need to lock anymore
     //Taxa tnext;
     private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
 
@@ -15,15 +15,15 @@ public class Taxa {
 		this(name, -1);
 	}
 	
-	 public Taxa(String name, int partition) {
-		 this(name, partition, false);
-	}
+//	 public Taxa(String name, int partition) {
+//		 this(name, partition, false);
+//	}
 	
 	 
-	public Taxa(String name, int partition, boolean locked) {
+	public Taxa(String name, int partition) {
 		this.name = name;
 		this.partition = partition;
-		this.locked = locked;
+		//this.locked = locked;
 		
 		this.svdTable = new HashSet<SVD_Log>() {
 
@@ -52,13 +52,13 @@ public class Taxa {
 
 	
 
-	public boolean isLocked() {
-		return locked;
-	}
-
-	public void setLocked(boolean locked) {
-		this.locked = locked;
-	}
+//	public boolean isLocked() {
+//		return locked;
+//	}
+//
+//	public void setLocked(boolean locked) {
+//		this.locked = locked;
+//	}
 
 	public String getName() {
 		return name;
