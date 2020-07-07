@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 public class Taxa {
 	private String name; // node name
-	private int partition; //0 = A, 1 = B
+	private byte partition; //0 = A, 1 = B
     //private int state; //0 = unmoved, 1 = moved
     //private int taxaScore;
     //private boolean locked;//dont need to lock anymore
@@ -12,7 +12,7 @@ public class Taxa {
     private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
 
 	public Taxa(String name) {
-		this(name, -1);
+		this(name, (byte) -1);
 	}
 	
 //	 public Taxa(String name, int partition) {
@@ -22,7 +22,7 @@ public class Taxa {
 	 
 	public Taxa(String name, int partition) {
 		this.name = name;
-		this.partition = partition;
+		this.partition = (byte) partition;
 		//this.locked = locked;
 		
 		this.svdTable = new HashSet<SVD_Log>() {
@@ -69,12 +69,12 @@ public class Taxa {
 	}
 	
 
-	public int getPartition() {
+	public byte getPartition() {
 		return partition;
 	}
 
 	public void setPartition(int partition) {
-		this.partition = partition;
+		this.partition = (byte) partition;
 	}
 	
 

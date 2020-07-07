@@ -8,7 +8,7 @@ import java.io.FileReader;
 //import java.io.FileWriter;
 //import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -86,12 +86,20 @@ public class Routines {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		int qID = 0;
+		for (Quartet quartet : quartetList) {
+			qID++;
+			quartet.setIncreaseFrequency(false);
+			quartet.setQuartetID(qID);;
+		}
+		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
+				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed().thenComparing(Quartet::getQuartetID)).collect(Collectors.toList()));
 		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 //		List<Quartet> sortedList = ql.stream()
 //				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList());
 		//LinkedHashSet<Quartet> nql = new LinkedHashSet<Quartet>(sortedList);
-		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
-				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));
+		/*LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
+				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));*/
 
 		double estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("Elapsed Time : "+ estimatedTime/1000 + " seconds");
@@ -102,12 +110,12 @@ public class Routines {
 		
 		System.out.println();
 		////////////I will investigate this block later. whether it is really nrcessary or not
-		int qID = 0;
-		for (Quartet quartet : countedSortedQL) {
-			qID++;
-			quartet.setIncreaseFrequency(false);
-			quartet.setQuartetID(qID);;
-		}
+//		int qID = 0;
+//		for (Quartet quartet : countedSortedQL) {
+//			qID++;
+//			quartet.setIncreaseFrequency(false);
+//			quartet.setQuartetID(qID);;
+//		}
 		///////////////////////////////////////////////////////////////////////////////////
 		//printQuartet(countedSortedQL);
 		System.out.println("\n Number of taxa : "+taxaList.size());
@@ -213,8 +221,9 @@ public class Routines {
 //	        int numOfDAA = 0;
 //	        int numOfDBB= 0;
 	        for (Quartet q : quartetList) {
-				int l = q.getStatus().length();
-				char c = q.getStatus().charAt(l-1);
+	        	char c = q.getInitStatus();
+				//int l = q.getStatus().length();
+				//char c = q.getStatus().charAt(l-1);
 //				Quartet qtemp = new Quartet(q.getT1(), q.getT2(), q.getT3(), q.getT4());
 //				qtemp.setIncreaseFrequency(false);
 //				qtemp.setStatus(q.getStatus());
@@ -1050,7 +1059,7 @@ public class Routines {
 		int csat = 0;
 	    char quartetScore;
 	    for (Quartet quartet : quartetList) {
-			quartetScore = mCheckQuartet(quartet, "null");
+			quartetScore = iCheckQuartet(quartet);
 			if(quartetScore == 's')
 	        {
 	        	csat += quartet.getQFrequency();
@@ -1059,7 +1068,7 @@ public class Routines {
 	    return csat;
 	}
 
-	private static int[] calculateScore(LinkedHashSet<Taxa> partB, LinkedHashSet<Quartet> quartetList, String tempTaxa,
+	/*private static int[] calculateScore(LinkedHashSet<Taxa> partB, LinkedHashSet<Quartet> quartetList, String tempTaxa,
 			int st, int vt, int df) {
 		int[] scores = {0,0,0,0};
 	    int  qscore;
@@ -1181,6 +1190,7 @@ public class Routines {
 		return score;
 
 	}
+	*/
 
 	private static void printQuartet(LinkedHashSet<Quartet> quartetList) {
 		System.out.println("**********************Quartet List********************************");
@@ -1451,7 +1461,7 @@ public class Routines {
 					
 					for (SVD_Log svd : taxa_to_move.getSvdTable()) {
 						Quartet q = svd.getQuartet();
-						q.setStatus(svd.getqStat()+"");
+						q.setInitStatus(svd.getqStat());
 						rQuartetList.add(q);
 					}
 					taxa_to_move.getSvdTable().clear();
@@ -1488,14 +1498,14 @@ public class Routines {
 			int cumulativeGain = 0, gainMax = 0;
 			//String back = "Initial"; 
 			int backIndex = -1, bi = 0;
-			//boolean isMove = false;
+			boolean isMove = false;
 			for (GainList ml : movedList) {
 				cumulativeGain += ml.getVal();
 				if (cumulativeGain >= gainMax) {
 					gainMax = cumulativeGain;
 					//back = ml.getTaxa().getName();
 					backIndex = bi;
-					//isMove = true;
+					isMove = true;
 				}
 				bi++;
 			}
@@ -1509,7 +1519,7 @@ public class Routines {
 //			LinkedList<Taxa> pb = new LinkedList<Taxa>();
            // boolean isMove = false; bi = 0;
 //            boolean revrs = true;
-			if (backIndex != -1) {
+			if (isMove) {
 				for (int i = backIndex + 1; i < movedList.size(); i++) {
 					Taxa moveTaxa = movedList.get(i).getTaxa();
 	            
@@ -1626,7 +1636,8 @@ public class Routines {
 	        {	
 	    		s = 0; v = 0; d = 0;
 	    		qStat  = mCheckQuartet(q, tempTaxa);
-	            c = q.getStatus().charAt(0);//status[0];
+	    		c = q.getInitStatus();
+	           // c = q.getStatus().charAt(0);//status[0];
 //	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
 //	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
 //	            System.out.println("tempTaxa = "+tempTaxa+ "  qscore = "+qscore+"  c = "+ c);
@@ -1685,8 +1696,8 @@ public class Routines {
 	    char  qStat;
 	    	 
 	    for (Quartet q : quartetList) {
-            q.setStatus("");
-            qStat  = mCheckQuartet(q, "null");
+            //q.setStatus("");
+            qStat  = iCheckQuartet(q);
             if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
             else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
             else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
@@ -1744,7 +1755,38 @@ public class Routines {
 	        qstat = 'd';
 	    }
 
-	    q.setStatus(q.getStatus()+qstat);
+	    q.setStatus(qstat);
+		return qstat;
+
+	}
+	private static char iCheckQuartet(Quartet q) {
+		//int a = 0, b = 0, c = 0, d = 0;
+		char qstat;
+
+		int a = q.getT1().getPartition();
+		int b = q.getT2().getPartition();
+		int c = q.getT3().getPartition();
+		int d = q.getT4().getPartition();
+		
+		if (a==b && c==d && b==c) // totally on one side
+	    {	
+	        qstat = 'b';
+	    }
+	    else if( a==b && c==d) //satisfied
+	    {
+	        qstat = 's';
+	    }
+	    else if ((a==c && b==d) || (a==d && b==c)) // violated
+	    {
+	        qstat = 'v';
+
+	    }
+	    else //deffered
+	    {
+	        qstat = 'd';
+	    }
+
+	    q.setInitStatus(qstat);
 		return qstat;
 
 	}
