@@ -23,7 +23,11 @@ import java.util.stream.Collectors;
 
 
 
+
+
 public class Routines {
+	
+	
 	public static String readQuartetQMC(String fileName) { // count will be done at the time of reading
 
 		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
@@ -154,11 +158,15 @@ public class Routines {
 		}
 		*/
 		//////////////////////////////////
-
 		String s = SQP(countedSortedQL, taxaList, 1000, 0);
-		s = s.replace("(O,", "(0,");
-		s = s.replace(",O,", ",0,");
-		s = s.replace(",O)", ",0)");
+		if (s != null) {
+			s = s.replace("(O,", "(0,");
+			s = s.replace(",O,", ",0,");
+			s = s.replace(",O)", ",0)");
+			s = "("+s+")"+";";
+		}else
+			s = "null";
+		
 		return s;
 		//return null;
 	
@@ -399,6 +407,7 @@ public class Routines {
 			return null;
 	}
 	private static String reroot(String s, String extra) {
+		
 
 		//String fileName = "reroot.txt";
 		boolean brkt;
@@ -416,8 +425,33 @@ public class Routines {
 		//System.out.println("**************** s= "+s);
 		//String cmd = "perl reroot_tree_new.pl -t "+ s+";"+ " -r "+extra+ " -o "+ fileName;
 		//System.out.println(cmd);
-	
-		File tempFile = null;
+		//synchronized block
+		String fileName = "qfm11011.tmp";
+		String ss = null;
+		
+		synchronized (fileName) {
+			try {
+				String cmd = "perl reroot_tree_new.pl -t "+ s +";"+ " -r "+extra+ " -o "+ fileName;
+				Process p = Runtime.getRuntime().exec(cmd);
+				p.waitFor();
+				p.destroy();
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+				System.out.println("Problem in cmd");
+			}
+			//reading from temp file
+			
+			try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
+				ss = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+			
+		}
+		
+		///////////////////
+		/*File tempFile = null;
 
 		try {
 			tempFile = File.createTempFile("prefix-", "-suffix");
@@ -444,6 +478,7 @@ public class Routines {
 		} catch (Exception e) {
 			
 		}
+		*/
 		if (ss != null) {
 			ss = ss.replace(":", "");
 			ss = ss.replace(";", "");

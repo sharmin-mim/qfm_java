@@ -13,9 +13,9 @@ public class Main {
 		//String fileName = "sample.txt";
 		//String s= Routines.readQuartetQMC("sample300.txt");
 		String s= Routines.readQuartetQMC(args[0]);
-		System.out.println("("+s+")"+";");
+		System.out.println(s);
 		try(BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
-			bw.write("("+s+")"+";");
+			bw.write(s);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
