@@ -7,8 +7,8 @@ public class Quartet {
 	private Taxa t2;
 	private Taxa t3;
 	private Taxa t4;
-	private char initStatus;
 	private char status;
+	//private char status;
 	private int qFrequency;
 	private boolean increaseFrequency;
 	private int quartetID;
@@ -66,17 +66,17 @@ public class Quartet {
 	public void setQuartetID(int quartetID) {
 		this.quartetID = quartetID;
 	}
+//	public char getStatus() {
+//		return status;
+//	}
+//	public void setStatus(char status) {
+//		this.status = status;
+//	}
 	public char getStatus() {
 		return status;
 	}
-	public void setStatus(char status) {
-		this.status = status;
-	}
-	public char getInitStatus() {
-		return initStatus;
-	}
-	public void setInitStatus(char initStatus) {
-		this.initStatus = initStatus;
+	public void setStatus(char initStatus) {
+		this.status = initStatus;
 	}
 	public boolean isIncreaseFrequency() {
 		return increaseFrequency;

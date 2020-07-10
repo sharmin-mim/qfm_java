@@ -109,25 +109,6 @@ public class Taxa {
 		return true;
 	}
 
-	
-
-
-
-
-	
-
-
-
-
-	
-
-	
-	
-	 
-	
-    
-
-    
 
 
 }

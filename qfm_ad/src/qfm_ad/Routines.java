@@ -1,24 +1,25 @@
 package qfm_ad;
 
 import java.io.BufferedReader;
-
-//import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
-
-//import java.io.FileWriter;
-//import java.io.IOException;
+import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import java.util.stream.Collectors;
+
+
 
 
 
@@ -28,7 +29,7 @@ public class Routines {
 		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
 		
 		
-		HashSet<Quartet> quartetList = new HashSet<Quartet>();
+		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
 		double startTime = System.currentTimeMillis();
 		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
 			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
@@ -39,6 +40,7 @@ public class Routines {
 				//String[] qq = singleQuartet.split(",|\\|");/// for quartet format q1,q2|q3,q4
 				String[] qq = singleQuartet.split(",|\\||:");// For both quartet format q1,q2|q3,q4 and q1,q2|q3,q4:weight
 				//Taxa t1, t2, t3, t4;
+				
 				Taxa[] t = new Taxa[4];
 				for (int i = 0; i < 4; i++) {
 					t[i] = new Taxa(qq[i]);
@@ -92,8 +94,10 @@ public class Routines {
 			quartet.setIncreaseFrequency(false);
 			quartet.setQuartetID(qID);;
 		}
+//		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+//		qr.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
-				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed().thenComparing(Quartet::getQuartetID)).collect(Collectors.toList()));
+				.sorted(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder())).collect(Collectors.toList()));
 		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 //		List<Quartet> sortedList = ql.stream()
 //				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList());
@@ -135,7 +139,20 @@ public class Routines {
 //			e.printStackTrace();
 //		}
 //		
-		
+		/*try(BufferedWriter bw = new BufferedWriter(new FileWriter("stable3.txt"))) {//args[1] is output file
+		//bw.write("("+s+")"+";");
+			for(Quartet quartets : countedSortedQL) {
+				
+				bw.write(quartets.getQuartetID()+":"+quartets.getT1().getName()+","
+						+quartets.getT2().getName()+"|"
+						+quartets.getT3().getName()+","
+						+quartets.getT4().getName()+":"
+						+quartets.getQFrequency()+"\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		*/
 		//////////////////////////////////
 
 		String s = SQP(countedSortedQL, taxaList, 1000, 0);
@@ -221,7 +238,7 @@ public class Routines {
 //	        int numOfDAA = 0;
 //	        int numOfDBB= 0;
 	        for (Quartet q : quartetList) {
-	        	char c = q.getInitStatus();
+	        	char c = q.getStatus();
 				//int l = q.getStatus().length();
 				//char c = q.getStatus().charAt(l-1);
 //				Quartet qtemp = new Quartet(q.getT1(), q.getT2(), q.getT3(), q.getT4());
@@ -332,9 +349,29 @@ public class Routines {
 //	        System.out.println("**************SQP After partitioning quartetB****************");
 //	        printQuartet(quartetB);
 	        System.out.println("One SQP divide step is completed");
-	        String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
-	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
-	        s = merge(s1,s2,extra);
+	        //final String s1, s2;
+	        if (extraTaxa == 1001) {
+	        	final int ext = extraTaxa, psc = partSatCount;
+	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
+	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+	   	        String s1 = null;
+	   			try {
+	   				s1 = cf.get();
+	   			} catch (InterruptedException e) {
+	   				//e.printStackTrace();
+	   			} catch (ExecutionException e) {
+	   				//e.printStackTrace();
+	   			}
+	   			s = merge(s1,s2,extra);
+			} else {
+				String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
+		        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+		        s = merge(s1,s2,extra);
+			}
+	       
+//	        //String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
+//	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+//	        s = merge(s1,s2,extra);
 	        //System.out.println("Merged Tree = "+s);
 
 	       
@@ -363,7 +400,7 @@ public class Routines {
 	}
 	private static String reroot(String s, String extra) {
 
-		String fileName = "reroot.txt";
+		//String fileName = "reroot.txt";
 		boolean brkt;
 		brkt = bracket(s);
 		if(!brkt)
@@ -377,9 +414,14 @@ public class Routines {
 		s = s.replace(",0)", ",O)");
 		//s = '"'+s+";"+'"';
 		//System.out.println("**************** s= "+s);
-		String cmd = "perl reroot_tree_new.pl -t "+ s+";"+ " -r "+extra+ " -o "+ fileName;
+		//String cmd = "perl reroot_tree_new.pl -t "+ s+";"+ " -r "+extra+ " -o "+ fileName;
 		//System.out.println(cmd);
+	
+		File tempFile = null;
+
 		try {
+			tempFile = File.createTempFile("prefix-", "-suffix");
+			String cmd = "perl reroot_tree_new.pl -t "+ s +";"+ " -r "+extra+ " -o "+ tempFile;
 			Process p = Runtime.getRuntime().exec(cmd);
 			p.waitFor();
 			p.destroy();
@@ -388,156 +430,155 @@ public class Routines {
 			e.printStackTrace();
 			System.out.println("Problem in cmd");
 		}
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
-			s = br.readLine();
-//			System.out.println("br = "+s);
-//			//String extra = "extra1000";
-//			System.out.println(s);
-			if (s != null) {
-				s = s.replace(":", "");
-				s = s.replace(";", "");
-				int pos1 = s.indexOf(extra);
-				s = s.replace(extra, "");
-//				System.out.println("After removing extra s= "+s);
-//				System.out.println("pos1 = "+pos1);
-
-				int start = 0, i= 0, ob = 0, end = 0, cb = 0; String mystring; boolean removebr = false;
-				if(s.charAt(pos1-1) =='('&& s.charAt(pos1) ==',')
-			     {
-					
-					try{
-
-						s = s.substring(0, pos1)+s.substring(pos1+1);
-						 start = pos1-1;
-//						System.out.println("inside s= "+ s+ " and start = "+start );
-
-			           
-			            i = start; ob = 0;
-			            while(true)
-			            {
-			                if(s.charAt(i) == '(')
-			                    ob++;
-			                else if(s.charAt(i) == ')')
-			                {
-			                    ob--;
-			                    if(ob==0)
-			                    {	end = i;
-			                        break;
-			                    }
-
-
-			                }
-			                i++;
-			            }
-			        }
-			        catch (Exception e) {
-
-			        }
-					//System.out.println("start = "+ start + " and end = "+ end);
-			        mystring = s.substring(start, end+1);
-			        //System.out.println("mystring = "+mystring);
-			        removebr = balance(mystring);
-			        //System.out.println(removebr);
-			        if(removebr)
-			        {
-			            try{
-
-
-			                s = s.substring(0, end) + s.substring(end+1);
-			                //System.out.println(s);
-			                s = s.substring(0,start) + s.substring(start+1);
-
-			            }
-			            catch (Exception e) {
-
-			            }
-
-			        }
-
-			    
-			     }
-			    else if(s.charAt(pos1-1) == ',' && s.charAt(pos1) == ')')
-			    {
-
-			        try{
-			        	s = s.substring(0, pos1-1) + s.substring(pos1);
-		
-			            end = pos1-1;
-			            i = end; cb = 0;
-			            while(true)
-			            {
-			                if(s.charAt(i) == ')')
-			                    cb++;
-			                else if(s.charAt(i) == '(')
-			                {
-			                    cb--;
-			                    if(cb==0)
-			                    { 	start = i;
-			                        break;
-			                    }
-			                }
-			                i--;
-			            }
-			        }
-			        catch (Exception e) {
-			 
-			        }
-			        mystring = s.substring(start, end+1);
-			        removebr = balance(mystring);
-			        if(removebr)
-			        {
-			            try{
-
-			            	s = s.substring(0, end) + s.substring(end + 1);
-			                s = s.substring(0,start) + s.substring(start+1);
-
-			            }
-			            catch (Exception e) {
-
-			            }
-
-			        }
-
-
-
-			    
-			    }
-			    else if(s.charAt(pos1-1) == ',' && s.charAt(pos1) == ',')
-			    {
-
-			        try{
-			            s = s.substring(0, pos1-1) + s.substring(pos1);
-			        	//s1.assign(s1.replace(pos1-1,1,""));
-			        }
-			        catch (Exception e) {
-			            //cerr << "Out of Range error: " << oor.what() << endl;
-			        }
-			        if(s.charAt(pos1-2) == '(' && s.charAt(pos1) == ')')
-			        {
-			            try{
-			                s = s.substring(0, pos1) + s.substring(pos1 + 1);
-			                s = s.substring(0, pos1 - 2) + s.substring(pos1 - 1);
-//			            	s2.assign(s2.replace(pos1,1,""));
-//			                s2.assign(s2.replace(pos1-2,1,""));
-
-			            }
-			            catch (Exception e) {
-			               // cerr << "Out of Range error: " << oor.what() << endl;
-			            }
-			        }
-
-
-
-			    
-			    }
-			}
-		
-
-		} catch (Exception e) {
+		//reading from temp file
+		String ss = null;
+		try (BufferedReader br = new BufferedReader(new FileReader(tempFile))){
+			ss = br.readLine();
+		} catch (IOException e) {
 			e.printStackTrace();
+		} 
+		//deleting temp file
+		try {
+			if(!tempFile.delete())
+				tempFile.deleteOnExit();
+		} catch (Exception e) {
+			
 		}
+		if (ss != null) {
+			ss = ss.replace(":", "");
+			ss = ss.replace(";", "");
+			int pos1 = ss.indexOf(extra);
+			ss = ss.replace(extra, "");
+//			System.out.println("After removing extra s= "+s);
+//			System.out.println("pos1 = "+pos1);
+
+			int start = 0, i= 0, ob = 0, end = 0, cb = 0; String mystring; boolean removebr = false;
+			if(ss.charAt(pos1-1) =='('&& ss.charAt(pos1) ==',')
+		     {
+				
+				try{
+
+					ss = ss.substring(0, pos1)+ss.substring(pos1+1);
+					 start = pos1-1;
+//					System.out.println("inside s= "+ s+ " and start = "+start );
+
+		           
+		            i = start; ob = 0;
+		            while(true)
+		            {
+		                if(ss.charAt(i) == '(')
+		                    ob++;
+		                else if(ss.charAt(i) == ')')
+		                {
+		                    ob--;
+		                    if(ob==0)
+		                    {	end = i;
+		                        break;
+		                    }
+
+
+		                }
+		                i++;
+		            }
+		        }
+		        catch (Exception e) {
+
+		        }
+				//System.out.println("start = "+ start + " and end = "+ end);
+		        mystring = ss.substring(start, end+1);
+		        //System.out.println("mystring = "+mystring);
+		        removebr = balance(mystring);
+		        //System.out.println(removebr);
+		        if(removebr)
+		        {
+		            try{
+
+
+		                ss = ss.substring(0, end) + ss.substring(end+1);
+		                //System.out.println(s);
+		                ss = ss.substring(0,start) + ss.substring(start+1);
+
+		            }
+		            catch (Exception e) {
+
+		            }
+
+		        }
+
+		    
+		     }
+		    else if(ss.charAt(pos1-1) == ',' && ss.charAt(pos1) == ')')
+		    {
+
+		        try{
+		        	ss = ss.substring(0, pos1-1) + ss.substring(pos1);
+	
+		            end = pos1-1;
+		            i = end; cb = 0;
+		            while(true)
+		            {
+		                if(ss.charAt(i) == ')')
+		                    cb++;
+		                else if(ss.charAt(i) == '(')
+		                {
+		                    cb--;
+		                    if(cb==0)
+		                    { 	start = i;
+		                        break;
+		                    }
+		                }
+		                i--;
+		            }
+		        }
+		        catch (Exception e) {
+		 
+		        }
+		        mystring = ss.substring(start, end+1);
+		        removebr = balance(mystring);
+		        if(removebr)
+		        {
+		            try{
+
+		            	ss = ss.substring(0, end) + ss.substring(end + 1);
+		                ss = ss.substring(0,start) + ss.substring(start+1);
+
+		            }
+		            catch (Exception e) {
+
+		            }
+
+		        }
+
+
+
+		    
+		    }
+		    else if(ss.charAt(pos1-1) == ',' && ss.charAt(pos1) == ',')
+		    {
+
+		        try{
+		            ss = ss.substring(0, pos1-1) + ss.substring(pos1);
+		        }
+		        catch (Exception e) {
+		        }
+		        if(ss.charAt(pos1-2) == '(' && ss.charAt(pos1) == ')')
+		        {
+		            try{
+		                ss = ss.substring(0, pos1) + ss.substring(pos1 + 1);
+		                ss = ss.substring(0, pos1 - 2) + ss.substring(pos1 - 1);
+		            }
+		            catch (Exception e) {
+		            }
+		        }
+
+
+
+		    
+		    }
+		}
+		
 //		System.out.println("before return s= "+s);
-		return s;
+		return ss;
 	}
 	private static boolean balance(String s) {
 		
@@ -1461,7 +1502,7 @@ public class Routines {
 					
 					for (SVD_Log svd : taxa_to_move.getSvdTable()) {
 						Quartet q = svd.getQuartet();
-						q.setInitStatus(svd.getqStat());
+						q.setStatus(svd.getqStat());
 						rQuartetList.add(q);
 					}
 					taxa_to_move.getSvdTable().clear();
@@ -1636,7 +1677,7 @@ public class Routines {
 	        {	
 	    		s = 0; v = 0; d = 0;
 	    		qStat  = mCheckQuartet(q, tempTaxa);
-	    		c = q.getInitStatus();
+	    		c = q.getStatus();
 	           // c = q.getStatus().charAt(0);//status[0];
 //	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
 //	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
@@ -1656,16 +1697,16 @@ public class Routines {
 
 	            else if(qStat == 'b')
 	            {
-	                if(c=='s') { s = - q.getQFrequency(); c = 'b';}
-	                else if(c=='v') { v = - q.getQFrequency(); c = 'b';}
-	                else if(c=='d') { d = - q.getQFrequency(); c = 'b';}
+	                if(c=='s') { s = - q.getQFrequency();}
+	                else if(c=='v') { v = - q.getQFrequency();}
+	                else if(c=='d') { d = - q.getQFrequency();}
 
 	            }
 	            else if(c=='b')
 	            {
-	                if(qStat == 's') { s = q.getQFrequency(); c = 's';}
-	                else if(qStat == 'v') { v = q.getQFrequency(); c = 'v';}
-	                else if(qStat == 'd') { d = q.getQFrequency();c = 'd';}
+	                if(qStat == 's') { s = q.getQFrequency();}
+	                else if(qStat == 'v') { v = q.getQFrequency();}
+	                else if(qStat == 'd') { d = q.getQFrequency();}
 	            }
 	            
 	            svdTable.add(new SVD_Log(q, s, v, d, qStat));
@@ -1755,7 +1796,7 @@ public class Routines {
 	        qstat = 'd';
 	    }
 
-	    q.setStatus(qstat);
+	    //q.setStatus(qstat);
 		return qstat;
 
 	}
@@ -1786,7 +1827,7 @@ public class Routines {
 	        qstat = 'd';
 	    }
 
-	    q.setInitStatus(qstat);
+	    q.setStatus(qstat);
 		return qstat;
 
 	}
