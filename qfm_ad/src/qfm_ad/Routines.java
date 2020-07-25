@@ -1,7 +1,6 @@
 package qfm_ad;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,12 +17,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import java.util.stream.Collectors;
-
-
-
-
-
-
 
 public class Routines {
 	
@@ -1358,60 +1351,74 @@ public class Routines {
 				Iterator<Taxa> iteratorA = partA.iterator();
 				Iterator<Taxa> iteratorB = partB.iterator();
 				//System.out.println("New Iteration");
-				while (flag) {
-					if (iteratorA.hasNext() && alt == 0) {
+				final int iterationF = iteration;
+				final int prevSF = prevS;
+				final int prevVF = prevV;
+				final int prevDF = prevD;
+				final int prevScoreF = prevScore;
+				
+				Thread tA = new Thread() {
+
+					@Override
+					public void run() {
+						int[] score;
 						
-						Taxa taxaA = iteratorA.next();
-						//if (!taxaA.isLocked()) {
-							//taxaToMove = taxaA.getName();
-							//System.out.println("Flag taxa = "+ taxaToMove);
-							if (iteration == 1) {
+						for (Taxa taxaA : partA) {
+							if (iterationF == 1) {
 								//taxaA.getSvdTable().clear();
-								score = mCalculateScore(taxaA.getSvdTable(), quartetList, taxaA.getName(), prevS, prevV, prevD);
+								score = mCalculateScore(taxaA.getSvdTable(), quartetList, taxaA.getName(), prevSF, prevVF, prevDF);
 							} else {
-								score = mCalculateScore(taxaA.getSvdTable(), rQuartetList, taxaA.getName(), prevS, prevV, prevD);
+								score = mCalculateScore(taxaA.getSvdTable(), rQuartetList, taxaA.getName(), prevSF, prevVF, prevDF);
 							}
-							
-//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaA, score[0]-prevScore, score[1], score[2], score[3], ca-1));
-							
-						//}
-//						if (tag2 == 0 && iteratorB.hasNext()) {
-//							alt = 1;
-//						}
+							taxaA.setVal(score[0] - prevScoreF);
+							taxaA.setSat(score[1]);
+							taxaA.setVat(score[2]);
+							taxaA.setDef(score[3]);
+						}
+					}
+					
+				};
+				tA.start();
+				for (Taxa taxaB : partB) {
+					if (iterationF == 1) {
+						//taxaA.getSvdTable().clear();
+						score = mCalculateScore(taxaB.getSvdTable(), quartetList, taxaB.getName(), prevS, prevV, prevD);
+					} else {
+						score = mCalculateScore(taxaB.getSvdTable(), rQuartetList, taxaB.getName(), prevS, prevV, prevD);
+					}
+					taxaB.setVal(score[0] - prevScore);
+					taxaB.setSat(score[1]);
+					taxaB.setVat(score[2]);
+					taxaB.setDef(score[3]);
+				}
+				try {
+					tA.join();
+				} catch (InterruptedException e) {
+					
+				}
+				Taxa taxa_to_move = new Taxa("", -1);
+				int maxgain = -1000000000; //double
+				int maxsat = 0;
+	            //glPart = 0;
+	            int randnum = 0;
+	            int mVat = 0;
+	            int mDef = 0;
+				while (flag) {
+					Taxa taxa = new Taxa("", 5);
+					boolean access = false;
+					if (iteratorA.hasNext() && alt == 0 && ca > 2) {
+						taxa = iteratorA.next();
+						access = true;
 						
-						
-					} else if (iteratorB.hasNext() && alt == 1) {
-						Taxa taxaB = iteratorB.next();
-						//if (!taxaB.isLocked()) {
-							//taxaToMove = taxaB.getName();
-							//System.out.println("Flag taxa = "+ taxaToMove);
-							if (iteration == 1) {
-								//taxaB.getSvdTable().clear();
-								 score = mCalculateScore(taxaB.getSvdTable(), quartetList, taxaB.getName(), prevS, prevV, prevD);
-							} else {
-								 score = mCalculateScore(taxaB.getSvdTable(), rQuartetList, taxaB.getName(), prevS, prevV, prevD);
-							}
-	                      
-//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-							gainList.add(new GainList(taxaB, score[0]-prevScore, score[1], score[2], score[3], cb-1));
-							
-						//}
-//						if (tag1 == 0 && iteratorA.hasNext()) {
-//							alt = 0;
-//						}
-						
-						
+					} else if (iteratorB.hasNext() && alt == 1 && cb > 2) {
+						taxa = iteratorB.next();
+						access = true;
 					} 
 					
-					if (!iteratorA.hasNext()) {
+					if (!iteratorA.hasNext() || ca<3) {
 						tag1 = 1;
 					}
-					if (!iteratorB.hasNext()) {
+					if (!iteratorB.hasNext() || cb<3) {
 						tag2 = 1;
 					}
 					if (tag1 == 1 && tag2 == 1) {
@@ -1422,89 +1429,61 @@ public class Routines {
 					}else if (tag1 == 0 && alt == 1) {
 						alt= 0;
 					}
-				}
-//				System.out.println("********************Gain List*************");
-//				for (GainList gl : gainList) {
-//					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-//		                		gl.getDef()+" "+gl.getBel0w());
-//				}
-//				printQuartet(quartetList);
-				
-//				quartetList.stream()
-//				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList())
-				///////Moving Taxa which have highest gain
-				int maxgain = -1000000000; //double
-				//int glPart = 0;
-				//taxaToMove = null;
-
-				
-				GainList movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
-				Taxa taxa_to_move = new Taxa("", -1);
-				if (movedTaxa.getBel0w() >= 2) {
-					taxa_to_move = movedTaxa.getTaxa();
-					//taxaToMove = taxa_to_move.getName();
-					maxgain = movedTaxa.getVal();
-					//glPart = taxa_to_move.getPartition();
-	    	        prevS = movedTaxa.getSat() ;//score[1];//noOfSat
-	    	        prevV = movedTaxa.getVat();//score[2];//noOfVat
-	    	        prevD = movedTaxa.getDef();//score[3];//noOfDef
-				} else {
-					maxgain = -1000000000; //double
-					int maxsat = 0;
-		            //glPart = 0;
-		            int randnum = 0;
-		            int mVat = 0;
-		            int mDef = 0;
-					
-					for (GainList gl : gainList) {
-						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-							taxa_to_move = gl.getTaxa();
+					////Gain Calculation
+					if (access) {
+						if (taxa.getVal() > maxgain) {
+							taxa_to_move = taxa;
 							//taxaToMove = taxa_to_move.getName();
-		                    maxgain = gl.getVal();               
-		                    maxsat = gl.getSat();
+		                    maxgain = taxa.getVal();               
+		                    maxsat = taxa.getSat();
 		                    //glPart = taxa_to_move.getPartition(); // current Partition
-		                    mVat = gl.getVat();
-		                    mDef = gl.getDef();
+		                    mVat = taxa.getVat();
+		                    mDef = taxa.getDef();
 		                 
-						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
+						} else if(taxa.getVal() == maxgain){
 							 
 		                   
-		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+		                    if(taxa.getSat() > maxsat)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
 		                    {
-		                    	taxa_to_move = gl.getTaxa();
+		                    	taxa_to_move = taxa;
 								//taxaToMove = taxa_to_move.getName();
-			                    maxgain = gl.getVal();               
-			                    maxsat = gl.getSat();
+			                    maxgain = taxa.getVal();               
+			                    maxsat = taxa.getSat();
 			                   // glPart = taxa_to_move.getPartition(); // current Partition
-			                    mVat = gl.getVat();
-			                    mDef = gl.getDef();
+			                    mVat = taxa.getVat();
+			                    mDef = taxa.getDef();
 		                    }
-		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-		                    {
-		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-		                        if(randnum%2 == 0){
-		                        	taxa_to_move = gl.getTaxa();
-									//taxaToMove = taxa_to_move.getName();
-				                    maxgain = gl.getVal();               
-				                    maxsat = gl.getSat();
-				                    //glPart = taxa_to_move.getPartition(); // current Partition
-				                    mVat = gl.getVat();
-				                    mDef = gl.getDef();
-		                        }
-		                        //}
-
-		                    }
+//		                    else if(taxa.getSat() == maxsat)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+//		                    {
+//		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+//		                        if(randnum%2 == 0){
+//		                        	taxa_to_move = taxa;
+//									//taxaToMove = taxa_to_move.getName();
+//				                    maxgain = taxa.getVal();               
+//				                    maxsat = taxa.getSat();
+//				                    //glPart = taxa_to_move.getPartition(); // current Partition
+//				                    mVat = taxa.getVat();
+//				                    mDef = taxa.getDef();
+//		                        }
+//		                        //}
+//
+//		                    }
 
 		                
 						}
 					}
-					prevS = maxsat;//score[1];//noOfSat
-	    	        prevV = mVat;//score[2];//noOfVat
-	    	        prevD = mDef;//score[3];//noOfDef
-	    	        
+
 					
-				}
 				
+					////////////
+				}
+
+				///////Moving Taxa which have highest gain
+				
+				prevS = maxsat;//score[1];//noOfSat
+    	        prevV = mVat;//score[2];//noOfVat
+    	        prevD = mDef;//score[3];//noOfDef
+    	        
 				int glPart = taxa_to_move.getPartition();
 				prevScore = prevS - prevV;//partition score
 				if (glPart != -1) {

@@ -10,6 +10,13 @@ public class Taxa {
     //private boolean locked;//dont need to lock anymore
     //Taxa tnext;
     private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
+    
+    /////For threading
+    private int val;		
+	private int sat;
+	private int vat;
+	private int def;
+    /////For threading
 
 	public Taxa(String name) {
 		this(name, (byte) -1);
@@ -85,6 +92,38 @@ public class Taxa {
 //	public void setState(int state) {
 //		this.state = state;
 //	}
+
+	public int getVal() {
+		return val;
+	}
+
+	public void setVal(int val) {
+		this.val = val;
+	}
+
+	public int getSat() {
+		return sat;
+	}
+
+	public void setSat(int sat) {
+		this.sat = sat;
+	}
+
+	public int getVat() {
+		return vat;
+	}
+
+	public void setVat(int vat) {
+		this.vat = vat;
+	}
+
+	public int getDef() {
+		return def;
+	}
+
+	public void setDef(int def) {
+		this.def = def;
+	}
 
 	@Override
 	public int hashCode() {

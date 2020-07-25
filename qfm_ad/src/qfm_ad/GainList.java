@@ -6,22 +6,32 @@ public class GainList {
 	 //If I give Taxa instead of taxaToMove, space complexity becomes high. That's why I am rolling back to previous implementation
 	private Taxa taxa;
 	private int val;		
-	private int sat;
-	private int vat;
-	private int def;
-	private int bel0w;
+//	private int sat;
+//	private int vat;
+//	private int def;
+//	private int bel0w;
 	//private int part; // part means partition. part = 0 means partA; part = 1 means partB;
+//	public GainList(Taxa taxa, int val) {
+//		this(taxa, val, -1, -1, -1, 0);
+//	}
+//	public GainList(Taxa taxa, int val, int sat, int vat, int def, int bel0w) {
+//		
+//		this.taxa = taxa;
+//		this.val = val;
+//		this.sat = sat;
+//		this.vat = vat;
+//		this.def = def;
+//		this.bel0w = bel0w;
+//		//this.part = part;
+//	}
 	public GainList(Taxa taxa, int val) {
-		this(taxa, val, -1, -1, -1, 0);
-	}
-	public GainList(Taxa taxa, int val, int sat, int vat, int def, int bel0w) {
 		
 		this.taxa = taxa;
 		this.val = val;
-		this.sat = sat;
-		this.vat = vat;
-		this.def = def;
-		this.bel0w = bel0w;
+//		this.sat = sat;
+//		this.vat = vat;
+//		this.def = def;
+//		this.bel0w = bel0w;
 		//this.part = part;
 	}
 	public Taxa getTaxa() {
@@ -30,18 +40,18 @@ public class GainList {
 	public int getVal() {
 		return val;
 	}
-	public int getSat() {
-		return sat;
-	}
-	public int getVat() {
-		return vat;
-	}
-	public int getDef() {
-		return def;
-	}
-	public int getBel0w() {
-		return bel0w;
-	}
+//	public int getSat() {
+//		return sat;
+//	}
+//	public int getVat() {
+//		return vat;
+//	}
+//	public int getDef() {
+//		return def;
+//	}
+//	public int getBel0w() {
+//		return bel0w;
+//	}
 //	public int getPart() {
 //		return part;
 //	}
