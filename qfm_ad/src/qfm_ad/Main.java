@@ -13,14 +13,15 @@ public class Main {
 		//String fileName = "sample.txt";
 		//String s= Routines.readQuartetQMC("sample300.txt");
 		String s= Routines.readQuartetQMC(args[0]);
-		System.out.println(s);
+		//System.out.println(s);
 		try(BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
 			bw.write(s);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		long estimatedTime = System.currentTimeMillis() - startTime;
-		System.out.println("Elapsed Time : "+ estimatedTime/1000 + " seconds");
+		//System.out.println("Elapsed Time : "+ estimatedTime/1000 + " seconds");
+		System.out.println(estimatedTime);
 		
 		//String s= Routines.readQuartetQMC("t25_q125_80_qmc.txt");
 		

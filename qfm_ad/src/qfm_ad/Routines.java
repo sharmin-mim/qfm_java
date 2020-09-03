@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -79,8 +80,8 @@ public class Routines {
 				
 				
 			}
-			System.out.println("number of quartet = "+ qc);
-			System.out.println("number of unique quartet = "+quartetList.size());
+			//System.out.println("number of quartet = "+ qc);
+			//System.out.println("number of unique quartet = "+quartetList.size());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -103,13 +104,13 @@ public class Routines {
 				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));*/
 
 		double estimatedTime = System.currentTimeMillis() - startTime;
-		System.out.println("Elapsed Time : "+ estimatedTime/1000 + " seconds");
-		for (Taxa taxa : taxaList) {
-			System.out.print(taxa.getName()+"->");
-		}
-		
-		
-		System.out.println();
+		//System.out.println("Quartet reading and sorting Time : "+ estimatedTime + " miliseconds");
+//		for (Taxa taxa : taxaList) {
+//			System.out.print(taxa.getName()+"->");
+//		}
+//		
+//		
+//		System.out.println();
 		////////////I will investigate this block later. whether it is really nrcessary or not
 //		int qID = 0;
 //		for (Quartet quartet : countedSortedQL) {
@@ -119,7 +120,7 @@ public class Routines {
 //		}
 		///////////////////////////////////////////////////////////////////////////////////
 		//printQuartet(countedSortedQL);
-		System.out.println("\n Number of taxa : "+taxaList.size());
+		//System.out.println("\n Number of taxa : "+taxaList.size());
 		///////////////////////////////will delete
 //		FM(taxaList, countedSortedQL);
 //		try(BufferedWriter bw = new BufferedWriter(new FileWriter("sample27.txt"))) {//args[1] is output file
@@ -151,7 +152,10 @@ public class Routines {
 		}
 		*/
 		//////////////////////////////////
+		long startTime1 = System.currentTimeMillis();
 		String s = SQP(countedSortedQL, taxaList, 1000, 0);
+		long estimatedTime1 = System.currentTimeMillis() - startTime1;
+		//System.out.println("SQP function Total Time : "+ estimatedTime1 + " miliseconds");
 		if (s != null) {
 			s = s.replace("(O,", "(0,");
 			s = s.replace(",O,", ",0,");
@@ -167,15 +171,17 @@ public class Routines {
 	}
 	
 	public static String SQP(LinkedHashSet<Quartet> quartetList, LinkedHashSet<Taxa> taxaList, int extraTaxa, int partSatCount) {
+		//long t0 = System.currentTimeMillis();
 		int taxacount = taxaList.size();
 //		System.out.println("******************SQP*****************");
 //		System.out.println("Taxa Count = "+ taxacount);
 //		System.out.println("Quartet Count = "+ quartetList.size());
-		String s, extra = "extra";
+		String s , extra = "extra";
 
 		
 		if (taxacount == 0) {
 			s = ("");
+			
 			return s;
 		}
 		//quartetList.size() == 0 diye check korte hobe
@@ -200,9 +206,11 @@ public class Routines {
 	            partSatCount++;
 	            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
 	            {	
-	            	System.out.println("partSatCount value = "+ partSatCount);
+	            	//System.out.println("partSatCount value = "+ partSatCount);
 	            	partSatCount = 0;
 	                s = depthOneTree(taxaList);
+	                //long t2 = System.currentTimeMillis() - t0;
+	        		//System.out.println(taxacount+","+ quartetList.size()+","+t2);
 	                return s;
 	            }
 	        }
@@ -230,14 +238,7 @@ public class Routines {
 //	        ArrayList<Quartet> quartetBBB = new ArrayList<Quartet>();
 	        
 	        int numOfBDQ = 0; //number of b and deferred quartet
-//	        int numOfB = 0;
-//	        int numOfD = 0;
-//	        int numOfBA = 0;
-//	        int numOfBB = 0;
-//	        int numOfDA = 0;
-//	        int numOfDB = 0;
-//	        int numOfDAA = 0;
-//	        int numOfDBB= 0;
+
 	        for (Quartet q : quartetList) {
 	        	char c = q.getStatus();
 				//int l = q.getStatus().length();
@@ -349,26 +350,44 @@ public class Routines {
 //	        printTaxa(partB);
 //	        System.out.println("**************SQP After partitioning quartetB****************");
 //	        printQuartet(quartetB);
-	        System.out.println("One SQP divide step is completed");
+	       // System.out.println("One SQP divide step is completed");
 	        //final String s1, s2;
-	        if (extraTaxa == 1001) {
-	        	final int ext = extraTaxa, psc = partSatCount;
-	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
-	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
-	   	        String s1 = null;
-	   			try {
-	   				s1 = cf.get();
-	   			} catch (InterruptedException e) {
-	   				//e.printStackTrace();
-	   			} catch (ExecutionException e) {
-	   				//e.printStackTrace();
-	   			}
-	   			s = merge(s1,s2,extra);
-			} else {
+	        
+//	        System.out.println("\n\n**************Before first recursive call****************");
+//	        long t1 = System.currentTimeMillis();
+//			System.out.println("Before first recursive call : "+ (t1 - t0) + " miliseconds");
+//			 System.out.println("\n\n**************Before first recursive call****************\n\n");
+	        double estimatedTime = -517 + ( 111 * partA.size()) + ( 0.205 * quartetA.size());
+	        
+	        //if (extraTaxa == 1001) {
+	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
+	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
+	        //if (estimatedTime > 30000) {//if estimatedTime > 30000 miliseconds
+	        //if (estimatedTime > 20000) {//if estimatedTime > 20000 miliseconds
+	        //if (estimatedTime > 10000) {//if estimatedTime > 10000 miliseconds
+	        //if (estimatedTime > 5000) {//if estimatedTime > 5000 miliseconds
+	        //if (estimatedTime > 1000) {//if estimatedTime > 1000 miliseconds
+	        //if (estimatedTime > 500) {//if estimatedTime > 500 miliseconds
+//	        if (estimatedTime > 100) {//if estimatedTime > 100 miliseconds
+//	        	final int ext = extraTaxa, psc = partSatCount;
+//	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
+//	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+//	   	        String s1 = null;
+//	   			try {
+//	   				s1 = cf.get();
+//	   			} catch (InterruptedException e) {
+//	   				//e.printStackTrace();
+//	   			} catch (ExecutionException e) {
+//	   				//e.printStackTrace();
+//	   			}
+//
+//	   			s = merge(s1,s2,extra);
+//			} else {
 				String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
-		        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+		        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);  
 		        s = merge(s1,s2,extra);
-			}
+		        
+			//}
 	       
 //	        //String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 //	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
@@ -380,7 +399,8 @@ public class Routines {
 	    }
 
 	
-		
+		//long t2 = System.currentTimeMillis() - t0;
+		//System.out.println(taxacount+","+ quartetList.size()+","+t2);
 		return s;
 		//return null;
 	
@@ -1308,6 +1328,9 @@ public class Routines {
 			boolean iterationMore = true; int iteration = 0;
 			int ca = partA.size();
 			int cb = partB.size();
+			// at the begining of this loop(loopAgain) ca and cb are size of partA and part. But later it is hypothetically true.
+			// because I only remove taxa from these partitions but I dont add them in opposite partition. I add the removed taxa in movedList
+			
 			int arraysize = ca + cb;
 			List<GainList> movedList;
 			if (arraysize > 0) {
@@ -1343,13 +1366,13 @@ public class Routines {
 //				int cb = partB.size();
 //				System.out.println("Before Flag: prevScore = "+prevScore+"  prevS = "+ prevS+"  prevV = "+prevV+"  prevD = "+ prevD);
 //				printQuartet(quartetList);
-				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
+//				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
 //				gainList = new Listt();
 				//LinkedHashSet<GainList> gainList = new LinkedHashSet<GainList>();
 				List<GainList> gainList = new LinkedList<GainList>();
 					
-				Iterator<Taxa> iteratorA = partA.iterator();
-				Iterator<Taxa> iteratorB = partB.iterator();
+//				Iterator<Taxa> iteratorA = partA.iterator();
+//				Iterator<Taxa> iteratorB = partB.iterator();
 				//System.out.println("New Iteration");
 				final int iterationF = iteration;
 				final int prevSF = prevS;
@@ -1357,12 +1380,13 @@ public class Routines {
 				final int prevDF = prevD;
 				final int prevScoreF = prevScore;
 				
+		
 				Thread tA = new Thread() {
 
 					@Override
 					public void run() {
 						int[] score;
-						
+						int partitionIndex = 0;
 						for (Taxa taxaA : partA) {
 							if (iterationF == 1) {
 								//taxaA.getSvdTable().clear();
@@ -1370,15 +1394,21 @@ public class Routines {
 							} else {
 								score = mCalculateScore(taxaA.getSvdTable(), rQuartetList, taxaA.getName(), prevSF, prevVF, prevDF);
 							}
+							//I am keeping following values as attributes of taxa. If I keep them in a treemap, i think it
+							//will be fasster. but we may not get similar result
 							taxaA.setVal(score[0] - prevScoreF);
 							taxaA.setSat(score[1]);
 							taxaA.setVat(score[2]);
 							taxaA.setDef(score[3]);
+							partitionIndex += 1;
+							taxaA.partitionIndex = partitionIndex;
 						}
+						
 					}
 					
 				};
 				tA.start();
+				int partitionIndex = 0;
 				for (Taxa taxaB : partB) {
 					if (iterationF == 1) {
 						//taxaA.getSvdTable().clear();
@@ -1390,100 +1420,184 @@ public class Routines {
 					taxaB.setSat(score[1]);
 					taxaB.setVat(score[2]);
 					taxaB.setDef(score[3]);
+					partitionIndex += 1;
+					taxaB.partitionIndex = partitionIndex;
 				}
+//				Taxa maxGainTaxaPartB = null;
+//				if (!partB.isEmpty() && cb > 2) {
+//					maxGainTaxaPartB = partB.stream().max(Comparator.comparing(Taxa::getVal).thenComparing(Taxa::getSat)).get();
+//				}
 				try {
 					tA.join();
 				} catch (InterruptedException e) {
 					
 				}
+				
 				Taxa taxa_to_move = new Taxa("", -1);
-				int maxgain = -1000000000; //double
-				int maxsat = 0;
-	            //glPart = 0;
-	            int randnum = 0;
-	            int mVat = 0;
-	            int mDef = 0;
-				while (flag) {
-					Taxa taxa = new Taxa("", 5);
-					boolean access = false;
-					if (iteratorA.hasNext() && alt == 0 && ca > 2) {
-						taxa = iteratorA.next();
-						access = true;
-						
-					} else if (iteratorB.hasNext() && alt == 1 && cb > 2) {
-						taxa = iteratorB.next();
-						access = true;
-					} 
-					
-					if (!iteratorA.hasNext() || ca<3) {
-						tag1 = 1;
-					}
-					if (!iteratorB.hasNext() || cb<3) {
-						tag2 = 1;
-					}
-					if (tag1 == 1 && tag2 == 1) {
-						flag = false;
-					}
-					if (tag2 == 0 && alt == 0) {
-						alt = 1;
-					}else if (tag1 == 0 && alt == 1) {
-						alt= 0;
-					}
-					////Gain Calculation
-					if (access) {
-						if (taxa.getVal() > maxgain) {
-							taxa_to_move = taxa;
-							//taxaToMove = taxa_to_move.getName();
-		                    maxgain = taxa.getVal();               
-		                    maxsat = taxa.getSat();
-		                    //glPart = taxa_to_move.getPartition(); // current Partition
-		                    mVat = taxa.getVat();
-		                    mDef = taxa.getDef();
-		                 
-						} else if(taxa.getVal() == maxgain){
-							 
-		                   
-		                    if(taxa.getSat() > maxsat)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-		                    {
-		                    	taxa_to_move = taxa;
-								//taxaToMove = taxa_to_move.getName();
-			                    maxgain = taxa.getVal();               
-			                    maxsat = taxa.getSat();
-			                   // glPart = taxa_to_move.getPartition(); // current Partition
-			                    mVat = taxa.getVat();
-			                    mDef = taxa.getDef();
-		                    }
-//		                    else if(taxa.getSat() == maxsat)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-//		                    {
-//		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-//		                        if(randnum%2 == 0){
-//		                        	taxa_to_move = taxa;
-//									//taxaToMove = taxa_to_move.getName();
-//				                    maxgain = taxa.getVal();               
-//				                    maxsat = taxa.getSat();
-//				                    //glPart = taxa_to_move.getPartition(); // current Partition
-//				                    mVat = taxa.getVat();
-//				                    mDef = taxa.getDef();
-//		                        }
-//		                        //}
-//
-//		                    }
-
-		                
+				
+				//I have tried Three ways for finding taxa which has maximum gain
+				//1. If we keep all taxa in a treeset in descending order on the basis of val, sat and partitionIndex,
+				// then first element will be taxa of maximum gain. But its not memory efficient
+				//2. Finding max taxa for partA and partB separately, then compare them. It can be done inside uppper thread
+				//3. Using iteration , then comparing one by one
+				// Three approaches gives almost same running time. Method two is slightly better. 
+				
+				
+//				//method 1: Using treeset
+//				TreeSet<Taxa> tr = new TreeSet<Taxa>(Comparator.comparing(Taxa::getVal, Collections.reverseOrder())
+//						.thenComparing(Taxa::getSat, Collections.reverseOrder())
+//						.thenComparing(Taxa::getPartitionIndex));
+//				if (!partA.isEmpty() && ca > 2) {
+//					tr.addAll(partA);
+//				}
+//			
+//				if (!partB.isEmpty() && cb > 2) {
+//					tr.addAll(partB);
+//				}
+//				if (!tr.isEmpty()) {
+//					taxa_to_move = tr.first();
+//				}
+				
+				
+				
+				// Method 2: Finding max taxa for partA and partB separately, then compare them. 
+				
+				Taxa maxGainTaxaPartA = null;
+				if (!partA.isEmpty() && ca > 2) {
+					maxGainTaxaPartA = partA.stream().max(Comparator.comparing(Taxa::getVal).thenComparing(Taxa::getSat)).get();
+				}
+				// adding below code after calculating gain of all taxa of partB
+				Taxa maxGainTaxaPartB = null;
+				if (!partB.isEmpty() && cb > 2) {
+					maxGainTaxaPartB = partB.stream().max(Comparator.comparing(Taxa::getVal).thenComparing(Taxa::getSat)).get();
+				}
+				
+	            if (maxGainTaxaPartA != null && maxGainTaxaPartB != null) {
+	            	if (maxGainTaxaPartA.getVal() > maxGainTaxaPartB.getVal()) {
+	            		taxa_to_move = maxGainTaxaPartA;						
+					}else if(maxGainTaxaPartA.getVal() < maxGainTaxaPartB.getVal()) {
+						taxa_to_move = maxGainTaxaPartB;
+					}else { //in that case maxGainTaxaPartA.getVal() == maxGainTaxaPartB.getVal()
+						if (maxGainTaxaPartA.getSat() > maxGainTaxaPartB.getSat()) {
+							taxa_to_move = maxGainTaxaPartA;
+						}else if (maxGainTaxaPartA.getSat() < maxGainTaxaPartB.getSat()) {
+							taxa_to_move = maxGainTaxaPartB;
+						}else {//in that case (maxGainTaxaPartA.getSat() == maxGainTaxaPartB.getSat()) {
+							if (maxGainTaxaPartA.partitionIndex <= maxGainTaxaPartB.partitionIndex) {
+								taxa_to_move = maxGainTaxaPartA;
+							}else {
+								taxa_to_move = maxGainTaxaPartB;
+							}
 						}
 					}
-
-					
-				
-					////////////
+	            	
+				} else if (maxGainTaxaPartA != null) {
+					taxa_to_move = maxGainTaxaPartA;
+				} else if (maxGainTaxaPartB != null) {
+					taxa_to_move = maxGainTaxaPartB;
 				}
+				
+				
+			
+             // Method 3: comparing one by one
+//				int maxgain = -1000000000; //double
+//				int maxsat = 0;
+//	            //glPart = 0;
+//	            int randnum = 0;
+//	            int mVat = 0;
+//	            int mDef = 0;   
+//				while (flag) {
+//					Taxa taxa = new Taxa("", 5);
+//					boolean access = false;
+//					if (iteratorA.hasNext() && alt == 0 && ca > 2) {
+//						taxa = iteratorA.next();
+//						access = true;
+//						
+//					} else if (iteratorB.hasNext() && alt == 1 && cb > 2) {
+//						taxa = iteratorB.next();
+//						access = true;
+//					} 
+//					
+//					if (!iteratorA.hasNext() || ca<3) {
+//						tag1 = 1;
+//					}
+//					if (!iteratorB.hasNext() || cb<3) {
+//						tag2 = 1;
+//					}
+//					if (tag1 == 1 && tag2 == 1) {
+//						flag = false;
+//					}
+//					if (tag2 == 0 && alt == 0) {
+//						alt = 1;
+//					}else if (tag1 == 0 && alt == 1) {
+//						alt= 0;
+//					}
+//					////Gain Calculation
+//					if (access) {
+//						if (taxa.getVal() > maxgain) {
+//							taxa_to_move = taxa;
+//							//taxaToMove = taxa_to_move.getName();
+//		                    maxgain = taxa.getVal();               
+//		                    maxsat = taxa.getSat();
+//		                    //glPart = taxa_to_move.getPartition(); // current Partition
+//		                    mVat = taxa.getVat();
+//		                    mDef = taxa.getDef();
+//		                 
+//						} else if(taxa.getVal() == maxgain){
+//							 
+//		                   
+//		                    if(taxa.getSat() > maxsat)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
+//		                    {
+//		                    	taxa_to_move = taxa;
+//								//taxaToMove = taxa_to_move.getName();
+//			                    maxgain = taxa.getVal();               
+//			                    maxsat = taxa.getSat();
+//			                   // glPart = taxa_to_move.getPartition(); // current Partition
+//			                    mVat = taxa.getVat();
+//			                    mDef = taxa.getDef();
+//		                    }
+//		                    //below code is for randomly pick a taxa. I m commenting this block to turn off randomization. It is not necessary
+////		                    else if(taxa.getSat() == maxsat)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
+////		                    {
+////		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
+////		                        if(randnum%2 == 0){
+////		                        	taxa_to_move = taxa;
+////									//taxaToMove = taxa_to_move.getName();
+////				                    maxgain = taxa.getVal();               
+////				                    maxsat = taxa.getSat();
+////				                    //glPart = taxa_to_move.getPartition(); // current Partition
+////				                    mVat = taxa.getVat();
+////				                    mDef = taxa.getDef();
+////		                        }
+////		                        //}
+////
+////		                    }
+//
+//		                
+//						}
+//					}
+//
+//					
+//				
+//					////////////
+//				}
 
 				///////Moving Taxa which have highest gain
-				
-				prevS = maxsat;//score[1];//noOfSat
-    	        prevV = mVat;//score[2];//noOfVat
-    	        prevD = mDef;//score[3];//noOfDef
+//	            maxgain = taxa_to_move.getVal();               
+//                maxsat = taxa_to_move.getSat();
+//                //glPart = taxa_to_move.getPartition(); // current Partition
+//                mVat = taxa_to_move.getVat();
+//                mDef = taxa_to_move.getDef();
+//				prevS = maxsat;//score[1];//noOfSat
+//    	        prevV = mVat;//score[2];//noOfVat
+//    	        prevD = mDef;//score[3];//noOfDef
     	        
+    	        
+    	        ///////////////
+    	        prevS = taxa_to_move.getSat();//score[1];//noOfSat
+    	        prevV = taxa_to_move.getVat();//score[2];//noOfVat
+    	        prevD = taxa_to_move.getDef();//score[3];//noOfDef
+    	        ////////////////
 				int glPart = taxa_to_move.getPartition();
 				prevScore = prevS - prevV;//partition score
 				if (glPart != -1) {
@@ -1507,8 +1621,8 @@ public class Routines {
 					}
 					//taxa_to_move.setLocked(true);
 //					t.setLocked(true);
-					movedList.add(new GainList(taxa_to_move, maxgain));
-					
+					//movedList.add(new GainList(taxa_to_move, maxgain));
+					movedList.add(new GainList(taxa_to_move,  taxa_to_move.getVal()));
 					////////////Extracting quartets which have moved_taxa
 					
 					rQuartetList.clear();

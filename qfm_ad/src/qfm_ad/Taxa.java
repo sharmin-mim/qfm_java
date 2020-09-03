@@ -16,7 +16,12 @@ public class Taxa {
 	private int sat;
 	private int vat;
 	private int def;
+	public int partitionIndex;//it's for taxa serial number in partition
     /////For threading
+
+	public int getPartitionIndex() {
+		return partitionIndex;
+	}
 
 	public Taxa(String name) {
 		this(name, (byte) -1);
