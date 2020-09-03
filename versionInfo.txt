@@ -1,0 +1,56 @@
+******************************************************************************
+
+                            VERSION INFORMATION
+
+
+******************************************************************************
+version 2.0.* --------> Non-threaded version 
+	No Thread
+	I will write this part later
+******************************************************************************
+
+					version 2.1.* --------> Threaded version
+
+
+******************************************************************************
+version 2.1.0
+	Commit ID: 026ec42 
+	Commit: 026ec42e246925655eb6b42eab7a5753b93bc311
+	Commit message: multithreading is done in SQP(), temp file is created in reroot() instead of reroot.txt file
+	Changes: SQP()-> one thread is used
+	Total maximum number of running thread: 2 (including main)
+version 2.1.1
+	Commit ID: 37185e3
+	Commit: 37185e37ceb37b7b9cc27674544da5e1f9447bfa
+	commit message: null value problem is solved
+	Changes: SQP()-> one thread is used
+	Total maximum number of running thread: 2 (including main)
+version 2.1.2
+	Commit ID: c365411 
+	Commit: c36541159a1f6931e41e6cd853617fe7d9ba66dd
+	Commit message: Version 2.1.2 -> Taxa: sat, vat, def, val added, GainList(Taxa, val).
+									 MFM:no randomization, one thread for partA. 
+									 SQP: one thread for S1.
+	Changes: Routine/SQP()-> one thread is used
+			 Routine/MFM_algo() -> one thread is used in partA gain calculation. Randomization part is deleted.
+			 Taxa -> sat, vat, def, val variable are added
+			 GainList -> all variable are deleted except taxa and val(val means maxGain)
+	Total maximum number of running thread: 4 (including main)
+version 2.1.3
+	Commit ID: c24e698  
+	Commit: 34ac5e31edc7b269710481e28d0fdb0ff16006f8
+	Commit message: Version 2.1.3 -> Taxa: partitionIndex adeded, Fm_algo: max Taxa is calculated using three method
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+			 Routine/MFM_algo() ->//I have tried Three ways for finding taxa which has maximum gain
+				//1. If we keep all taxa in a treeset in descending order on the basis of val, sat and partitionIndex,
+				// then first element will be taxa of maximum gain. But its not memory efficient
+				//2. Finding max taxa for partA and partB separately, then compare them. 
+				//3. Using iteration , then comparing one by one
+				// Three approaches gives almost same running time. Method-2 better in terms of space.
+				// That's why I m keeping it
+				
+			 Taxa -> partitionIndex variable are added
+			 GainList -> all variable are deleted except taxa and val(val means maxGain)
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+
+Future Step: Deffered variable will be deleted. merge function will be updated.
