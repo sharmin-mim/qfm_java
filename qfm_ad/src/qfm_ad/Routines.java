@@ -1340,7 +1340,7 @@ public class Routines {
 			}
 			
 			LinkedHashSet<Quartet> rQuartetList = new LinkedHashSet<Quartet>();//reduced quartetList(quartets with movedTaxa);
-			int prevScore =0, prevS = 0, prevV = 0, prevD = 0;
+			int prevScore =0, prevS = 0, prevV = 0;//, prevD = 0;
 			while (iterationMore) {
 				iteration++;
 				int[] score;
@@ -1350,7 +1350,7 @@ public class Routines {
 					prevScore = score[0];//partition score
 		            prevS = score[1];//noOfSat
 		            prevV = score[2];//noOfVat
-		            prevD = score[3];//noOfDef
+		            //prevD = score[3];//noOfDef
 				}
 //				else {
 //					score= iCalculateScore(partB,rQuartetList);
@@ -1377,7 +1377,7 @@ public class Routines {
 				final int iterationF = iteration;
 				final int prevSF = prevS;
 				final int prevVF = prevV;
-				final int prevDF = prevD;
+				//final int prevDF = prevD;
 				final int prevScoreF = prevScore;
 				
 		
@@ -1390,16 +1390,16 @@ public class Routines {
 						for (Taxa taxaA : partA) {
 							if (iterationF == 1) {
 								//taxaA.getSvdTable().clear();
-								score = mCalculateScore(taxaA.getSvdTable(), quartetList, taxaA.getName(), prevSF, prevVF, prevDF);
+								score = mCalculateScore(taxaA.getSvdTable(), quartetList, taxaA.getName(), prevSF, prevVF);
 							} else {
-								score = mCalculateScore(taxaA.getSvdTable(), rQuartetList, taxaA.getName(), prevSF, prevVF, prevDF);
+								score = mCalculateScore(taxaA.getSvdTable(), rQuartetList, taxaA.getName(), prevSF, prevVF);
 							}
 							//I am keeping following values as attributes of taxa. If I keep them in a treemap, i think it
 							//will be fasster. but we may not get similar result
 							taxaA.setVal(score[0] - prevScoreF);
 							taxaA.setSat(score[1]);
 							taxaA.setVat(score[2]);
-							taxaA.setDef(score[3]);
+							//taxaA.setDef(score[3]);
 							partitionIndex += 1;
 							taxaA.partitionIndex = partitionIndex;
 						}
@@ -1412,14 +1412,14 @@ public class Routines {
 				for (Taxa taxaB : partB) {
 					if (iterationF == 1) {
 						//taxaA.getSvdTable().clear();
-						score = mCalculateScore(taxaB.getSvdTable(), quartetList, taxaB.getName(), prevS, prevV, prevD);
+						score = mCalculateScore(taxaB.getSvdTable(), quartetList, taxaB.getName(), prevS, prevV);
 					} else {
-						score = mCalculateScore(taxaB.getSvdTable(), rQuartetList, taxaB.getName(), prevS, prevV, prevD);
+						score = mCalculateScore(taxaB.getSvdTable(), rQuartetList, taxaB.getName(), prevS, prevV);
 					}
 					taxaB.setVal(score[0] - prevScore);
 					taxaB.setSat(score[1]);
 					taxaB.setVat(score[2]);
-					taxaB.setDef(score[3]);
+					//taxaB.setDef(score[3]);
 					partitionIndex += 1;
 					taxaB.partitionIndex = partitionIndex;
 				}
@@ -1596,7 +1596,7 @@ public class Routines {
     	        ///////////////
     	        prevS = taxa_to_move.getSat();//score[1];//noOfSat
     	        prevV = taxa_to_move.getVat();//score[2];//noOfVat
-    	        prevD = taxa_to_move.getDef();//score[3];//noOfDef
+    	       // prevD = taxa_to_move.getDef();//score[3];//noOfDef
     	        ////////////////
 				int glPart = taxa_to_move.getPartition();
 				prevScore = prevS - prevV;//partition score
@@ -1792,18 +1792,18 @@ public class Routines {
 		return new MultiReturnType(partA, partB);
 	}
 	private static int[] mCalculateScore(HashSet<SVD_Log> svdTable, LinkedHashSet<Quartet> quartetList, String tempTaxa,
-			int st, int vt, int df) {
+			int st, int vt) {
 		
-		int[] scores = {0,0,0,0};
+		int[] scores = {0,0,0};
 	    char  qStat;
-	    int s = 0, v = 0, d = 0;
+	    int s = 0, v = 0;//, d = 0;
 	    char c;
 	    //only tempTaxa ta jei shob quartet a ase, oi gulo niye new Qlist korte hobe
 	    for (Quartet q : quartetList) {
 	    	if(q.getT1().getName().contentEquals(tempTaxa) || q.getT2().getName().contentEquals(tempTaxa) ||
 	        		q.getT3().getName().contentEquals(tempTaxa) || q.getT4().getName().contentEquals(tempTaxa))
 	        {	
-	    		s = 0; v = 0; d = 0;
+	    		s = 0; v = 0;// d = 0;
 	    		qStat  = mCheckQuartet(q, tempTaxa);
 	    		c = q.getStatus();
 	           // c = q.getStatus().charAt(0);//status[0];
@@ -1813,44 +1813,47 @@ public class Routines {
 
 	            if(c=='s' && qStat == 'v') { s = - q.getQFrequency(); v =  q.getQFrequency();} // s v
 
-	            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency(); d =  q.getQFrequency();} // s d
+	            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
 
 	            else if(c=='v' && qStat == 's'){v = - q.getQFrequency(); s = q.getQFrequency();} // v s
 
-	            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();d = q.getQFrequency();}  // v d
+	            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
 
-	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
+//	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
+//
+//	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
+	            else if(c=='d' && qStat == 'v'){v = q.getQFrequency();} // d v
 
-	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
+	            else if(c=='d' && qStat == 's'){s = q.getQFrequency();} // d s
 
 	            else if(qStat == 'b')
 	            {
 	                if(c=='s') { s = - q.getQFrequency();}
 	                else if(c=='v') { v = - q.getQFrequency();}
-	                else if(c=='d') { d = - q.getQFrequency();}
+	                //else if(c=='d') { d = - q.getQFrequency();}
 
 	            }
 	            else if(c=='b')
 	            {
 	                if(qStat == 's') { s = q.getQFrequency();}
 	                else if(qStat == 'v') { v = q.getQFrequency();}
-	                else if(qStat == 'd') { d = q.getQFrequency();}
+	                //else if(qStat == 'd') { d = q.getQFrequency();}
 	            }
 	            
-	            svdTable.add(new SVD_Log(q, s, v, d, qStat));
+	            svdTable.add(new SVD_Log(q, s, v, qStat));
 	            
 
 	        }
 		}
-	    s = 0; v = 0; d = 0;
+	    s = 0; v = 0;// d = 0;
     	for (SVD_Log svd : svdTable) {
 			s += svd.getSat();
 			v += svd.getVat();
-			d += svd.getDef();
+			//d += svd.getDef();
 		}
     	scores[1] = st+s ;//noOfSat = st+s;
         scores[2] = vt+v;//noOfVat = vt+v;
-        scores[3] = df+d;//noOfDef = df+d;
+        //scores[3] = df+d;//noOfDef = df+d;
 
         scores[0]= scores[1]-scores[2];//partitionScore = ((st+s)-(vt+v));
 	    

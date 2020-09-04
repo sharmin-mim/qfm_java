@@ -11,15 +11,15 @@ public class SVD_Log {
 	private Quartet quartet;
 	private int sat;//number of satisfied quartet
 	private int vat;//number of violated quartet
-	private int def;//number of deferred quartet
-	private char qStat;
+	//private int def;//number of deferred quartet
+	private char qStat;//status of quartet
 	
-	public SVD_Log(Quartet quartet, int sat, int vat, int def, char qStat) {
-
+	//public SVD_Log(Quartet quartet, int sat, int vat, int def, char qStat) {
+	public SVD_Log(Quartet quartet, int sat, int vat, char qStat) {
 		this.quartet = quartet;
 		this.sat = sat;
 		this.vat = vat;
-		this.def = def;
+		//this.def = def;
 		this.qStat = qStat;
 	}
 
@@ -40,9 +40,9 @@ public class SVD_Log {
 	public int getVat() {
 		return vat;
 	}
-	public int getDef() {
-		return def;
-	}
+//	public int getDef() {
+//		return def;
+//	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(quartet);

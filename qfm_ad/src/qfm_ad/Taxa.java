@@ -15,7 +15,7 @@ public class Taxa {
     private int val;		
 	private int sat;
 	private int vat;
-	private int def;
+	//private int def;
 	public int partitionIndex;//it's for taxa serial number in partition
     /////For threading
 
@@ -122,13 +122,13 @@ public class Taxa {
 		this.vat = vat;
 	}
 
-	public int getDef() {
-		return def;
-	}
-
-	public void setDef(int def) {
-		this.def = def;
-	}
+//	public int getDef() {
+//		return def;
+//	}
+//
+//	public void setDef(int def) {
+//		this.def = def;
+//	}
 
 	@Override
 	public int hashCode() {
