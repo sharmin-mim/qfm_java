@@ -37,8 +37,8 @@ version 2.1.2
 			 GainList -> all variable are deleted except taxa and val(val means maxGain)
 	Total maximum number of running thread: 4 (including main)
 version 2.1.3
-	Commit ID: c24e698  
-	Commit: 34ac5e31edc7b269710481e28d0fdb0ff16006f8
+	Commit ID: c24e698 
+	Commit: c24e698e0e66569b017e52cca8e8b5a1ae914627   
 	Commit message: Version 2.1.3 -> Taxa: partitionIndex adeded, Fm_algo: max Taxa is calculated using three method
 	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
 			 Routine/MFM_algo() ->//I have tried Three ways for finding taxa which has maximum gain
@@ -54,3 +54,15 @@ version 2.1.3
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 
 Future Step: Deffered variable will be deleted. merge function will be updated.
+version 2.1.4
+	Commit ID: b1e2e21  
+	Commit: b1e2e21f4d56f9d7c908038ba9c066cf51d67cf0
+	Commit message: Version 2.1.4 -> Taxa and SVD_log: defered variable is deleted
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+			 Routine/mCalculateScore is changed because deffered va is deleted in Taxa and Gainlist class.
+			 Since partition_score = satified_quartet - violated_quartet, we dont need to calculate number of defered quartet.
+				
+			 Taxa -> defered variable is deleted
+			 SVD_log -> defered variable is deleted
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore() efficient. 
