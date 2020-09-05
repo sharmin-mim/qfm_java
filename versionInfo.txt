@@ -66,3 +66,25 @@ version 2.1.4
 			 SVD_log -> defered variable is deleted
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore() efficient. 
+version 2.1.4
+	Commit ID: b1e2e21  
+	Commit: b1e2e21f4d56f9d7c908038ba9c066cf51d67cf0
+	Commit message: Version 2.1.4 -> Taxa and SVD_log: defered variable is deleted
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+			 Routine/mCalculateScore is changed because deffered va is deleted in Taxa and Gainlist class.
+			 Since partition_score = satified_quartet - violated_quartet, we dont need to calculate number of defered quartet.
+				
+			 Taxa -> defered variable is deleted
+			 SVD_log -> defered variable is deleted
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore() efficient. 
+version 2.1.5
+	Commit ID: 46b5941 
+	Commit: 46b5941c9434dada35aa120457ff9ffee068c679
+	Commit message: Version 2.1.5 -> Taxa: relaventQuartetList, Quartet: fillUpRelaventQuartetOfCorrespondingTaxa
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+			 Routine/Fm_algo : relaventQuartetList is used instead of rQuartetList	
+			 Taxa -> relaventQuartetList is added
+			 Quartet -> fillUpRelaventQuartetOfCorrespondingTaxa is added
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore()more efficient.
