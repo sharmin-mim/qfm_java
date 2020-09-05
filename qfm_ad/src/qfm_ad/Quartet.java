@@ -84,6 +84,14 @@ public class Quartet {
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
+	public void fillUpRelaventQuartetListOfCorrespondingTaxa() {
+		t1.relaventQuartet.add(this);
+		t2.relaventQuartet.add(this);
+		t3.relaventQuartet.add(this);
+		t4.relaventQuartet.add(this);
+	}
+	
+	
 //	@Override
 //	public int hashCode() {
 //		return Objects.hash(t1, t2, t3, t4);

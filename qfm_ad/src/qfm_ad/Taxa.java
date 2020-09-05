@@ -1,6 +1,8 @@
 package qfm_ad;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class Taxa {
 	private String name; // node name
@@ -9,7 +11,8 @@ public class Taxa {
     //private int taxaScore;
     //private boolean locked;//dont need to lock anymore
     //Taxa tnext;
-    private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter 
+    private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
+    public List<Quartet> relaventQuartet = new ArrayList<Quartet>();
     
     /////For threading
     private int val;		
