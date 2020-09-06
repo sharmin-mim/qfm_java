@@ -84,11 +84,17 @@ public class Quartet {
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
-	public void fillUpRelaventQuartetListOfCorrespondingTaxa() {
-		t1.relaventQuartet.add(quartetID);
-		t2.relaventQuartet.add(quartetID);
-		t3.relaventQuartet.add(quartetID);
-		t4.relaventQuartet.add(quartetID);
+	public void fillUpRelaventQuartetIndexOfCorrespondingMovedTaxa() {
+		t1.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
+		t2.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
+		t3.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
+		t4.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
+	}
+	public void fillUpInitialRelaventQuartetIndex() {
+		t1.initialRelaventQuartetID.add(quartetID);
+		t2.initialRelaventQuartetID.add(quartetID);
+		t3.initialRelaventQuartetID.add(quartetID);
+		t4.initialRelaventQuartetID.add(quartetID);
 	}
 	
 	

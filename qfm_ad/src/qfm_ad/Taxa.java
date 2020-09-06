@@ -3,6 +3,7 @@ package qfm_ad;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -15,7 +16,8 @@ public class Taxa {
     //Taxa tnext;
     //private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
     public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
-    public List<Integer> relaventQuartet = new ArrayList<Integer>();
+    public List<Integer> initialRelaventQuartetID = new ArrayList<Integer>();
+    public List<Integer> relaventQuartetIDOfCorrespondingMovedTaxa = new ArrayList<Integer>();
     
     /////For threading
     private int val;		
@@ -137,20 +139,16 @@ public class Taxa {
 //	public void setDef(int def) {
 //		this.def = def;
 //	}
-	public void mCalculateScore(LinkedHashSet<Quartet> quartetList, int prevS, int prevV, int prevScore) {
+	public void mCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap, int prevS, int prevV, int prevScore) {
 		
 		int satisfied = 0, violated = 0;
-	    for (Quartet q : quartetList) {
-	    	if(q.getT1().getName().contentEquals(name) || q.getT2().getName().contentEquals(name) ||
-	        		q.getT3().getName().contentEquals(name) || q.getT4().getName().contentEquals(name))
-	        {	
-	    		char qStat  = Routines.mCheckQuartet(q, name);
-	    		int[] sv = svScore(q, qStat);//sv[0] = s, sv[1] = 1;
-	            svdTableMap.put(q.getQuartetID(), new SVD_Log(q, sv[0], sv[1], qStat));
-	            satisfied += sv[0]; violated += sv[1];
-	        }
-	    	
-		}
+	    for (int index : initialRelaventQuartetID) {
+	    	Quartet q = quartetMap.get(index);
+	    	char qStat  = Routines.mCheckQuartet(q, name);
+    		int[] sv = svScore(q, qStat);//sv[0] = s, sv[1] = 1;
+            svdTableMap.put(q.getQuartetID(), new SVD_Log(q, sv[0], sv[1], qStat));
+            satisfied += sv[0]; violated += sv[1];
+	    }
 
 	    sumOfSatOfSVDmap = satisfied;
 	    sumOfVatOfSVDmap = violated;
@@ -165,7 +163,7 @@ public class Taxa {
 	    char  qStat;
 	    int satisfied = sumOfSatOfSVDmap, violated = sumOfVatOfSVDmap;//, d = 0;
 	
-	    for (int index : relaventQuartet) {
+	    for (int index : relaventQuartetIDOfCorrespondingMovedTaxa) {
 	    	
 	    	SVD_Log svd = svdTableMap.get(index);
 	    	Quartet q = svd.getQuartet();
@@ -176,7 +174,7 @@ public class Taxa {
             svd.setSat(sv[0]); svd.setVat(sv[1]); svd.setqStat(qStat);
             
 		}
-	    relaventQuartet.clear();
+	    relaventQuartetIDOfCorrespondingMovedTaxa.clear();
 	    sumOfSatOfSVDmap = satisfied;
 	    sumOfVatOfSVDmap = violated;
         sat = prevS + satisfied;

@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,16 +88,22 @@ public class Routines {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		int qID = 0;
-		for (Quartet quartet : quartetList) {
-			qID++;
-			quartet.setIncreaseFrequency(false);
-			quartet.setQuartetID(qID);;
-		}
+		
 //		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
 //		qr.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
 				.sorted(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder())).collect(Collectors.toList()));
+		
+		LinkedHashMap<Integer, Quartet> quartetMap = new LinkedHashMap<Integer, Quartet>();
+		int qID = 0;
+		for (Quartet quartet : countedSortedQL) {
+			qID++;
+			quartet.setIncreaseFrequency(false);
+			quartet.setQuartetID(qID);;
+			quartetMap.put(qID, quartet);
+		}
+		
+		
 		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 //		List<Quartet> sortedList = ql.stream()
 //				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList());
@@ -104,7 +111,7 @@ public class Routines {
 		/*LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
 				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));*/
 
-		double estimatedTime = System.currentTimeMillis() - startTime;
+		//double estimatedTime = System.currentTimeMillis() - startTime;
 		//System.out.println("Quartet reading and sorting Time : "+ estimatedTime + " miliseconds");
 //		for (Taxa taxa : taxaList) {
 //			System.out.print(taxa.getName()+"->");
@@ -153,9 +160,9 @@ public class Routines {
 		}
 		*/
 		//////////////////////////////////
-		long startTime1 = System.currentTimeMillis();
-		String s = SQP(countedSortedQL, taxaList, 1000, 0);
-		long estimatedTime1 = System.currentTimeMillis() - startTime1;
+		//long startTime1 = System.currentTimeMillis();
+		String s = SQP(quartetMap, taxaList, 1000, 0);
+		//long estimatedTime1 = System.currentTimeMillis() - startTime1;
 		//System.out.println("SQP function Total Time : "+ estimatedTime1 + " miliseconds");
 		if (s != null) {
 			s = s.replace("(O,", "(0,");
@@ -171,7 +178,7 @@ public class Routines {
 		
 	}
 	
-	public static String SQP(LinkedHashSet<Quartet> quartetList, LinkedHashSet<Taxa> taxaList, int extraTaxa, int partSatCount) {
+	public static String SQP(LinkedHashMap<Integer, Quartet> quartetMap, LinkedHashSet<Taxa> taxaList, int extraTaxa, int partSatCount) {
 		//long t0 = System.currentTimeMillis();
 		int taxacount = taxaList.size();
 //		System.out.println("******************SQP*****************");
@@ -186,11 +193,11 @@ public class Routines {
 			return s;
 		}
 		//quartetList.size() == 0 diye check korte hobe
-		if (quartetList.isEmpty() || taxacount <3) {
+		if (quartetMap.isEmpty() || taxacount <3) {
 //			System.out.println("Quartet list is empty");
 			s = depthOneTree(taxaList);
 		} else {
-			MultiReturnType mrt = FM(taxaList, quartetList);
+			MultiReturnType mrt = FM(taxaList, quartetMap);
 			LinkedHashSet<Taxa> partA = mrt.getPartA();
 			LinkedHashSet<Taxa> partB = mrt.getPartB();
 //			System.out.println("****************************SQP****************");
@@ -199,7 +206,7 @@ public class Routines {
 //			System.out.println("*****************PartB**************************");
 //			printTaxa(partB);
 			//printQuartet(quartetList);
-			int partSat = countSatisfiedQuartets(quartetList); // It returns # of satisfied quartets
+			int partSat = countSatisfiedQuartets(quartetMap); // It returns # of satisfied quartets
 			//System.out.println("partSat = "+ partSat);
 
 			if(partSat==0){
@@ -229,8 +236,8 @@ public class Routines {
 //			printTaxa(partA);
 //			System.out.println("*****************PartB**************************");
 //			printTaxa(partB);
-	        LinkedHashSet<Quartet> quartetA = new LinkedHashSet<Quartet>();
-	        LinkedHashSet<Quartet> quartetB = new LinkedHashSet<Quartet>();
+	        LinkedHashMap<Integer, Quartet> quartetA = new LinkedHashMap<Integer, Quartet>();
+	        LinkedHashMap<Integer, Quartet> quartetB = new LinkedHashMap<Integer, Quartet>();
 	        
 //	        LinkedHashSet<Quartet> quartetAA = new LinkedHashSet<Quartet>();
 //	        LinkedHashSet<Quartet> quartetBB = new LinkedHashSet<Quartet>();
@@ -240,7 +247,7 @@ public class Routines {
 	        
 	        int numOfBDQ = 0; //number of b and deferred quartet
 
-	        for (Quartet q : quartetList) {
+	        for (Quartet q : quartetMap.values()) {
 	        	char c = q.getStatus();
 				//int l = q.getStatus().length();
 				//char c = q.getStatus().charAt(l-1);
@@ -255,16 +262,12 @@ public class Routines {
 					if (c == 'b') {
 						//numOfB++;
 						//if (partA.contains(q.getT1())) {
-						if (q.getT1().getPartition() == 0) {	
-							quartetA.add(q);
-//							quartetAA.add(q);
-//							quartetAAA.add(qtemp);
-//							numOfBA++;
+						if (q.getT1().getPartition() == 0) {
+							quartetA.put(numOfBDQ, q);
+							
 						} else {
-							quartetB.add(q);
-//							quartetBB.add(q);
-//							quartetBBB.add(qtemp);
-//							numOfBB++;
+							quartetB.put(numOfBDQ, q);
+
 						}
 					} else {
 						//numOfD++;
@@ -283,7 +286,7 @@ public class Routines {
 							else if(q.getT2().getPartition() == 0)q.setT2(extraB);
 							else if(q.getT3().getPartition() == 0)q.setT3(extraB);
 							else q.setT4(extraB);
-							quartetB.add(q);
+							quartetB.put(numOfBDQ, q);
 //							if (partB.contains(q.getT1()))q.setT1(extraA);
 //							else if (partB.contains(q.getT2()))q.setT2(extraA);
 //							else if (partB.contains(q.getT3()))q.setT3(extraA);
@@ -300,7 +303,7 @@ public class Routines {
 							else if(q.getT2().getPartition() == 1)q.setT2(extraA);
 							else if(q.getT3().getPartition() == 1)q.setT3(extraA);
 							else q.setT4(extraA);
-							quartetA.add(q);
+							quartetA.put(numOfBDQ, q);
 //							if (partA.contains(q.getT1()))q.setT1(extraB);
 //							else if (partA.contains(q.getT2()))q.setT2(extraB);
 //							else if (partA.contains(q.getT3()))q.setT3(extraB);
@@ -665,11 +668,11 @@ public class Routines {
 	}
 
 
-	private static MultiReturnType FM(LinkedHashSet<Taxa> taxaList, LinkedHashSet<Quartet> quartetList) {
+	private static MultiReturnType FM(LinkedHashSet<Taxa> taxaList, LinkedHashMap<Integer, Quartet> quartetMap) {
 		LinkedHashSet<Taxa> partA = new LinkedHashSet<Taxa>();
 		LinkedHashSet<Taxa> partB = new LinkedHashSet<Taxa>();
 		int ca = 0, cb = 0;
-		for (Quartet quartet : quartetList) {
+		for (Quartet quartet : quartetMap.values()) {
 			int tcount = 0;
 			if (taxaList.isEmpty()) {
 				//System.out.println("Finished");
@@ -816,7 +819,7 @@ public class Routines {
 //		printTaxa(partA);
 //		printTaxa(partB);
 		//return null;
-		return MFM_algo(partA, partB, quartetList);
+		return MFM_algo(partA, partB, quartetMap);
 		//return FM_algo(partA, partB, quartetList);
 	}
 
@@ -1145,10 +1148,10 @@ public class Routines {
 //	}
 	
 	
-	private static int countSatisfiedQuartets(LinkedHashSet<Quartet> quartetList) {
+	private static int countSatisfiedQuartets(LinkedHashMap<Integer, Quartet> quartetMap) {
 		int csat = 0;
 	    char quartetScore;
-	    for (Quartet quartet : quartetList) {
+	    for (Quartet quartet : quartetMap.values()) {
 			quartetScore = iCheckQuartet(quartet);
 			if(quartetScore == 's')
 	        {
@@ -1322,9 +1325,18 @@ public class Routines {
 	}
 	/////////////Modifying Gain//////////////////
 	private static MultiReturnType MFM_algo(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,
-			LinkedHashSet<Quartet> quartetList) {
+			LinkedHashMap<Integer, Quartet> quartetMap) {
 		//String taxaToMove = null;
 		boolean loopAgain = true;
+		for (Taxa taxa : partA) {
+			taxa.initialRelaventQuartetID.clear();
+		}
+		for (Taxa taxa : partB) {
+			taxa.initialRelaventQuartetID.clear();
+		}
+		for (Quartet quartet : quartetMap.values()) {
+			quartet.fillUpInitialRelaventQuartetIndex();
+		}
 		while (loopAgain) {
 			boolean iterationMore = true; int iteration = 0;
 			int ca = partA.size();
@@ -1351,7 +1363,7 @@ public class Routines {
 				iteration++;
 				int[] score;
 				if (iteration == 1) {
-					score= iCalculateScore(quartetList);
+					score= iCalculateScore(quartetMap);
 					//score[0] -> partition score, score[1] -> noOfSat, score[2] -> noOfVat, score[3] -> noOfDef
 					prevScore = score[0];//partition score
 		            prevS = score[1];//noOfSat
@@ -1397,8 +1409,8 @@ public class Routines {
 							
 							if (iterationF == 1) {
 								//taxaA.getSvdTable().clear();
-								taxaA.relaventQuartet.clear();
-								taxaA.mCalculateScore(quartetList, prevSF, prevVF, prevScoreF);
+								taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+								taxaA.mCalculateScore(quartetMap, prevSF, prevVF, prevScoreF);
 							} else {
 								taxaA.mCalculateScore(prevSF, prevVF, prevScoreF);
 							}
@@ -1421,8 +1433,8 @@ public class Routines {
 				for (Taxa taxaB : partB) {
 					if (iterationF == 1) {
 						//taxaA.getSvdTable().clear();
-						taxaB.relaventQuartet.clear();
-						taxaB.mCalculateScore(quartetList, prevS, prevV, prevScore);
+						taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
 					} else {
 						taxaB.mCalculateScore(prevS, prevV, prevScore);
 					}
@@ -1642,7 +1654,7 @@ public class Routines {
 					for (SVD_Log svd : taxa_to_move.svdTableMap.values()) {
 						Quartet q = svd.getQuartet();
 						q.setStatus(svd.getqStat());
-						q.fillUpRelaventQuartetListOfCorrespondingTaxa();
+						q.fillUpRelaventQuartetIndexOfCorrespondingMovedTaxa();
 						//rQuartetList.add(q);
 					}
 					taxa_to_move.svdTableMap.clear();
@@ -2095,12 +2107,12 @@ public class Routines {
 	 
 	}
 	
-	private static int[] iCalculateScore(LinkedHashSet<Quartet> quartetList) {
+	private static int[] iCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap) {
 		//initial_calculate_score
 		int[] scores = {0,0,0,0};
 	    char  qStat;
 	    	 
-	    for (Quartet q : quartetList) {
+	    for (Quartet q : quartetMap.values()) {
             //q.setStatus("");
             qStat  = iCheckQuartet(q);
             if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
