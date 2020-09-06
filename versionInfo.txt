@@ -79,6 +79,7 @@ version 2.1.4
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore() efficient. 
 version 2.1.5
+	Date: Sep 5, 2020
 	Commit ID: 46b5941 
 	Commit: 46b5941c9434dada35aa120457ff9ffee068c679
 	Commit message: Version 2.1.5 -> Taxa: relaventQuartetList, Quartet: fillUpRelaventQuartetOfCorrespondingTaxa
@@ -88,3 +89,20 @@ version 2.1.5
 			 Quartet -> fillUpRelaventQuartetOfCorrespondingTaxa is added
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 Future Step:  merge function will be updated. Threading condition needs to change. will make mCalculateScore()more efficient.
+version 2.1.6 
+	Date: Sep 6, 2020
+	Running Time: 75 to 85 seconds for taxa = 500 and quartet = 250000 
+	Commit ID: 53480e5 
+	Commit: 53480e5478a9cffd2c178c84bb50df07f162b7cc
+	Commit message: Version 2.1.6 -> Taxa: svdTableMap, mCalculateScore, svScore, sumOfSatOfSVDmap and sumOfVatOfSVDmap is added
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+			 Routine/Fm_algo : taxa.mCalculateScore is used instead of Routines.mCalculateScore	
+			 Taxa -> HashMap<Integer, SVD_Log> svdTableMap instead of HashSet<SVD_Log> svdTable
+				 sumOfSatOfSVDmap and sumOfVatOfSVDmap variable is added.
+				 mCalculateScore(LinkedHashSet<Quartet> quartetList, int prevS, int prevV, int prevScore) is added
+				 mCalculateScore(int prevS, int prevV, int prevScore) is added
+				 svScore(Quartet q, char qStat ) is added
+			 Quartet -> fillUpRelaventQuartetOfCorrespondingTaxa is modified for adding quartetID instead of quartet.
+	
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+Future Step:  merge function will be updated. Threading condition needs to change. will make FM_algo() more efficient.
