@@ -96,7 +96,7 @@ version 2.1.6
 	Commit: 53480e5478a9cffd2c178c84bb50df07f162b7cc
 	Commit message: Version 2.1.6 -> Taxa: svdTableMap, mCalculateScore, svScore, sumOfSatOfSVDmap and sumOfVatOfSVDmap is added
 	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
-			 Routine/Fm_algo : taxa.mCalculateScore is used instead of Routines.mCalculateScore	
+		 Routine/Fm_algo : taxa.mCalculateScore is used instead of Routines.mCalculateScore	
 			 Taxa -> HashMap<Integer, SVD_Log> svdTableMap instead of HashSet<SVD_Log> svdTable
 				 sumOfSatOfSVDmap and sumOfVatOfSVDmap variable is added.
 				 mCalculateScore(LinkedHashSet<Quartet> quartetList, int prevS, int prevV, int prevScore) is added
@@ -106,3 +106,23 @@ version 2.1.6
 	
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 Future Step:  merge function will be updated. Threading condition needs to change. will make FM_algo() more efficient.
+version 2.1.7 
+	Date: Sep 6, 2020
+	Running Time: 65 to 70 seconds for taxa = 500 and quartet = 250000 
+	Commit ID: c755a2b
+	Commit: c755a2b0d1d009cbea466de2545c777dbbba7995
+	Commit message: Version 2.1.7 -> QuartetMap is used in every section. Taxa-> initialRelaventQuartetID is added
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+		 Routine -> LinkedHashMap<Integer, Quartet> quartetMap is used in every section instead of LinkedHashSet<Quartet> quartetList
+		 Routine/readQuartet : quartetMap is used instead of quartetList
+		 Routine/Fm_algo : fillUpinitialRelaventQuartetID is calculated before loopAgain Loop 	
+		 Taxa -> HashMap<Integer, SVD_Log> svdTableMap instead of HashSet<SVD_Log> svdTable
+			 initialRelaventQuartetID list is added.
+			 mCalculateScore(LinkedHashSet<Quartet> quartetList, int prevS, int prevV, int prevScore) is modified to 
+						mCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap, int prevS, int prevV, int prevScore)
+		 Quartet -> fillUpRelaventQuartetOfCorrespondingTaxa is renamed to fillUpRelaventQuartetIDOfCorrespondingMovedTaxa
+				    
+	
+	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
+	Fulfilled Goal: Now FM_algo is more efficient than ever.
+Future Step:  merge function will be updated. Threading condition needs to change. readQuartet() function should be modified.
