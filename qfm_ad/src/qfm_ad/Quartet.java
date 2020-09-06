@@ -85,10 +85,10 @@ public class Quartet {
 		this.increaseFrequency = increaseFrequency;
 	}
 	public void fillUpRelaventQuartetListOfCorrespondingTaxa() {
-		t1.relaventQuartet.add(this);
-		t2.relaventQuartet.add(this);
-		t3.relaventQuartet.add(this);
-		t4.relaventQuartet.add(this);
+		t1.relaventQuartet.add(quartetID);
+		t2.relaventQuartet.add(quartetID);
+		t3.relaventQuartet.add(quartetID);
+		t4.relaventQuartet.add(quartetID);
 	}
 	
 	

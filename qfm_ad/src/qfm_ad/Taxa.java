@@ -1,7 +1,9 @@
 package qfm_ad;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class Taxa {
@@ -11,8 +13,9 @@ public class Taxa {
     //private int taxaScore;
     //private boolean locked;//dont need to lock anymore
     //Taxa tnext;
-    private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
-    public List<Quartet> relaventQuartet = new ArrayList<Quartet>();
+    //private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
+    public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
+    public List<Integer> relaventQuartet = new ArrayList<Integer>();
     
     /////For threading
     private int val;		
@@ -20,6 +23,8 @@ public class Taxa {
 	private int vat;
 	//private int def;
 	public int partitionIndex;//it's for taxa serial number in partition
+	private int sumOfSatOfSVDmap;
+	private int sumOfVatOfSVDmap;
     /////For threading
 
 	public int getPartitionIndex() {
@@ -40,30 +45,30 @@ public class Taxa {
 		this.partition = (byte) partition;
 		//this.locked = locked;
 		
-		this.svdTable = new HashSet<SVD_Log>() {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public boolean add(SVD_Log e) {
-				if(contains(e))
-		            remove(e);
-				return super.add(e);
-			}
-
-			
-		};
+//		this.svdTable = new HashSet<SVD_Log>() {
+//
+//			/**
+//			 * 
+//			 */
+//			private static final long serialVersionUID = 1L;
+//
+//			@Override
+//			public boolean add(SVD_Log e) {
+//				if(contains(e))
+//		            remove(e);
+//				return super.add(e);
+//			}
+//
+//			
+//		};
 		
 	}
 	
 
 
-	public HashSet<SVD_Log> getSvdTable() {
-		return svdTable;
-	}
+//	public HashSet<SVD_Log> getSvdTable() {
+//		return svdTable;
+//	}
 
 	
 
@@ -132,6 +137,86 @@ public class Taxa {
 //	public void setDef(int def) {
 //		this.def = def;
 //	}
+	public void mCalculateScore(LinkedHashSet<Quartet> quartetList, int prevS, int prevV, int prevScore) {
+		
+		int satisfied = 0, violated = 0;
+	    for (Quartet q : quartetList) {
+	    	if(q.getT1().getName().contentEquals(name) || q.getT2().getName().contentEquals(name) ||
+	        		q.getT3().getName().contentEquals(name) || q.getT4().getName().contentEquals(name))
+	        {	
+	    		char qStat  = Routines.mCheckQuartet(q, name);
+	    		int[] sv = svScore(q, qStat);//sv[0] = s, sv[1] = 1;
+	            svdTableMap.put(q.getQuartetID(), new SVD_Log(q, sv[0], sv[1], qStat));
+	            satisfied += sv[0]; violated += sv[1];
+	        }
+	    	
+		}
+
+	    sumOfSatOfSVDmap = satisfied;
+	    sumOfVatOfSVDmap = violated;
+        sat = prevS + satisfied;
+        vat = prevV + violated;
+        val = (sat - vat) - prevScore;
+	 
+	}
+	
+	public void mCalculateScore(int prevS, int prevV, int prevScore) {
+
+	    char  qStat;
+	    int satisfied = sumOfSatOfSVDmap, violated = sumOfVatOfSVDmap;//, d = 0;
+	
+	    for (int index : relaventQuartet) {
+	    	
+	    	SVD_Log svd = svdTableMap.get(index);
+	    	Quartet q = svd.getQuartet();
+    		qStat  = Routines.mCheckQuartet(q, name);
+    		int[] sv = svScore(q, Routines.mCheckQuartet(q, name));//sv[0] = s, sv[1] = 1;
+    		satisfied = satisfied + sv[0] - svd.getSat();
+    		violated = violated + sv[1] - svd.getVat();
+            svd.setSat(sv[0]); svd.setVat(sv[1]); svd.setqStat(qStat);
+            
+		}
+	    relaventQuartet.clear();
+	    sumOfSatOfSVDmap = satisfied;
+	    sumOfVatOfSVDmap = violated;
+        sat = prevS + satisfied;
+        vat = prevV + violated;
+        val = (sat - vat) - prevScore;
+
+	
+	}
+	public int[] svScore(Quartet q, char qStat ) {
+		char c = q.getStatus();
+		int[] sv = {0,0}; // sv[0] for satisfied, sv[1] for violated
+
+
+        if(c=='s' && qStat == 'v') { sv[0] = - q.getQFrequency(); sv[1] =  q.getQFrequency();} // s v
+
+        else if(c=='s' && qStat == 'd'){ sv[0] = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
+
+        else if(c=='v' && qStat == 's'){sv[1] = - q.getQFrequency(); sv[0] = q.getQFrequency();} // v s
+
+        else if(c=='v' && qStat == 'd'){sv[1] = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
+
+        else if(c=='d' && qStat == 'v'){sv[1] = q.getQFrequency();} // d v
+
+        else if(c=='d' && qStat == 's'){sv[0] = q.getQFrequency();} // d s
+
+        else if(qStat == 'b')
+        {
+            if(c=='s') { sv[0] = - q.getQFrequency();}
+            else if(c=='v') {sv[1] = - q.getQFrequency();}
+            //else if(c=='d') { d = - q.getQFrequency();}
+
+        }
+        else if(c=='b')
+        {
+            if(qStat == 's') { sv[0] = q.getQFrequency();}//s
+            else if(qStat == 'v') {sv[1] = q.getQFrequency();}//v
+            //else if(qStat == 'd') { d = q.getQFrequency();}
+        }
+		return sv;
+	}
 
 	@Override
 	public int hashCode() {

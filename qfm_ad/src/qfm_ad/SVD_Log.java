@@ -40,7 +40,16 @@ public class SVD_Log {
 	public int getVat() {
 		return vat;
 	}
-//	public int getDef() {
+	
+	public void setSat(int sat) {
+		this.sat = sat;
+	}
+
+	public void setVat(int vat) {
+		this.vat = vat;
+	}
+
+	//	public int getDef() {
 //		return def;
 //	}
 	@Override
