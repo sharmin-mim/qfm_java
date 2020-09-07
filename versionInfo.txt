@@ -147,5 +147,17 @@ version 2.1.8 (Final Non threaded Version)
 		 Quartet -> mCheckQuartet(): check status	
 	
 	Total maximum number of running thread: no thread for now. But I will change it in next version/commit.
-	Fulfilled Goal: Now FM_algo is more efficient than ever.
+	Fulfilled Goal: Now FM_algo is more efficient than ever without any thread
+Future Step: Threading condition needs to change. 
+
+version 2.1.9 (Final Threaded Version)
+	Date: Sep 7, 2020
+	Running Time: 13 to 15 seconds for taxa = 500 and quartet = 250000 
+	Commit ID: d2bf661
+	Commit: d2bf6618c4b13acedd6e7fa9d443987e6a99c043
+	Commit message: Version 2.1.9 -> (Threaded version) FM_algo -> one thread, sqp -> one thread
+	Changes: Routine/SQP()-> In First divide step, a thread will be created
+		 Routine/Fm_algo : PartA gain calculation is done using a thread.
+	Total maximum number of running thread: At a peak time there will be maximum 4 running thread
+	
 Future Step: Threading condition needs to change. 
