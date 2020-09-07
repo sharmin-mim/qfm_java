@@ -126,3 +126,26 @@ version 2.1.7
 	Total maximum number of running thread: 2 (including main) for now. But I will change it in next version/commit.
 	Fulfilled Goal: Now FM_algo is more efficient than ever.
 Future Step:  merge function will be updated. Threading condition needs to change. readQuartet() function should be modified.
+
+version 2.1.8 (Final Non threaded Version)
+	Date: Sep 7, 2020
+	Running Time: 13 to 15 seconds for taxa = 500 and quartet = 250000 
+	Commit ID: d08dc0c
+	Commit: d08dc0c22b8b6326c84e14b15f8cf56ab2b63c14
+	Commit message: Version 2.1.8 -> Quartet -> mCheckQuartet, merge -> jar, FM_algo -> no thread, sqp -> no thread
+	Changes: Routine/SQP()-> threading part is commented out for. Later I will change it with appropriate threading condition
+				merging method is changed.
+		 Routine/mergeUsingJAR() and Routine/rerootTreeUsingJARAndProcessing() is added.
+		 Routine/rerootTreeUsingJARAndProcessing(): rerooting is done using a jar file of phylonet package
+		 Routine -> LinkedHashMap<Integer, Quartet> quartetMap is used in every section instead of LinkedHashSet<Quartet> quartetList
+		 Routine/readQuartet : quartetList and qr arrayList is cleared as soon as they are not needed.
+				       code for adding final bracket and semicolon and code for Replacing o with zero is commented out
+				       because it is not needed while using JAR for rerooting
+		 Routine/Fm_algo : PartA gain calculation was under a thread. This part is commented out. No thread is used here
+		 SVD_log -> quertetID is used instead of quartet
+		 Taxa ->  mCalculateScore is changed because of SVD_log definition
+		 Quartet -> mCheckQuartet(): check status	
+	
+	Total maximum number of running thread: no thread for now. But I will change it in next version/commit.
+	Fulfilled Goal: Now FM_algo is more efficient than ever.
+Future Step: Threading condition needs to change. 
