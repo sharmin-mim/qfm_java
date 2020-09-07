@@ -8,15 +8,16 @@ package qfm_ad;
 import java.util.Objects;
 
 public class SVD_Log {
-	private Quartet quartet;
+	//private Quartet quartet;
+	private int quertetID;
 	private int sat;//number of satisfied quartet
 	private int vat;//number of violated quartet
 	//private int def;//number of deferred quartet
 	private char qStat;//status of quartet
 	
 	//public SVD_Log(Quartet quartet, int sat, int vat, int def, char qStat) {
-	public SVD_Log(Quartet quartet, int sat, int vat, char qStat) {
-		this.quartet = quartet;
+	public SVD_Log(int quertetID, int sat, int vat, char qStat) {
+		this.quertetID = quertetID;
 		this.sat = sat;
 		this.vat = vat;
 		//this.def = def;
@@ -31,8 +32,8 @@ public class SVD_Log {
 		this.qStat = qStat;
 	}
 
-	public Quartet getQuartet() {
-		return quartet;
+	public int getQuartetID() {
+		return quertetID;
 	}
 	public int getSat() {
 		return sat;
@@ -54,7 +55,7 @@ public class SVD_Log {
 //	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(quartet);
+		return Objects.hash(quertetID);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -63,7 +64,7 @@ public class SVD_Log {
 		if (!(obj instanceof SVD_Log))
 			return false;
 		SVD_Log other = (SVD_Log) obj;
-		return Objects.equals(quartet, other.quartet);
+		return Objects.equals(quertetID, other.quertetID);
 	}
 	
 	/*

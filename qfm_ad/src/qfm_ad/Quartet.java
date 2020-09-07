@@ -84,19 +84,55 @@ public class Quartet {
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
-	public void fillUpRelaventQuartetIndexOfCorrespondingMovedTaxa() {
+	public void fillUpRelaventQuartetIDOfCorrespondingMovedTaxa() {
 		t1.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t2.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t3.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t4.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 	}
-	public void fillUpInitialRelaventQuartetIndex() {
+	public void fillUpInitialRelaventQuartetID() {
 		t1.initialRelaventQuartetID.add(quartetID);
 		t2.initialRelaventQuartetID.add(quartetID);
 		t3.initialRelaventQuartetID.add(quartetID);
 		t4.initialRelaventQuartetID.add(quartetID);
 	}
-	
+	public char mCheckQuartet(String tempTaxa) {
+		//int a = 0, b = 0, c = 0, d = 0;
+		char quartet_state;
+
+		int a = t1.getPartition();
+		int b = t2.getPartition();
+		int c = t3.getPartition();
+		int d = t4.getPartition();
+
+		if(tempTaxa.contentEquals(t1.getName())) a = 1 - a;
+	    else if(tempTaxa.contentEquals(t2.getName())) b = 1-b;
+	    else if(tempTaxa.contentEquals(t3.getName())) c = 1-c;
+	    else if(tempTaxa.contentEquals(t4.getName())) d = 1-d;
+
+		
+		if (a==b && c==d && b==c) // totally on one side
+	    {	
+			quartet_state = 'b';
+	    }
+	    else if( a==b && c==d) //satisfied
+	    {
+	    	quartet_state = 's';
+	    }
+	    else if ((a==c && b==d) || (a==d && b==c)) // violated
+	    {
+	    	quartet_state = 'v';
+
+	    }
+	    else //deffered
+	    {
+	    	quartet_state = 'd';
+	    }
+
+	    //q.setStatus(qstat);
+		return quartet_state;
+
+	}
 	
 //	@Override
 //	public int hashCode() {

@@ -21,6 +21,10 @@ import java.util.concurrent.ExecutionException;
 
 import java.util.stream.Collectors;
 
+import phylonet.tree.io.ParseException;
+import phylonet.tree.model.sti.STITree;
+
+
 public class Routines {
 	
 	
@@ -30,7 +34,7 @@ public class Routines {
 		
 		
 		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
-		double startTime = System.currentTimeMillis();
+		//double startTime = System.currentTimeMillis();
 		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
 			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
 			int qc = 0;
@@ -89,20 +93,21 @@ public class Routines {
 			e.printStackTrace();
 		}
 		
-//		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
-//		qr.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
-		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
-				.sorted(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder())).collect(Collectors.toList()));
+		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+		quartetList.clear();
+		qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
+//		LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
+//				.sorted(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder())).collect(Collectors.toList()));
 		
 		LinkedHashMap<Integer, Quartet> quartetMap = new LinkedHashMap<Integer, Quartet>();
 		int qID = 0;
-		for (Quartet quartet : countedSortedQL) {
+		for (Quartet quartet : qr) {
 			qID++;
 			quartet.setIncreaseFrequency(false);
 			quartet.setQuartetID(qID);;
 			quartetMap.put(qID, quartet);
 		}
-		
+		qr.clear();
 		
 		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
 //		List<Quartet> sortedList = ql.stream()
@@ -164,13 +169,16 @@ public class Routines {
 		String s = SQP(quartetMap, taxaList, 1000, 0);
 		//long estimatedTime1 = System.currentTimeMillis() - startTime1;
 		//System.out.println("SQP function Total Time : "+ estimatedTime1 + " miliseconds");
-		if (s != null) {
-			s = s.replace("(O,", "(0,");
-			s = s.replace(",O,", ",0,");
-			s = s.replace(",O)", ",0)");
-			s = "("+s+")"+";";
-		}else
+//		if (s != null) {
+//			s = s.replace("(O,", "(0,");
+//			s = s.replace(",O,", ",0,");
+//			s = s.replace(",O)", ",0)");
+//			//s = "("+s+")"+";"; //for rerooting with jar, this line is not needed
+//		}else
+//			s = "null";
+		if (s == null) {
 			s = "null";
+		}
 		
 		return s;
 		//return null;
@@ -200,6 +208,12 @@ public class Routines {
 			MultiReturnType mrt = FM(taxaList, quartetMap);
 			LinkedHashSet<Taxa> partA = mrt.getPartA();
 			LinkedHashSet<Taxa> partB = mrt.getPartB();
+			for (Taxa taxa : partA) {
+				taxa.initialRelaventQuartetID.clear();
+			}
+			for (Taxa taxa : partB) {
+				taxa.initialRelaventQuartetID.clear();
+			}
 //			System.out.println("****************************SQP****************");
 //			System.out.println("*****************PartA**************************");
 //			printTaxa(partA);
@@ -361,18 +375,18 @@ public class Routines {
 //	        long t1 = System.currentTimeMillis();
 //			System.out.println("Before first recursive call : "+ (t1 - t0) + " miliseconds");
 //			 System.out.println("\n\n**************Before first recursive call****************\n\n");
-	        double estimatedTime = -517 + ( 111 * partA.size()) + ( 0.205 * quartetA.size());
+	        //double estimatedTime = -517 + ( 111 * partA.size()) + ( 0.205 * quartetA.size());
 	        
-	        //if (extraTaxa == 1001) {
-	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
-	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
-	        //if (estimatedTime > 30000) {//if estimatedTime > 30000 miliseconds
-	        //if (estimatedTime > 20000) {//if estimatedTime > 20000 miliseconds
-	        //if (estimatedTime > 10000) {//if estimatedTime > 10000 miliseconds
-	        //if (estimatedTime > 5000) {//if estimatedTime > 5000 miliseconds
-	        //if (estimatedTime > 1000) {//if estimatedTime > 1000 miliseconds
-	        //if (estimatedTime > 500) {//if estimatedTime > 500 miliseconds
-//	        if (estimatedTime > 100) {//if estimatedTime > 100 miliseconds
+//	        if (extraTaxa == 1001) {
+//	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
+//	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
+//	        //if (estimatedTime > 30000) {//if estimatedTime > 30000 miliseconds
+//	        //if (estimatedTime > 20000) {//if estimatedTime > 20000 miliseconds
+//	        //if (estimatedTime > 10000) {//if estimatedTime > 10000 miliseconds
+//	        //if (estimatedTime > 5000) {//if estimatedTime > 5000 miliseconds
+//	        //if (estimatedTime > 1000) {//if estimatedTime > 1000 miliseconds
+//	        //if (estimatedTime > 500) {//if estimatedTime > 500 miliseconds
+//	        //if (estimatedTime > 100) {//if estimatedTime > 100 miliseconds
 //	        	final int ext = extraTaxa, psc = partSatCount;
 //	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
 //	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
@@ -385,11 +399,14 @@ public class Routines {
 //	   				//e.printStackTrace();
 //	   			}
 //
-//	   			s = merge(s1,s2,extra);
+//	   			//s = merge(s1,s2,extra);
+//	   		    s = mergeUsingJAR(s1,s2,extra);
 //			} else {
 				String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 		        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);  
-		        s = merge(s1,s2,extra);
+		       // s = merge(s1,s2,extra);
+		        //s = mergeUnrootedTrees(s1,s2,extra);
+		        s = mergeUsingJAR(s1,s2,extra);
 		        
 			//}
 	       
@@ -423,6 +440,8 @@ public class Routines {
 		} else
 			return null;
 	}
+
+    
 	private static String reroot(String s, String extra) {
 		
 
@@ -444,7 +463,10 @@ public class Routines {
 		//System.out.println(cmd);
 		//synchronized block
 		String fileName = "qfm11011.tmp";
+//		System.out.println("s = "+s);
+//		System.out.println("extra = "+ extra);
 		String ss = null;
+	
 		
 		synchronized (fileName) {
 			try {
@@ -1328,14 +1350,9 @@ public class Routines {
 			LinkedHashMap<Integer, Quartet> quartetMap) {
 		//String taxaToMove = null;
 		boolean loopAgain = true;
-		for (Taxa taxa : partA) {
-			taxa.initialRelaventQuartetID.clear();
-		}
-		for (Taxa taxa : partB) {
-			taxa.initialRelaventQuartetID.clear();
-		}
+		
 		for (Quartet quartet : quartetMap.values()) {
-			quartet.fillUpInitialRelaventQuartetIndex();
+			quartet.fillUpInitialRelaventQuartetID();
 		}
 		while (loopAgain) {
 			boolean iterationMore = true; int iteration = 0;
@@ -1392,57 +1409,68 @@ public class Routines {
 //				Iterator<Taxa> iteratorA = partA.iterator();
 //				Iterator<Taxa> iteratorB = partB.iterator();
 				//System.out.println("New Iteration");
-				final int iterationF = iteration;
-				final int prevSF = prevS;
-				final int prevVF = prevV;
-				//final int prevDF = prevD;
-				final int prevScoreF = prevScore;
 				
-		
-				Thread tA = new Thread() {
-
-					@Override
-					public void run() {
-						//int[] score;
-						int partitionIndex = 0;
-						for (Taxa taxaA : partA) {
-							
-							if (iterationF == 1) {
-								//taxaA.getSvdTable().clear();
-								taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
-								taxaA.mCalculateScore(quartetMap, prevSF, prevVF, prevScoreF);
-							} else {
-								taxaA.mCalculateScore(prevSF, prevVF, prevScoreF);
-							}
-							//I am keeping following values as attributes of taxa. If I keep them in a treemap, i think it
-							//will be fasster. but we may not get similar result
-							//System.out.println("Taxa : "+ taxaA.getName() +" , number of relavantQuartet = "+ taxaA.relaventQuartet.size());
-//							taxaA.setVal(score[0] - prevScoreF);
-//							taxaA.setSat(score[1]);
-//							taxaA.setVat(score[2]);
-							//taxaA.setDef(score[3]);
-							partitionIndex += 1;
-							taxaA.partitionIndex = partitionIndex;
-						}
-						
-					}
-					
-				};
-				tA.start();
+				
+//				final int iterationF = iteration;
+//				final int prevSF = prevS;
+//				final int prevVF = prevV;
+//				//final int prevDF = prevD;
+//				final int prevScoreF = prevScore;
+//				
+//		
+//				Thread tA = new Thread() {
+//
+//					@Override
+//					public void run() {
+//						//int[] score;
+//						int partitionIndex = 0;
+//						for (Taxa taxaA : partA) {
+//							
+//							if (iterationF == 1) {
+//								//taxaA.getSvdTable().clear();
+//								taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+//								taxaA.mCalculateScore(quartetMap, prevSF, prevVF, prevScoreF);
+//							} else {
+//								taxaA.mCalculateScore2(quartetMap, prevSF, prevVF, prevScoreF);
+//							}
+//							//I am keeping following values as attributes of taxa. If I keep them in a treemap, i think it
+//							//will be fasster. but we may not get similar result
+//							//System.out.println("Taxa : "+ taxaA.getName() +" , number of relavantQuartet = "+ taxaA.relaventQuartet.size());
+////							taxaA.setVal(score[0] - prevScoreF);
+////							taxaA.setSat(score[1]);
+////							taxaA.setVat(score[2]);
+//							//taxaA.setDef(score[3]);
+//							partitionIndex += 1;
+//							taxaA.partitionIndex = partitionIndex;
+//						}
+//						
+//					}
+//					
+//				};
+//				tA.start();
+				
 				int partitionIndex = 0;
+				for (Taxa taxaA : partA) {
+					if (iteration == 1) {
+						//taxaA.getSvdTable().clear();
+						taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+						taxaA.mCalculateScore(quartetMap, prevS, prevV, prevScore);
+					} else {
+						taxaA.mCalculateScore2(quartetMap, prevS, prevV, prevScore);
+					}
+					partitionIndex += 1;
+					taxaA.partitionIndex = partitionIndex;
+				}
+
+				 partitionIndex = 0;
 				for (Taxa taxaB : partB) {
-					if (iterationF == 1) {
+					if (iteration == 1) {
 						//taxaA.getSvdTable().clear();
 						taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
 						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
 					} else {
-						taxaB.mCalculateScore(prevS, prevV, prevScore);
+						taxaB.mCalculateScore2(quartetMap, prevS, prevV, prevScore);
 					}
-					//System.out.println("Taxa : "+ taxaB.getName() +" , number of relavantQuartet = "+ taxaB.relaventQuartet.size());
-//					taxaB.setVal(score[0] - prevScore);
-//					taxaB.setSat(score[1]);
-//					taxaB.setVat(score[2]);
-					//taxaB.setDef(score[3]);
 					partitionIndex += 1;
 					taxaB.partitionIndex = partitionIndex;
 				}
@@ -1450,11 +1478,12 @@ public class Routines {
 //				if (!partB.isEmpty() && cb > 2) {
 //					maxGainTaxaPartB = partB.stream().max(Comparator.comparing(Taxa::getVal).thenComparing(Taxa::getSat)).get();
 //				}
-				try {
-					tA.join();
-				} catch (InterruptedException e) {
-					
-				}
+				
+//				try {
+//					tA.join();
+//				} catch (InterruptedException e) {
+//					
+//				}
 				
 				Taxa taxa_to_move = new Taxa("", -1);
 				
@@ -1652,9 +1681,9 @@ public class Routines {
 					
 					
 					for (SVD_Log svd : taxa_to_move.svdTableMap.values()) {
-						Quartet q = svd.getQuartet();
+						Quartet q = quartetMap.get(svd.getQuartetID());
 						q.setStatus(svd.getqStat());
-						q.fillUpRelaventQuartetIndexOfCorrespondingMovedTaxa();
+						q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa();
 						//rQuartetList.add(q);
 					}
 					taxa_to_move.svdTableMap.clear();
@@ -1816,296 +1845,7 @@ public class Routines {
 //		mCalculateScore(null,partB,quartetList,"null",0,0,0);
 		return new MultiReturnType(partA, partB);
 	}
-	private static int[] mCalculateScore3(HashMap<Integer, SVD_Log> svdTableMap, LinkedHashSet<Quartet> quartetList, String tempTaxa,
-			int st, int vt) {
-		
-		int[] scores = {0,0,0};
-	    char  qStat;
-	    int s = 0, v = 0;//, d = 0;
-	    char c;
-	   
-	    //only tempTaxa ta jei shob quartet a ase, oi gulo niye new Qlist korte hobe
-	    for (Quartet q : quartetList) {
-	    	if(q.getT1().getName().contentEquals(tempTaxa) || q.getT2().getName().contentEquals(tempTaxa) ||
-	        		q.getT3().getName().contentEquals(tempTaxa) || q.getT4().getName().contentEquals(tempTaxa))
-	        {	
-	    		
-	    		s = 0; v = 0;// d = 0;
-	    		qStat  = mCheckQuartet(q, tempTaxa);
-	    		c = q.getStatus();
-	           // c = q.getStatus().charAt(0);//status[0];
-//	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
-//	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
-//	            System.out.println("tempTaxa = "+tempTaxa+ "  qscore = "+qscore+"  c = "+ c);
-
-	            if(c=='s' && qStat == 'v') { s = - q.getQFrequency(); v =  q.getQFrequency();} // s v
-
-	            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
-
-	            else if(c=='v' && qStat == 's'){v = - q.getQFrequency(); s = q.getQFrequency();} // v s
-
-	            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
-
-//	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
-//
-//	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
-	            else if(c=='d' && qStat == 'v'){v = q.getQFrequency();} // d v
-
-	            else if(c=='d' && qStat == 's'){s = q.getQFrequency();} // d s
-
-	            else if(qStat == 'b')
-	            {
-	                if(c=='s') { s = - q.getQFrequency();}
-	                else if(c=='v') { v = - q.getQFrequency();}
-	                //else if(c=='d') { d = - q.getQFrequency();}
-
-	            }
-	            else if(c=='b')
-	            {
-	                if(qStat == 's') { s = q.getQFrequency();}
-	                else if(qStat == 'v') { v = q.getQFrequency();}
-	                //else if(qStat == 'd') { d = q.getQFrequency();}
-	            }
-	            svdTableMap.put(q.getQuartetID(), new SVD_Log(q, s, v, qStat));
-	                 
-
-	        }
-	    	
-		}
-	   // System.out.println("Taxa : "+ tempTaxa+" , number of accessed Quartet = " + numberOfAccessedQuartet);
-	    s = 0; v = 0;// d = 0;
-    	for (SVD_Log svd :  svdTableMap.values()) {
-			s += svd.getSat();
-			v += svd.getVat();
-			//d += svd.getDef();
-		}
-    	scores[1] = st+s ;//noOfSat = st+s;
-        scores[2] = vt+v;//noOfVat = vt+v;
-        //scores[3] = df+d;//noOfDef = df+d;
-
-        scores[0]= scores[1]-scores[2];//partitionScore = ((st+s)-(vt+v));
-	    
-	    //System.out.println("s = "+s+"  v = "+v+"  d = "+d);
-		return scores;
-	 
-	}
 	
-	private static int[] mCalculateScore4(HashMap<Integer, SVD_Log> svdTableMap, List<Integer> relaventQuartet, String tempTaxa,
-			int st, int vt) {
-
-		
-		int[] scores = {0,0,0};
-	    char  qStat;
-	    int satisfied = 0, violated = 0;//, d = 0;
-	    char c;
-	    //only tempTaxa ta jei shob quartet a ase, oi gulo niye new Qlist korte hobe
-	    for (int index : relaventQuartet) {
-	    	
-	    	SVD_Log svd = svdTableMap.get(index);
-	    	
-	    	satisfied -= svd.getSat(); violated -= svd.getVat();
-	    	Quartet q = svd.getQuartet();
-    		int s = 0, v = 0;// d = 0;
-    		qStat  = mCheckQuartet(q, tempTaxa);
-    		c = q.getStatus();
-           // c = q.getStatus().charAt(0);//status[0];
-//	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
-//	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
-//	            System.out.println("tempTaxa = "+tempTaxa+ "  qscore = "+qscore+"  c = "+ c);
-
-            if(c=='s' && qStat == 'v') { s = - q.getQFrequency(); v =  q.getQFrequency();} // s v
-
-            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
-
-            else if(c=='v' && qStat == 's'){v = - q.getQFrequency(); s = q.getQFrequency();} // v s
-
-            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
-
-//	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
-//
-//	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
-            else if(c=='d' && qStat == 'v'){v = q.getQFrequency();} // d v
-
-            else if(c=='d' && qStat == 's'){s = q.getQFrequency();} // d s
-
-            else if(qStat == 'b')
-            {
-                if(c=='s') { s = - q.getQFrequency();}
-                else if(c=='v') { v = - q.getQFrequency();}
-                //else if(c=='d') { d = - q.getQFrequency();}
-
-            }
-            else if(c=='b')
-            {
-                if(qStat == 's') { s = q.getQFrequency();}
-                else if(qStat == 'v') { v = q.getQFrequency();}
-                //else if(qStat == 'd') { d = q.getQFrequency();}
-            }
-            svd.setSat(s); svd.setVat(v);
-            satisfied += s; violated += v;
-            
-
-	        
-		}
-	    relaventQuartet.clear();
-	 
-    	scores[1] = st+satisfied ;//noOfSat = st+s;
-        scores[2] = vt+violated;//noOfVat = vt+v;
-        //scores[3] = df+d;//noOfDef = df+d;
-
-        scores[0]= scores[1]-scores[2];//partitionScore = ((st+s)-(vt+v));
-	    
-	    //System.out.println("s = "+s+"  v = "+v+"  d = "+d);
-		return scores;
-	 
-	
-	}
-	private static int[] mCalculateScore2(HashSet<SVD_Log> svdTable, List<Quartet> relaventQuartet, String tempTaxa,
-			int st, int vt) {
-
-		
-		int[] scores = {0,0,0};
-	    char  qStat;
-	    int s = 0, v = 0;//, d = 0;
-	    char c;
-	    //only tempTaxa ta jei shob quartet a ase, oi gulo niye new Qlist korte hobe
-	    for (Quartet q : relaventQuartet) {
-	    	
-    		s = 0; v = 0;// d = 0;
-    		qStat  = mCheckQuartet(q, tempTaxa);
-    		c = q.getStatus();
-           // c = q.getStatus().charAt(0);//status[0];
-//	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
-//	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
-//	            System.out.println("tempTaxa = "+tempTaxa+ "  qscore = "+qscore+"  c = "+ c);
-
-            if(c=='s' && qStat == 'v') { s = - q.getQFrequency(); v =  q.getQFrequency();} // s v
-
-            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
-
-            else if(c=='v' && qStat == 's'){v = - q.getQFrequency(); s = q.getQFrequency();} // v s
-
-            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
-
-//	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
-//
-//	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
-            else if(c=='d' && qStat == 'v'){v = q.getQFrequency();} // d v
-
-            else if(c=='d' && qStat == 's'){s = q.getQFrequency();} // d s
-
-            else if(qStat == 'b')
-            {
-                if(c=='s') { s = - q.getQFrequency();}
-                else if(c=='v') { v = - q.getQFrequency();}
-                //else if(c=='d') { d = - q.getQFrequency();}
-
-            }
-            else if(c=='b')
-            {
-                if(qStat == 's') { s = q.getQFrequency();}
-                else if(qStat == 'v') { v = q.getQFrequency();}
-                //else if(qStat == 'd') { d = q.getQFrequency();}
-            }
-            
-            svdTable.add(new SVD_Log(q, s, v, qStat));
-            
-
-	        
-		}
-	    relaventQuartet.clear();
-	    s = 0; v = 0;// d = 0;
-    	for (SVD_Log svd : svdTable) {
-			s += svd.getSat();
-			v += svd.getVat();
-			//d += svd.getDef();
-		}
-    	scores[1] = st+s ;//noOfSat = st+s;
-        scores[2] = vt+v;//noOfVat = vt+v;
-        //scores[3] = df+d;//noOfDef = df+d;
-
-        scores[0]= scores[1]-scores[2];//partitionScore = ((st+s)-(vt+v));
-	    
-	    //System.out.println("s = "+s+"  v = "+v+"  d = "+d);
-		return scores;
-	 
-	
-	}
-
-	private static int[] mCalculateScore(HashSet<SVD_Log> svdTable, LinkedHashSet<Quartet> quartetList, String tempTaxa,
-			int st, int vt) {
-		
-		int[] scores = {0,0,0};
-	    char  qStat;
-	    int s = 0, v = 0;//, d = 0;
-	    char c;
-	    
-	    //only tempTaxa ta jei shob quartet a ase, oi gulo niye new Qlist korte hobe
-	    for (Quartet q : quartetList) {
-	    	if(q.getT1().getName().contentEquals(tempTaxa) || q.getT2().getName().contentEquals(tempTaxa) ||
-	        		q.getT3().getName().contentEquals(tempTaxa) || q.getT4().getName().contentEquals(tempTaxa))
-	        {	
-	    		
-	    		s = 0; v = 0;// d = 0;
-	    		qStat  = mCheckQuartet(q, tempTaxa);
-	    		c = q.getStatus();
-	           // c = q.getStatus().charAt(0);//status[0];
-//	            System.out.println(q.getT1().getName()+","+q.getT2().getName()
-//	            		+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
-//	            System.out.println("tempTaxa = "+tempTaxa+ "  qscore = "+qscore+"  c = "+ c);
-
-	            if(c=='s' && qStat == 'v') { s = - q.getQFrequency(); v =  q.getQFrequency();} // s v
-
-	            else if(c=='s' && qStat == 'd'){ s = - q.getQFrequency();}// d =  q.getQFrequency();} // s d
-
-	            else if(c=='v' && qStat == 's'){v = - q.getQFrequency(); s = q.getQFrequency();} // v s
-
-	            else if(c=='v' && qStat == 'd'){v = - q.getQFrequency();}//d = q.getQFrequency();}  // v d
-
-//	            else if(c=='d' && qStat == 'v'){d = - q.getQFrequency();v = q.getQFrequency();} // d v
-//
-//	            else if(c=='d' && qStat == 's'){d = - q.getQFrequency();s = q.getQFrequency();} // d s
-	            else if(c=='d' && qStat == 'v'){v = q.getQFrequency();} // d v
-
-	            else if(c=='d' && qStat == 's'){s = q.getQFrequency();} // d s
-
-	            else if(qStat == 'b')
-	            {
-	                if(c=='s') { s = - q.getQFrequency();}
-	                else if(c=='v') { v = - q.getQFrequency();}
-	                //else if(c=='d') { d = - q.getQFrequency();}
-
-	            }
-	            else if(c=='b')
-	            {
-	                if(qStat == 's') { s = q.getQFrequency();}
-	                else if(qStat == 'v') { v = q.getQFrequency();}
-	                //else if(qStat == 'd') { d = q.getQFrequency();}
-	            }
-	            
-	            svdTable.add(new SVD_Log(q, s, v, qStat));
-	            
-
-	        }
-	    	
-		}
-	   // System.out.println("Taxa : "+ tempTaxa+" , number of accessed Quartet = " + numberOfAccessedQuartet);
-	    s = 0; v = 0;// d = 0;
-    	for (SVD_Log svd : svdTable) {
-			s += svd.getSat();
-			v += svd.getVat();
-			//d += svd.getDef();
-		}
-    	scores[1] = st+s ;//noOfSat = st+s;
-        scores[2] = vt+v;//noOfVat = vt+v;
-        //scores[3] = df+d;//noOfDef = df+d;
-
-        scores[0]= scores[1]-scores[2];//partitionScore = ((st+s)-(vt+v));
-	    
-	    //System.out.println("s = "+s+"  v = "+v+"  d = "+d);
-		return scores;
-	 
-	}
 	
 	private static int[] iCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap) {
 		//initial_calculate_score
@@ -2126,56 +1866,43 @@ public class Routines {
 		return scores;
 	 
 	}
-	public static char mCheckQuartet(Quartet q, String tempTaxa) {
-		//int a = 0, b = 0, c = 0, d = 0;
-		char qstat;
-		///////will delete
-		//following code should work. will investigate later
-//		if(q.getT1().getPartition() == 1) a = 1;
-//		if(q.getT2().getPartition() == 1) b = 1;
-//		if(q.getT3().getPartition() == 1) c = 1;
-//		if(q.getT4().getPartition() == 1) d = 1;
-		int a = q.getT1().getPartition();
-		int b = q.getT2().getPartition();
-		int c = q.getT3().getPartition();
-		int d = q.getT4().getPartition();
-		/////////////
-		/*
-		if(partB.contains(q.getT1())) a = 1;
-		if(partB.contains(q.getT2())) b = 1;
-		if(partB.contains(q.getT3())) c = 1;
-		if(partB.contains(q.getT4())) d = 1;
-		*/
-		////////will change above block of code later
-//		if (!tempTaxa.contentEquals("null")) {
-			if(tempTaxa.contentEquals(q.getT1().getName())) a = 1 - a;
-		    else if(tempTaxa.contentEquals(q.getT2().getName())) b = 1-b;
-		    else if(tempTaxa.contentEquals(q.getT3().getName())) c = 1-c;
-		    else if(tempTaxa.contentEquals(q.getT4().getName())) d = 1-d;
-//		}	
-		
-		if (a==b && c==d && b==c) // totally on one side
-	    {	
-	        qstat = 'b';
-	    }
-	    else if( a==b && c==d) //satisfied
-	    {
-	        qstat = 's';
-	    }
-	    else if ((a==c && b==d) || (a==d && b==c)) // violated
-	    {
-	        qstat = 'v';
-
-	    }
-	    else //deffered
-	    {
-	        qstat = 'd';
-	    }
-
-	    //q.setStatus(qstat);
-		return qstat;
-
-	}
+//	public static char mCheckQuartet(Quartet q, String tempTaxa) {
+//		//int a = 0, b = 0, c = 0, d = 0;
+//		char qstat;
+//
+//		int a = q.getT1().getPartition();
+//		int b = q.getT2().getPartition();
+//		int c = q.getT3().getPartition();
+//		int d = q.getT4().getPartition();
+//
+//		if(tempTaxa.contentEquals(q.getT1().getName())) a = 1 - a;
+//	    else if(tempTaxa.contentEquals(q.getT2().getName())) b = 1-b;
+//	    else if(tempTaxa.contentEquals(q.getT3().getName())) c = 1-c;
+//	    else if(tempTaxa.contentEquals(q.getT4().getName())) d = 1-d;
+//	
+//		
+//		if (a==b && c==d && b==c) // totally on one side
+//	    {	
+//	        qstat = 'b';
+//	    }
+//	    else if( a==b && c==d) //satisfied
+//	    {
+//	        qstat = 's';
+//	    }
+//	    else if ((a==c && b==d) || (a==d && b==c)) // violated
+//	    {
+//	        qstat = 'v';
+//
+//	    }
+//	    else //deffered
+//	    {
+//	        qstat = 'd';
+//	    }
+//
+//	    //q.setStatus(qstat);
+//		return qstat;
+//
+//	}
 	private static char iCheckQuartet(Quartet q) {
 		//int a = 0, b = 0, c = 0, d = 0;
 		char qstat;
@@ -2207,6 +1934,48 @@ public class Routines {
 		return qstat;
 
 	}
+	
+	//////////////////////////////
+
+    private static String mergeUsingJAR(String s1, String s2, String extra) {
+       
+        if (s1.equals("")) {
+            return s2;
+        }
+        if (s2.equals("")) {
+            return s1;
+        }
+
+        String rootedS1 = rerootTreeUsingJARAndProcessing(s1, extra);
+        String rootedS2 = rerootTreeUsingJARAndProcessing(s2, extra);
+        
+        String mergedTree = "("+rootedS1 + "," + rootedS2+");";
+
+        return mergedTree;
+
+	}
+
+	private static String rerootTreeUsingJARAndProcessing(String newickTree, String outGroupNode) {
+		STITree tree = null;
+		  try {
+	            tree = new STITree(newickTree);
+	            tree.rerootTreeAtNode(tree.getNode(outGroupNode));
+	        } catch (IOException | ParseException ex) {
+	            System.out.println("Error in rerootTree.JAR ... check if jar main.jar exists. Exiting.");
+	            System.exit(-1);
+	        }
+
+	      String rootedTree = tree.toNewick();
+	      
+	      rootedTree = rootedTree.replace(";", ""); // remove semi-colon
+	      rootedTree = rootedTree.substring(1, rootedTree.length() - 1); // remove first and last brackets
+	      rootedTree = rootedTree.replace(outGroupNode, ""); //remove outGroup Node
+	      rootedTree = rootedTree.substring(1); //From left, so remove first comma
+	 
+	      return rootedTree;
+		
+	}
+
 
 	////////////////////////////////////////////
 	/*

@@ -6,4 +6,9 @@
  *
  */
 module qfm_ad {
+	
+	requires main;
+	
+	
+	
 }
