@@ -1,0 +1,5 @@
+InputFile	#ofTaxa	#ofQuartet	RF_score
+Sample-1	25	125		1.0			
+Sample-2	100	398107		0.08
+Sample-3	500	250000		0.827
+27_ecoli	27	597616		0.125
