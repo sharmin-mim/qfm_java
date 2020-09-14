@@ -2,9 +2,9 @@ package qfm_ad;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+//import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+//import java.util.LinkedHashSet;
 import java.util.List;
 
 public class Taxa {
@@ -16,8 +16,11 @@ public class Taxa {
     //Taxa tnext;
     //private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
     public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
-    public List<Integer> initialRelaventQuartetID = new ArrayList<Integer>();
+    
+    
+    //public List<Integer> initialRelaventQuartetID = new ArrayList<Integer>();
     public List<Integer> relaventQuartetIDOfCorrespondingMovedTaxa = new ArrayList<Integer>();
+
     
     /////For threading
     private int val;		
@@ -142,13 +145,14 @@ public class Taxa {
 	public void mCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap, int prevS, int prevV, int prevScore) {
 		
 		int satisfied = 0, violated = 0;
-	    for (int index : initialRelaventQuartetID) {
+	    for (int index : svdTableMap.keySet()) {
 	    	Quartet q = quartetMap.get(index);
 	    	char qStat  = q.mCheckQuartet(name);
     		int[] sv = svScore(q, qStat);//sv[0] = s, sv[1] = 1;
-            svdTableMap.put(index, new SVD_Log(index, sv[0], sv[1], qStat));
+    		SVD_Log svd = svdTableMap.get(index);
+    		svd.setSVD(sv[0], sv[1], qStat);
             satisfied += sv[0]; violated += sv[1];
-	    }
+		}
 
 	    sumOfSatOfSVDmap = satisfied;
 	    sumOfVatOfSVDmap = violated;
@@ -171,7 +175,7 @@ public class Taxa {
     		SVD_Log svd = svdTableMap.get(index);
     		satisfied = satisfied + sv[0] - svd.getSat();
     		violated = violated + sv[1] - svd.getVat();
-            svd.setSat(sv[0]); svd.setVat(sv[1]); svd.setqStat(qStat);
+            svd.setSVD(sv[0], sv[1], qStat);
             
 		}
 	    relaventQuartetIDOfCorrespondingMovedTaxa.clear();
@@ -183,6 +187,35 @@ public class Taxa {
 
 	
 	}
+//	public void mCalculateScore3(LinkedHashMap<Integer, Quartet> quartetMap, HashMap<Integer, SVD_Log> svdTableMap1, int prevS, int prevV, int prevScore) {
+//
+//		
+//	    int satisfied = sumOfSatOfSVDmap, violated = sumOfVatOfSVDmap;//, d = 0;
+//	
+//	    for (int id : svdTableMap1.keySet()) {
+//	    	
+//	    	if (!svdTableMap.containsKey(id)) {
+//				continue;
+//			}
+//	    	
+//	    	Quartet q = quartetMap.get(id);
+//    		char qStat  = q.mCheckQuartet(name);
+//    		int[] sv = svScore(q, qStat);//sv[0] = s, sv[1] = 1;
+//    		SVD_Log svd = svdTableMap.get(id);
+//    		satisfied = satisfied + sv[0] - svd.getSat();
+//    		violated = violated + sv[1] - svd.getVat();
+//            svd.setSVD(sv[0], sv[1], qStat);
+//            
+//		}
+//	    relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+//	    sumOfSatOfSVDmap = satisfied;
+//	    sumOfVatOfSVDmap = violated;
+//        sat = prevS + satisfied;
+//        vat = prevV + violated;
+//        val = (sat - vat) - prevScore;
+//
+//	
+//	}
 	public int[] svScore(Quartet q, char qStat ) {
 		char c = q.getStatus();
 		int[] sv = {0,0}; // sv[0] for satisfied, sv[1] for violated

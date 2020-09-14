@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+//import java.util.Random;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,9 @@ import phylonet.tree.io.ParseException;
 import phylonet.tree.model.sti.STITree;
 
 
+
 public class Routines {
+	
 	
 	
 	public static String readQuartetQMC(String fileName) { // count will be done at the time of reading
@@ -86,8 +88,9 @@ public class Routines {
 				
 				
 			}
-			//System.out.println("number of quartet = "+ qc);
-			//System.out.println("number of unique quartet = "+quartetList.size());
+			System.out.println("number of quartet = "+ qc);
+			System.out.println("number of unique quartet = "+quartetList.size());
+			System.out.println("number of Taxa = "+taxaList.size());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,67 +107,12 @@ public class Routines {
 		for (Quartet quartet : qr) {
 			qID++;
 			quartet.setIncreaseFrequency(false);
-			quartet.setQuartetID(qID);;
+			//quartet.setQuartetID(qID);;
 			quartetMap.put(qID, quartet);
 		}
 		qr.clear();
 		
-		//ql.sort(Comparator.comparing(Quartet::getQFrequency).reversed());
-//		List<Quartet> sortedList = ql.stream()
-//				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList());
-		//LinkedHashSet<Quartet> nql = new LinkedHashSet<Quartet>(sortedList);
-		/*LinkedHashSet<Quartet> countedSortedQL = new LinkedHashSet<Quartet>(quartetList.stream()
-				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList()));*/
-
-		//double estimatedTime = System.currentTimeMillis() - startTime;
-		//System.out.println("Quartet reading and sorting Time : "+ estimatedTime + " miliseconds");
-//		for (Taxa taxa : taxaList) {
-//			System.out.print(taxa.getName()+"->");
-//		}
-//		
-//		
-//		System.out.println();
-		////////////I will investigate this block later. whether it is really nrcessary or not
-//		int qID = 0;
-//		for (Quartet quartet : countedSortedQL) {
-//			qID++;
-//			quartet.setIncreaseFrequency(false);
-//			quartet.setQuartetID(qID);;
-//		}
-		///////////////////////////////////////////////////////////////////////////////////
-		//printQuartet(countedSortedQL);
-		//System.out.println("\n Number of taxa : "+taxaList.size());
-		///////////////////////////////will delete
-//		FM(taxaList, countedSortedQL);
-//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("sample27.txt"))) {//args[1] is output file
-//			//bw.write("("+s+")"+";");
-//			for(Quartet quartets : countedSortedQL) {
-//				
-//				bw.write("("+quartets.getT1().getName()+","+quartets.getT1().getPartition()+")"+","
-//						+"("+quartets.getT2().getName()+","+quartets.getT1().getPartition()+")"+"|"
-//						+"("+quartets.getT3().getName()+","+quartets.getT1().getPartition()+")"+","
-//						+"("+quartets.getT4().getName()+","+quartets.getT1().getPartition()+")"+":"
-//						+quartets.getQFrequency()+"\n");
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		
-		/*try(BufferedWriter bw = new BufferedWriter(new FileWriter("stable3.txt"))) {//args[1] is output file
-		//bw.write("("+s+")"+";");
-			for(Quartet quartets : countedSortedQL) {
-				
-				bw.write(quartets.getQuartetID()+":"+quartets.getT1().getName()+","
-						+quartets.getT2().getName()+"|"
-						+quartets.getT3().getName()+","
-						+quartets.getT4().getName()+":"
-						+quartets.getQFrequency()+"\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
-		//////////////////////////////////
+		
 		//long startTime1 = System.currentTimeMillis();
 		String s = SQP(quartetMap, taxaList, 1000, 0);
 		//long estimatedTime1 = System.currentTimeMillis() - startTime1;
@@ -183,6 +131,107 @@ public class Routines {
 		return s;
 		//return null;
 	
+		
+	}
+	
+	public static String newickQuartetWeightAsFrequency(String fileName) {
+		//Quartet Format: ((a,b),(c,d)); Frequency
+		// If frequency is already counted or weight represents frequency 
+		//and quartet is in newick format i.e ((a,b),(c,d)); Frequency
+		//Then use this function.
+		
+		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
+			
+		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
+		long startTime = System.currentTimeMillis();
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
+			//scanner = new Scanner(new BufferedReader(new FileReader("sample.txt")));
+			//int tcount=0, qcount = 0;
+			String loc;// int qc = 0;
+			while ((loc = br.readLine())!=null) {
+				if(loc.equals("")) {
+					//remove extra new line/white space
+					continue;
+				}
+				//System.out.println(loc);
+				String[] qq = loc.split("\\(\\(|,|\\),\\(|\\)\\)|; ");
+			
+				int frequency = Integer.parseInt(qq[6]); //for qfm, frequency means number of quartet. Frequency must be integer
+				Taxa[] t = new Taxa[4];
+				for (int i = 0; i < 4; i++) {
+					t[i] = new Taxa(qq[i+1]);
+					//taxaList.add(t[i]);
+					///////////recent change
+					if (!taxaList.add(t[i])) {
+						final String taxaName = t[i].getName();
+						t[i] = taxaList.stream().filter(j -> j.getName().contentEquals(taxaName)).findAny().get();
+					}
+					////recent change/////////
+				}
+
+				
+//				if(quartetList.contains(new Quartet(t1, t2, t3, t4))) {
+//					qc++;
+//				}else 
+//				if (quartetList.contains(new Quartet(t[1], t[0], t[2], t[3], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[0], t[1], t[3], t[2], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[1], t[0], t[3], t[2], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[2], t[3], t[0], t[1], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[2], t[3], t[1], t[0], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[3], t[2], t[0], t[1], frequency))) {
+//					qc++;
+//				}else if (quartetList.contains(new Quartet(t[3], t[2], t[1], t[0], frequency))) {
+//					qc++;
+//				}else {
+					quartetList.add(new Quartet(t[0], t[1], t[2], t[3], frequency));
+					//count++;
+//					qc++;
+//				}
+//				
+								
+			}	
+				
+			//System.out.println("number of quartet = "+ qc);
+			System.out.println("number of quartet = "+quartetList.size());
+			System.out.println("number of Taxa = "+taxaList.size());
+			
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		long estimatedTime = System.currentTimeMillis() - startTime;
+		System.out.println("Quartet Reading : "+ estimatedTime/1000 + " seconds");
+		//printQuartet(quartetList);
+		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+		quartetList.clear();
+		qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
+		long sortingTime = System.currentTimeMillis() - startTime - estimatedTime;
+		System.out.println("Sorting Time : "+ sortingTime/1000 + " seconds");
+		
+		LinkedHashMap<Integer, Quartet> quartetMap = new LinkedHashMap<Integer, Quartet>();
+		int qID = 0;
+		for (Quartet quartet : qr) {
+			qID++;
+			quartet.setIncreaseFrequency(false);
+			//quartet.setQuartetID(qID);;
+			quartetMap.put(qID, quartet);
+		}
+		qr.clear();
+		
+		
+		String s = SQP(quartetMap, taxaList, 1000, 0);
+
+		if (s == null) {
+			s = "null";
+		}
+		
+		return s;
+
 		
 	}
 	
@@ -209,10 +258,12 @@ public class Routines {
 			LinkedHashSet<Taxa> partA = mrt.getPartA();
 			LinkedHashSet<Taxa> partB = mrt.getPartB();
 			for (Taxa taxa : partA) {
-				taxa.initialRelaventQuartetID.clear();
+				//taxa.initialRelaventQuartetID.clear();
+				taxa.svdTableMap.clear();
 			}
 			for (Taxa taxa : partB) {
-				taxa.initialRelaventQuartetID.clear();
+				//taxa.initialRelaventQuartetID.clear();
+				taxa.svdTableMap.clear();
 			}
 //			System.out.println("****************************SQP****************");
 //			System.out.println("*****************PartA**************************");
@@ -253,26 +304,17 @@ public class Routines {
 	        LinkedHashMap<Integer, Quartet> quartetA = new LinkedHashMap<Integer, Quartet>();
 	        LinkedHashMap<Integer, Quartet> quartetB = new LinkedHashMap<Integer, Quartet>();
 	        
-//	        LinkedHashSet<Quartet> quartetAA = new LinkedHashSet<Quartet>();
-//	        LinkedHashSet<Quartet> quartetBB = new LinkedHashSet<Quartet>();
-//	        
-//	        ArrayList<Quartet> quartetAAA = new ArrayList<Quartet>();
-//	        ArrayList<Quartet> quartetBBB = new ArrayList<Quartet>();
+
 	        
 	        int numOfBDQ = 0; //number of b and deferred quartet
 
 	        for (Quartet q : quartetMap.values()) {
 	        	char c = q.getStatus();
-				//int l = q.getStatus().length();
-				//char c = q.getStatus().charAt(l-1);
-//				Quartet qtemp = new Quartet(q.getT1(), q.getT2(), q.getT3(), q.getT4());
-//				qtemp.setIncreaseFrequency(false);
-//				qtemp.setStatus(q.getStatus());
-//				qtemp.setQFrequency(q.getQFrequency());
+
 				
 				if (c == 'b' || c == 'd' ) {
 					numOfBDQ++;
-					q.setQuartetID(numOfBDQ);
+					//q.setQuartetID(numOfBDQ);
 					if (c == 'b') {
 						//numOfB++;
 						//if (partA.contains(q.getT1())) {
@@ -301,82 +343,24 @@ public class Routines {
 							else if(q.getT3().getPartition() == 0)q.setT3(extraB);
 							else q.setT4(extraB);
 							quartetB.put(numOfBDQ, q);
-//							if (partB.contains(q.getT1()))q.setT1(extraA);
-//							else if (partB.contains(q.getT2()))q.setT2(extraA);
-//							else if (partB.contains(q.getT3()))q.setT3(extraA);
-//							else q.setT4(extraA);
-//							/*if (partB.contains(q.getT1()))q.setT1(new Taxa(extra));
-//							else if (partB.contains(q.getT2()))q.setT2(new Taxa(extra));
-//							else if (partB.contains(q.getT3()))q.setT3(new Taxa(extra));
-//							else q.setT4(new Taxa(extra));*/
-							//quartetA.add(q);
-//							quartetAAA.add(qtemp);
-//							numOfDA++;
+
 						} else {
 							if(q.getT1().getPartition() == 1)q.setT1(extraA);
 							else if(q.getT2().getPartition() == 1)q.setT2(extraA);
 							else if(q.getT3().getPartition() == 1)q.setT3(extraA);
 							else q.setT4(extraA);
 							quartetA.put(numOfBDQ, q);
-//							if (partA.contains(q.getT1()))q.setT1(extraB);
-//							else if (partA.contains(q.getT2()))q.setT2(extraB);
-//							else if (partA.contains(q.getT3()))q.setT3(extraB);
-//							else q.setT4(extraB);
-//							/*if (partA.contains(q.getT1()))q.setT1(new Taxa(extra));
-//							else if (partA.contains(q.getT2()))q.setT2(new Taxa(extra));
-//							else if (partA.contains(q.getT3()))q.setT3(new Taxa(extra));
-//							else q.setT4(new Taxa(extra));*/
-							//quartetB.add(q);
-//							quartetBBB.add(qtemp);
-//							numOfDB++;
+
 
 						}
-//						if (dcount == 1) {
-//							if (partA.contains(q.getT1()))q.setT1(new Taxa(extra));
-//							else if (partA.contains(q.getT2()))q.setT2(new Taxa(extra));
-//							else if (partA.contains(q.getT3()))q.setT3(new Taxa(extra));
-//							else q.setT4(new Taxa(extra));
-//							
-//							quartetBB.add(q);
-//							numOfDBB++;
-//						} else {
-//							if (partB.contains(q.getT1()))q.setT1(new Taxa(extra));
-//							else if (partB.contains(q.getT2()))q.setT2(new Taxa(extra));
-//							else if (partB.contains(q.getT3()))q.setT3(new Taxa(extra));
-//							else q.setT4(new Taxa(extra));
-//							
-//							quartetAA.add(q);
-//							numOfDAA++;
-//						}
+
 					}
 				}
 			}
-	       // System.out.println("numOfBDQ = "+numOfBDQ+"  QuartetA+B = "+(quartetA.size()+quartetB.size()));
-//	        System.out.println("NumOfD = "+numOfD+"  numOfB = "+numOfB+ "  numOfD+B = "+(numOfD+numOfB));
-//	        System.out.println("QuartetA = "+quartetA.size()+"  numOfDA = "+ numOfDA + "  numOfBA = "+numOfBA);
-//	        System.out.println("QuartetB = "+quartetB.size()+"  numOfDB = "+ numOfDB + "  numOfBB = "+numOfBB);
-//	        System.out.println("NumOfDAA = "+numOfDAA+"  numOfDBB = "+numOfDBB+ "  numOfDAA+DBB = "+(numOfDAA+numOfDBB));
-	       // System.out.println("QuartetA = "+quartetA.size());
-	        //System.out.println("QuartetB = "+quartetB.size());
-//	        System.out.println("QuartetAAA = "+quartetAAA.size());
-//	        System.out.println("QuartetBBB = "+quartetBBB.size());
+	       
 	        
-//	        System.out.println("**************SQP After partitioning quartet****************");
-//	        printTaxa(partA);
-//	        System.out.println("**************SQP After partitioning quartetA****************");
-//	        printQuartet(quartetA);
-//	        printTaxa(partB);
-//	        System.out.println("**************SQP After partitioning quartetB****************");
-//	        printQuartet(quartetB);
-	       // System.out.println("One SQP divide step is completed");
-	        //final String s1, s2;
-	        
-//	        System.out.println("\n\n**************Before first recursive call****************");
-//	        long t1 = System.currentTimeMillis();
-//			System.out.println("Before first recursive call : "+ (t1 - t0) + " miliseconds");
-//			 System.out.println("\n\n**************Before first recursive call****************\n\n");
-	        //double estimatedTime = -517 + ( 111 * partA.size()) + ( 0.205 * quartetA.size());
-	        
+	       // System.out.println("One divide step complete");
+	        quartetMap.clear();
 	        if (extraTaxa == 1001) {
 	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
 	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
@@ -845,329 +829,7 @@ public class Routines {
 		//return FM_algo(partA, partB, quartetList);
 	}
 
-//	private static MultiReturnType FM_algo(LinkedHashSet<Taxa> partA, LinkedHashSet<Taxa> partB,
-//			LinkedHashSet<Quartet> quartetList) {
-//		String taxaToMove = null;
-//		boolean loopAgain = true;
-//		while (loopAgain) {
-//			boolean iterationMore = true;
-//			LinkedHashSet<GainList> movedList = new LinkedHashSet<GainList>();
-//			while (iterationMore) {
-//				System.out.println("****************Before Score and Gain**************");
-//				printQuartet(quartetList);
-//				int[] score= calculateScore(partB,quartetList,"null",0,0,0);
-//				//score[0] -> partition score, score[1] -> noOfSat, score[2] -> noOfVat, score[3] -> noOfDef
-//				int prevScore = score[0];//partition score
-//	            int prevS = score[1];//noOfSat
-//	            int prevV = score[2];//noOfVat
-//	            int prevD = score[3];//noOfDef
-//	            int ca = partA.size();
-//				int cb = partB.size();
-//				System.out.println("Before Flag: prevScore = "+prevScore+"  prevS = "+ prevS+"  prevV = "+prevV+"  prevD = "+ prevD);
-//				printQuartet(quartetList);
-//				boolean flag = true; int tag1 = 0, tag2 = 0, alt = 0;
-////				gainList = new Listt();
-//				LinkedHashSet<GainList> gainList = new LinkedHashSet<GainList>();
-//				Iterator<Taxa> iteratorA = partA.iterator();
-//				Iterator<Taxa> iteratorB = partB.iterator();
-//				//System.out.println("New Iteration");
-//				while (flag) {
-//					if (iteratorA.hasNext() && alt == 0) {
-//						
-//						Taxa taxaA = iteratorA.next();
-//						if (!taxaA.isLocked()) {
-//							taxaToMove = taxaA.getName();
-//							System.out.println("Flag taxa = "+ taxaToMove);
-//	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
-//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-//							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], ca-1, 0));
-//							
-//						}
-////						if (tag2 == 0 && iteratorB.hasNext()) {
-////							alt = 1;
-////						}
-//						
-//						
-//					} else if (iteratorB.hasNext() && alt == 1) {
-//						Taxa taxaB = iteratorB.next();
-//						if (!taxaB.isLocked()) {
-//							taxaToMove = taxaB.getName();
-//							System.out.println("Flag taxa = "+ taxaToMove);
-//	                        score = calculateScore(partB, quartetList, taxaToMove, prevS, prevV, prevD);
-//	                        System.out.println("Inside Flag: score[0]-prevScore = "+(score[0]-prevScore)
-//	                        		+"  Score[0] = "+score[0]+"  score[1] = "+score[1]
-//	                        		+"  score[2] = "+score[2]+"  score[3] = "+score[3]);
-//							gainList.add(new GainList(taxaToMove, score[0]-prevScore, score[1], score[2], score[3], cb-1, 1));
-//							
-//						}
-////						if (tag1 == 0 && iteratorA.hasNext()) {
-////							alt = 0;
-////						}
-//						
-//						
-//					} 
-//					
-//					if (!iteratorA.hasNext()) {
-//						tag1 = 1;
-//					}
-//					if (!iteratorB.hasNext()) {
-//						tag2 = 1;
-//					}
-//					if (tag1 == 1 && tag2 == 1) {
-//						flag = false;
-//					}
-//					if (tag2 == 0 && alt == 0) {
-//						alt = 1;
-//					}else if (tag1 == 0 && alt == 1) {
-//						alt= 0;
-//					}
-//				}
-//				System.out.println("********************Gain List*************");
-//				for (GainList gl : gainList) {
-//					 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-//		                		gl.getDef()+" "+gl.getBel0w());
-//				}
-//				printQuartet(quartetList);
-//				
-////				quartetList.stream()
-////				.sorted(Comparator.comparing(Quartet::getQFrequency).reversed()).collect(Collectors.toList())
-//				///////Moving Taxa which have highest gain
-//				int maxgain = -1000000000; //double
-//				int glPart = 0;
-//				taxaToMove = null;
-//				
-//				
-//				/////////////////////
-//
-////				//maxgain = -1000000000; //double
-////				int maxsat = 0;
-////	            //glPart = 0;
-////	            int randnum = 0;
-////				
-////				for (GainList gl : gainList) {
-////					if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-////						taxaToMove = gl.getTaxaToMove();
-////	                    maxgain = gl.getVal();               
-////	                    maxsat = gl.getSat();
-////	                    glPart = gl.getPart(); // current Partition
-////					} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-////						 
-////	                   
-////	                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-////	                    {
-////	                        taxaToMove = gl.getTaxaToMove();
-////	                        maxgain = gl.getVal();
-////	                        maxsat = gl.getSat();
-////	                        glPart = gl.getPart();
-////	                    }
-////	                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-////	                    {
-////	                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-////	                        if(randnum%2 == 0){
-////	                            taxaToMove = gl.getTaxaToMove();
-////	                            maxgain = gl.getVal();                       
-////	                            maxsat = gl.getSat();
-////	                            glPart = gl.getPart(); // current Partition
-////	                        }
-////	                        //}
-////
-////	                    }
-////
-////	                
-////					}
-////				}
-//			
-//				
-//				
-//				//////////////////////
-//				
-//				GainList movedTaxa = new GainList();
-//				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat)).get();
-//				
-//				if (movedTaxa.getBel0w() >= 2) {
-//					taxaToMove = movedTaxa.getTaxaToMove();
-//					maxgain = movedTaxa.getVal();
-//					glPart = movedTaxa.getPart();
-//				} else {
-//					maxgain = -1000000000; //double
-//					int maxsat = 0;
-//		            glPart = 0;
-//		            int randnum = 0;
-//					
-//					for (GainList gl : gainList) {
-//						if (gl.getVal() > maxgain && gl.getBel0w() >= 2 ) {
-//							taxaToMove = gl.getTaxaToMove();
-//		                    maxgain = gl.getVal();               
-//		                    maxsat = gl.getSat();
-//		                    glPart = gl.getPart(); // current Partition
-//						} else if(gl.getVal() == maxgain && gl.getBel0w() >= 2 ){
-//							 
-//		                   
-//		                    if(gl.getSat() > maxsat && gl.getBel0w() >= 2)// && ((c1>2||c2>2)&& total!=gl->val+gl->sat)) //(tempratio1>maxratio1)
-//		                    {
-//		                        taxaToMove = gl.getTaxaToMove();
-//		                        maxgain = gl.getVal();
-//		                        maxsat = gl.getSat();
-//		                        glPart = gl.getPart();
-//		                    }
-//		                    else if(gl.getSat() == maxsat && gl.getBel0w() >= 2)// &&((c1>2||c2>2)&& total!=gl->val+gl->sat))//(tempratio1==maxratio1)
-//		                    {
-//		                       randnum = 10 + (new Random().nextInt(100));///rand()%100;
-//		                        if(randnum%2 == 0){
-//		                            taxaToMove = gl.getTaxaToMove();
-//		                            maxgain = gl.getVal();                       
-//		                            maxsat = gl.getSat();
-//		                            glPart = gl.getPart(); // current Partition
-//		                        }
-//		                        //}
-//
-//		                    }
-//
-//		                
-//						}
-//					}
-//				}
-//				
-//			
-//				if (taxaToMove != null) {
-//					final String taxaMove = taxaToMove;
-//					if (glPart == 1) {
-//						partB.removeIf(i -> i.getName().contentEquals(taxaMove));
-//						partA.add(new Taxa(taxaToMove, 0, true));
-//					} else {
-//						partA.removeIf(i -> i.getName().contentEquals(taxaMove));
-//						partB.add(new Taxa(taxaToMove, 1, true));
-//					}
-//					movedList.add(new GainList(taxaToMove, maxgain, 1-glPart));
-//					if (gainList.size() == 1)
-//						iterationMore = false;
-//				} else {
-//					iterationMore = false;
-//				}
-//				
-//				/*
-//				 * I will check this portion of code later. This part is efficient. 
-//				 * But gl.below() must be checked 
-//				 * GainList movedTaxa = new GainList();
-//				movedTaxa = gainList.stream().max(Comparator.comparing(GainList::getVal).thenComparing(GainList::getSat).).get();
-//				taxaToMove = movedTaxa.getTaxaToMove();
-//				System.out.println("Taxa to move = "+taxaToMove);
-//				final String taxaMove = taxaToMove;
-//				if (movedTaxa.getPart() == 1) {
-//					partB.removeIf(i -> i.getName().contentEquals(taxaMove));
-//					partA.add(new Taxa(taxaToMove, 0, true));
-//				} else {
-//					partA.removeIf(i -> i.getName().contentEquals(taxaMove));
-//					partB.add(new Taxa(taxaToMove, 1, true));
-//				}
-//				movedTaxa.setPart(1-movedTaxa.getPart());
-//				movedList.add(movedTaxa);
-//				
-//				if (gainList.size() == 1) {
-//					iterationMore = false;
-//				}else {
-//					System.out.println("Next Iteration");
-//				}
-//				*/
-//				
-//				
-//			}///no more iteration
-//			System.out.println("********************Moved List*************");
-//			for (GainList gl : movedList) {
-//				 System.out.println(gl.getTaxaToMove()+" "+gl.getVal()+" "+gl.getPart()+" "+gl.getSat()+" "+gl.getVat()+" "+
-//	                		gl.getDef()+" "+gl.getBel0w());
-//			}
-//			int cumulativeGain = 0, gainMax = 0;
-//			String back = "Initial";
-//			for (GainList ml : movedList) {
-//				cumulativeGain += ml.getVal();
-//				if (cumulativeGain >= gainMax) {
-//					gainMax = cumulativeGain;
-//					back = ml.getTaxaToMove();
-//				}
-//			}
-//			System.out.println("cumulative gain = "+ cumulativeGain);
-//            System.out.println(" taxa to move = "+ taxaToMove);
-//            System.out.println(" back taxa = "+ back);
-//            System.out.println("partA and partB");
-//            printTaxa(partA);
-//            printTaxa(partB);
-//            boolean isMove = false;
-//            LinkedHashSet<Taxa> pa = new LinkedHashSet<Taxa>();
-//            LinkedHashSet<Taxa> pb = new LinkedHashSet<Taxa>();
-//            for (GainList ml : movedList) {
-//            	String moveTaxa = ml.getTaxaToMove();
-//            	if (isMove) {
-//            		if (ml.getPart() == 1) {
-//    					partB.removeIf(i -> i.getName().contentEquals(moveTaxa));
-//    					pa.add(new Taxa(moveTaxa, 0));
-//    					//partA.add(new Taxa(moveTaxa, 0));
-//    				} else {
-//    					partA.removeIf(i -> i.getName().contentEquals(moveTaxa));
-//    					pb.add(new Taxa(moveTaxa, 1));
-//    					//partB.add(new Taxa(moveTaxa, 1));
-//
-//    				}
-//				}
-//				if (moveTaxa.contentEquals(back)) {
-//					isMove = true;
-//				}
-//			}
-//            ///PartA
-//            if (partA.size() == 1) {
-//				pa.addAll(partA);
-//			} else if (!partA.isEmpty()) {
-//				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partA);
-//	            Collections.reverse(reverseTaxaList);
-//	            pa.addAll(reverseTaxaList);
-//			}
-//            //PartB
-//            if (partB.size() == 1) {
-//				pb.addAll(partB);
-//			} else if (!partB.isEmpty()) {
-//				ArrayList<Taxa> reverseTaxaList = new ArrayList<Taxa>(partB);
-//	            Collections.reverse(reverseTaxaList);
-//	            pb.addAll(reverseTaxaList);
-//			}
-//            ////
-//            partA = new LinkedHashSet<Taxa>(pa);
-//            partB = new LinkedHashSet<Taxa>(pb);
-//            System.out.println("After moving partA and partB");
-//            printTaxa(partA);
-//            printTaxa(partB);
-//            for (Taxa taxa : partA) {
-//				taxa.setLocked(false);
-//			}
-//            for (Taxa taxa : partB) {
-//				taxa.setLocked(false);
-//			}
-//            
-//            
-//          
-//            if (gainMax <= 0) {
-//            	System.out.println("Looop again is finished");
-//            	loopAgain = false;
-//			}
-//			
-//		}//no more loop
-//		 //************end of Loop Again**********//
-//        //***********Merge Two list***************//
-//        /*
-//         * int partSat = countSatisfiedQuartets(partA, partB,quartetList);
-//        System.out.println("PartSat = "+partSat);
-//        System.out.println("After loop again part a nd b");
-//        printTaxa(partA);
-//        printTaxa(partB);
-//        LinkedHashSet<Taxa> finalTaxaList = new LinkedHashSet<Taxa>(partA);
-//        finalTaxaList.addAll(partB);
-//        printTaxa(finalTaxaList);
-//        */
-//		System.out.println("************************FM_algo Quartet List*************************");
-//		printQuartet(quartetList);
-//		return new MultiReturnType(partA, partB);
-//	}
+
 	
 	
 	private static int countSatisfiedQuartets(LinkedHashMap<Integer, Quartet> quartetMap) {
@@ -1311,7 +973,7 @@ public class Routines {
 		System.out.println("**********************Quartet List********************************");
 		for(Quartet quartets : quartetList) {
 			
-			System.out.println(quartets.getQuartetID()+" : "+quartets.getT1().getName()+","+quartets.getT2().getName()+"|"
+			System.out.println("quartet"+" : "+quartets.getT1().getName()+","+quartets.getT2().getName()+"|"
 					+quartets.getT3().getName()+","+quartets.getT4().getName()+":"+quartets.getQFrequency()+"->"
 					+quartets.isIncreaseFrequency()+" -> "+ quartets.getStatus()+"\n");
 		}
@@ -1351,8 +1013,13 @@ public class Routines {
 		//String taxaToMove = null;
 		boolean loopAgain = true;
 		
-		for (Quartet quartet : quartetMap.values()) {
-			quartet.fillUpInitialRelaventQuartetID();
+//		for (Quartet quartet : quartetMap.values()) {
+//			//quartet.fillUpInitialRelaventQuartetID();
+//			quartet.fillUpSVDtableMapWithInitialRelaventQuartetID();
+//		}
+		for (int quartetID : quartetMap.keySet()) {
+			Quartet quartet = quartetMap.get(quartetID);
+			quartet.fillUpSVDtableMapWithInitialRelaventQuartetID(quartetID);
 		}
 		while (loopAgain) {
 			boolean iterationMore = true; int iteration = 0;
@@ -1375,9 +1042,12 @@ public class Routines {
 //			for (Quartet quartet : quartetList) {
 //				quartet.fillUpRelaventQuartetListOfCorrespondingTaxa();
 //			}
+			//Taxa taxa_to_move = new Taxa("", -1);
 			
 			while (iterationMore) {
+				//final HashMap<Integer, SVD_Log> svdTableMap = taxa_to_move.svdTableMap;
 				iteration++;
+				//System.out.println("iteration "+ iteration);
 				int[] score;
 				if (iteration == 1) {
 					score= iCalculateScore(quartetMap);
@@ -1428,6 +1098,7 @@ public class Routines {
 							
 							if (iterationF == 1) {
 								//taxaA.getSvdTable().clear();
+								//System.out.println("Taxa A = "+taxaA.getName());
 								taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
 								taxaA.mCalculateScore(quartetMap, prevSF, prevVF, prevScoreF);
 							} else {
@@ -1466,6 +1137,7 @@ public class Routines {
 				for (Taxa taxaB : partB) {
 					if (iteration == 1) {
 						//taxaA.getSvdTable().clear();
+						//System.out.println("Taxa B = "+taxaB.getName());
 						taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
 						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
 					} else {
@@ -1653,6 +1325,7 @@ public class Routines {
 				int glPart = taxa_to_move.getPartition();
 				prevScore = prevS - prevV;//partition score
 				if (glPart != -1) {
+					//System.out.println("Moved Taxa = "+taxa_to_move.getName());
 //					if (gainList.size() == 1) {
 ////						mCalculateScore(null,partB,quartetList,"null",0,0,0);
 ////						System.out.println("gainlist.size == 1");
@@ -1680,13 +1353,15 @@ public class Routines {
 					//rQuartetList.clear();
 					
 					
-					for (SVD_Log svd : taxa_to_move.svdTableMap.values()) {
-						Quartet q = quartetMap.get(svd.getQuartetID());
+					for (int qid : taxa_to_move.svdTableMap.keySet()) {
+						Quartet q = quartetMap.get(qid);
+						SVD_Log svd = taxa_to_move.svdTableMap.get(qid);
 						q.setStatus(svd.getqStat());
-						q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa();
+						q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(qid);
 						//rQuartetList.add(q);
 					}
-					taxa_to_move.svdTableMap.clear();
+					
+					//taxa_to_move.svdTableMap.clear();
 					//taxa_to_move.relaventQuartet.clear();
 //					for (Quartet q : quartetList) {
 //						if(q.getT1().getName().contentEquals(taxaToMove) ||

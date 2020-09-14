@@ -11,18 +11,22 @@ public class Quartet {
 	//private char status;
 	private int qFrequency;
 	private boolean increaseFrequency;
-	private int quartetID;
+	//private int quartetID;
 	public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
-		super();
+		this(t1, t2, t3, t4, 1);
+	}
+	
+	public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4, int qFrequency) {
+		
 		this.t1 = t1;
 		this.t2 = t2;
 		this.t3 = t3;
 		this.t4 = t4;
-		this.qFrequency = 1;
+		this.qFrequency = qFrequency;
 		this.increaseFrequency = true;
-		//this.status = '';
-		this.quartetID = -1;
+		//this.quartetID = -1;
 	}
+
 	public Taxa getT1() {
 		return t1;
 	}
@@ -60,12 +64,12 @@ public class Quartet {
 	}
 	
 
-	public int getQuartetID() {
-		return quartetID;
-	}
-	public void setQuartetID(int quartetID) {
-		this.quartetID = quartetID;
-	}
+//	public int getQuartetID() {
+//		return quartetID;
+//	}
+//	public void setQuartetID(int quartetID) {
+//		this.quartetID = quartetID;
+//	}
 //	public char getStatus() {
 //		return status;
 //	}
@@ -84,17 +88,18 @@ public class Quartet {
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
-	public void fillUpRelaventQuartetIDOfCorrespondingMovedTaxa() {
+	public void fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(int quartetID) {
 		t1.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t2.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t3.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 		t4.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
 	}
-	public void fillUpInitialRelaventQuartetID() {
-		t1.initialRelaventQuartetID.add(quartetID);
-		t2.initialRelaventQuartetID.add(quartetID);
-		t3.initialRelaventQuartetID.add(quartetID);
-		t4.initialRelaventQuartetID.add(quartetID);
+
+	public void fillUpSVDtableMapWithInitialRelaventQuartetID(int quartetID) {
+		t1.svdTableMap.put(quartetID, new SVD_Log());
+		t2.svdTableMap.put(quartetID, new SVD_Log());
+		t3.svdTableMap.put(quartetID, new SVD_Log());
+		t4.svdTableMap.put(quartetID, new SVD_Log());
 	}
 	public char mCheckQuartet(String tempTaxa) {
 		//int a = 0, b = 0, c = 0, d = 0;
@@ -166,7 +171,7 @@ public class Quartet {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(quartetID, t1, t2, t3, t4);
+		return Objects.hash(t1, t2, t3, t4);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -175,10 +180,11 @@ public class Quartet {
 		if (!(obj instanceof Quartet))
 			return false;
 		Quartet other = (Quartet) obj;
-		if (quartetID == other.quartetID && Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
+		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
 				&& Objects.equals(t3, other.t3) && Objects.equals(t4, other.t4)) {
 			if (other.isIncreaseFrequency()) {
-				other.setQFrequency(other.getQFrequency()+1);
+				//other.setQFrequency(other.getQFrequency()+1);
+				other.setQFrequency(other.getQFrequency()+this.qFrequency);
 			}
 			return true;
 		} else {
