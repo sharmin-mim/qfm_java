@@ -161,3 +161,28 @@ version 2.1.9 (Final Threaded Version)
 	Total maximum number of running thread: At a peak time there will be maximum 4 running thread
 	
 Future Step: Threading condition needs to change. 
+
+version 2.1.10 (Final Threaded Version)
+	Date: Sep 14, 2020
+	Commit ID: e088c08
+	Commit: e088c086d29c33d8de4019c58ac281a83d8d44e6
+	Commit message: Version 2.1.10 -> (Threaded version) readQuartetSQP -> quartetMap, readQuartetNewick
+	Changes: Routine/readQuartet() -> HashMap quartetMap is used instead of HashSet qartetList
+		 Routine/readQuartetNewickIfWeightIsFrequency() is added 
+		 Quartet -> quartetID variable is deleted.
+			    fillUpSVDtableWithRelaventQuartetID() is added.
+			    fillUpInitialRelaventQuartetID() is deleted
+		 Taxa -> initialRelaventQuartetID list is deleted. in commented section there is a method named mCalculateScore3()
+		 SVD_Log -> quartetID is deleted
+	Total maximum number of running thread: At a peak time there will be maximum 4 running thread
+	
+Future Step: Threading condition needs to change. 
+version 2.1.11 (Final Version (non-threaded))
+	Date: Sep 14, 2020
+	Commit ID: 27b0136
+	Commit: 27b0136a5eb04586932f528656c937887eb51882
+	Commit message: Version 2.1.11 -> (Non-threaded version) no thread is used. All implementations are same as previous one
+	Changes: Only Threads are eliminated
+	
+	
+Future Step: Threading condition needs to change. 
