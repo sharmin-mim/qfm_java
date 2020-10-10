@@ -13,12 +13,12 @@ public class Main {
 //		//String fileName = "27_ecoli.txt";
 //		//String fileName = "sample.txt";
 //		//String s= Routines.readQuartetQMC("sample300.txt");
-		//String s= Routines.readQuartetQMC("27_ecoli.txt");
-		String s= Routines.readQuartetQMC(args[0]);
+		String s= Routines.readQuartetQMC("27_ecoli.txt");
+		//String s= Routines.readQuartetQMC(args[0]);
 		//String s = Routines.newickQuartetWeightAsFrequency(args[0]);
-		//System.out.println(s);
-		//try(BufferedWriter bw = new BufferedWriter(new FileWriter("gene101Out.txt"))) {//args[1] is output file
-		try(BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
+		System.out.println(s);
+		try(BufferedWriter bw = new BufferedWriter(new FileWriter("gene101Out.txt"))) {//args[1] is output file
+		//try(BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
 			bw.write(s);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -26,11 +26,6 @@ public class Main {
 		long estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("Total Running Time : "+ estimatedTime/1000 + " seconds");
 
-		
-		
-		
-		
-		
 		
 	}
 

@@ -53,8 +53,8 @@ public class Routines {
 					//taxaList.add(t[i]);
 					///////////recent change
 					if (!taxaList.add(t[i])) {
-						final String taxaName = t[i].getName();
-						t[i] = taxaList.stream().filter(j -> j.getName().contentEquals(taxaName)).findAny().get();
+						final String taxaName = t[i].name;
+						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
 					}
 					////recent change/////////
 				}
@@ -141,8 +141,9 @@ public class Routines {
 		//Then use this function.
 		
 		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
+		ArrayList<Quartet> qr = new ArrayList<Quartet>();
 			
-		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
+		//LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
 		long startTime = System.currentTimeMillis();
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))){
 			//scanner = new Scanner(new BufferedReader(new FileReader("sample.txt")));
@@ -163,8 +164,8 @@ public class Routines {
 					//taxaList.add(t[i]);
 					///////////recent change
 					if (!taxaList.add(t[i])) {
-						final String taxaName = t[i].getName();
-						t[i] = taxaList.stream().filter(j -> j.getName().contentEquals(taxaName)).findAny().get();
+						final String taxaName = t[i].name;
+						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
 					}
 					////recent change/////////
 				}
@@ -188,16 +189,17 @@ public class Routines {
 //				}else if (quartetList.contains(new Quartet(t[3], t[2], t[1], t[0], frequency))) {
 //					qc++;
 //				}else {
-					quartetList.add(new Quartet(t[0], t[1], t[2], t[3], frequency));
+//					quartetList.add(new Quartet(t[0], t[1], t[2], t[3], frequency));
 					//count++;
 //					qc++;
 //				}
 //				
-								
+				
+				qr.add(new Quartet(t[0], t[1], t[2], t[3], frequency));
 			}	
 				
 			//System.out.println("number of quartet = "+ qc);
-			System.out.println("number of quartet = "+quartetList.size());
+			System.out.println("number of quartet = "+qr.size());
 			System.out.println("number of Taxa = "+taxaList.size());
 			
 				
@@ -207,8 +209,8 @@ public class Routines {
 		long estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("Quartet Reading : "+ estimatedTime/1000 + " seconds");
 		//printQuartet(quartetList);
-		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
-		quartetList.clear();
+//		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+//		quartetList.clear();
 		qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
 		long sortingTime = System.currentTimeMillis() - startTime - estimatedTime;
 		System.out.println("Sorting Time : "+ sortingTime/1000 + " seconds");
@@ -257,14 +259,7 @@ public class Routines {
 			MultiReturnType mrt = FM(taxaList, quartetMap);
 			LinkedHashSet<Taxa> partA = mrt.getPartA();
 			LinkedHashSet<Taxa> partB = mrt.getPartB();
-			for (Taxa taxa : partA) {
-				//taxa.initialRelaventQuartetID.clear();
-				taxa.svdTableMap.clear();
-			}
-			for (Taxa taxa : partB) {
-				//taxa.initialRelaventQuartetID.clear();
-				taxa.svdTableMap.clear();
-			}
+			
 //			System.out.println("****************************SQP****************");
 //			System.out.println("*****************PartA**************************");
 //			printTaxa(partA);
@@ -309,7 +304,7 @@ public class Routines {
 	        int numOfBDQ = 0; //number of b and deferred quartet
 
 	        for (Quartet q : quartetMap.values()) {
-	        	char c = q.getStatus();
+	        	char c = q.status;
 
 				
 				if (c == 'b' || c == 'd' ) {
@@ -318,7 +313,7 @@ public class Routines {
 					if (c == 'b') {
 						//numOfB++;
 						//if (partA.contains(q.getT1())) {
-						if (q.getT1().getPartition() == 0) {
+						if (q.t1.getPartition() == 0) {
 							quartetA.put(numOfBDQ, q);
 							
 						} else {
@@ -328,7 +323,7 @@ public class Routines {
 					} else {
 						//numOfD++;
 						//int dcount = 0;
-						int dcount = q.getT1().getPartition() + q.getT2().getPartition() + q.getT3().getPartition();
+						int dcount = q.t1.getPartition() + q.t2.getPartition() + q.t3.getPartition();
 //						if (partA.contains(q.getT1()))dcount++;
 //						if (partA.contains(q.getT2()))dcount++;
 //						if (partA.contains(q.getT3()))dcount++;
@@ -338,17 +333,17 @@ public class Routines {
 //						System.out.println("dcount = "+ dcount);
 						
 						if (dcount > 1) {
-							if(q.getT1().getPartition() == 0)q.setT1(extraB);
-							else if(q.getT2().getPartition() == 0)q.setT2(extraB);
-							else if(q.getT3().getPartition() == 0)q.setT3(extraB);
-							else q.setT4(extraB);
+							if(q.t1.getPartition() == 0)q.t1 =extraB;
+							else if(q.t2.getPartition() == 0)q.t2 = extraB;
+							else if(q.t3.getPartition() == 0)q.t3 = extraB;
+							else q.t4 = extraB;
 							quartetB.put(numOfBDQ, q);
 
 						} else {
-							if(q.getT1().getPartition() == 1)q.setT1(extraA);
-							else if(q.getT2().getPartition() == 1)q.setT2(extraA);
-							else if(q.getT3().getPartition() == 1)q.setT3(extraA);
-							else q.setT4(extraA);
+							if(q.t1.getPartition() == 1)q.t1 = extraA;
+							else if(q.t2.getPartition() == 1)q.t2 = extraA;
+							else if(q.t3.getPartition() == 1)q.t3 = extraA;
+							else q.t4 = extraA;
 							quartetA.put(numOfBDQ, q);
 
 
@@ -684,20 +679,20 @@ public class Routines {
 				//System.out.println("Finished");
 				break;
 			} else {
-				if(taxaList.contains(quartet.getT1())) {
-					taxaList.remove(quartet.getT1());
+				if(taxaList.contains(quartet.t1)) {
+					taxaList.remove(quartet.t1);
 					tcount ++;
 				}
-				if(taxaList.contains(quartet.getT2())) {
-					taxaList.remove(quartet.getT2());
+				if(taxaList.contains(quartet.t2)) {
+					taxaList.remove(quartet.t2);
 					tcount ++;
 				}
-				if(taxaList.contains(quartet.getT3())) {
-					taxaList.remove(quartet.getT3());
+				if(taxaList.contains(quartet.t3)) {
+					taxaList.remove(quartet.t3);
 					tcount ++;
 				}
-				if(taxaList.contains(quartet.getT4())) {
-					taxaList.remove(quartet.getT4());
+				if(taxaList.contains(quartet.t4)) {
+					taxaList.remove(quartet.t4);
 					tcount ++;
 				}
 			}
@@ -714,77 +709,77 @@ public class Routines {
 //				if (partB.contains(quartet.getT4())) d = 1;
 		///ei khane ekta else if condition use kora jay. if partA contains, then we wont have to chk partB
 				//I will chk this later
-				if (partA.contains(quartet.getT1())) a = 0;
-				else if (partB.contains(quartet.getT1())) a = 1;
+				if (partA.contains(quartet.t1)) a = 0;
+				else if (partB.contains(quartet.t1)) a = 1;
 				
-				if (partA.contains(quartet.getT2())) b = 0;
-				else if (partB.contains(quartet.getT2())) b = 1;
+				if (partA.contains(quartet.t2)) b = 0;
+				else if (partB.contains(quartet.t2)) b = 1;
 				
-				if (partA.contains(quartet.getT3())) c = 0;
-				else if (partB.contains(quartet.getT3())) c = 1;
+				if (partA.contains(quartet.t3)) c = 0;
+				else if (partB.contains(quartet.t3)) c = 1;
 				
-				if (partA.contains(quartet.getT4())) d = 0;
-				else if (partB.contains(quartet.getT4())) d = 1;
+				if (partA.contains(quartet.t4)) d = 0;
+				else if (partB.contains(quartet.t4)) d = 1;
 				
 		
 				
 				if(a==-1 && b==-1 && c==-1 && d==-1) //all new
 			    {
 			        ///This section can create problem in multithreading
-					quartet.getT1().setPartition(0);
-					partA.add(quartet.getT1());
+					quartet.t1.setPartition(0);
+					partA.add(quartet.t1);
 			        a= 0; ca++;
-			        quartet.getT2().setPartition(0);
-					partA.add(quartet.getT2());
+			        quartet.t2.setPartition(0);
+					partA.add(quartet.t2);
 			        b= 0; ca++;
-			        quartet.getT3().setPartition(1);
-					partB.add(quartet.getT3());
+			        quartet.t3.setPartition(1);
+					partB.add(quartet.t3);
 			        c= 0; cb++;
-			        quartet.getT4().setPartition(1);
-					partB.add(quartet.getT4());
+			        quartet.t4.setPartition(1);
+					partB.add(quartet.t4);
 			        d= 0; cb++;
 			     
 			    }else {
 			    	if(a==-1)
 			        {	
 			            if(b!=-1){
-			                if(b==0) {quartet.getT1().setPartition(0); partA.add(quartet.getT1()); a=0; ca++;}
-			                else {quartet.getT1().setPartition(1); partB.add(quartet.getT1()); a=1; cb++;}
+			                if(b==0) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
+			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
 			            }
 			            else if(c!=-1){
-			                if(c==1) {quartet.getT1().setPartition(0); partA.add(quartet.getT1()); a=0; ca++;}
-			                else {quartet.getT1().setPartition(1); partB.add(quartet.getT1()); a=1; cb++;}
+			                if(c==1) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
+			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
 			            }
 			            else if(d!=-1)
 			            {
-			                if(d==1) {quartet.getT1().setPartition(0); partA.add(quartet.getT1()); a=0; ca++;}
-			                else {quartet.getT1().setPartition(1); partB.add(quartet.getT1()); a=1; cb++;}
+			                if(d==1) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
+			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
 			            }
 			
 			        }
 			        if(b==-1)
 			        {
 			
-			            if(a==0) {quartet.getT2().setPartition(0); partA.add(quartet.getT2()); b=0; ca++;}
-			            else {quartet.getT2().setPartition(1); partB.add(quartet.getT2()); b=1; cb++;}
+			            if(a==0) {quartet.t2.setPartition(0); partA.add(quartet.t2); b=0; ca++;}
+			            else {quartet.t2.setPartition(1); partB.add(quartet.t2); b=1; cb++;}
 			
 			        }
 			        if(c==-1)
 			        {
 			            if(d!=-1)
 			            {
-			                if(d==0) {quartet.getT3().setPartition(0); partA.add(quartet.getT3()); c=0; ca++;}
-			                else {quartet.getT3().setPartition(1); partB.add(quartet.getT3()); c=1; cb++;}
+			                if(d==0) {quartet.t3.setPartition(0); partA.add(quartet.t3); c=0; ca++;}
+			                else {quartet.t3.setPartition(1); partB.add(quartet.t3); c=1; cb++;}
 			            }
 			            else{
-			                if(a==1) {quartet.getT3().setPartition(0); partA.add(quartet.getT3()); c=0; ca++;}
-			                else {quartet.getT3().setPartition(1); partB.add(quartet.getT3()); c=1;cb++;}
+			                if(a==1) {quartet.t3.setPartition(0); partA.add(quartet.t3); c=0; ca++;}
+			                else {quartet.t3.setPartition(1); partB.add(quartet.t3); c=1;cb++;}
 			            }
 			        }
 			        if(d==-1)
 			        {
-			            if(c==0) {quartet.getT4().setPartition(0); partA.add(quartet.getT4()); d=0;ca++;}
-			            else {quartet.getT4().setPartition(1); partB.add(quartet.getT4()); d=1; cb++;}
+			            if(c==0) {quartet.t4.setPartition(0); partA.add(quartet.t4); d=0;ca++;}
+			            else {quartet.t4.setPartition(1); partB.add(quartet.t4); d=1; cb++;}
 			        }
 			
 				}
@@ -834,10 +829,11 @@ public class Routines {
 	
 	private static int countSatisfiedQuartets(LinkedHashMap<Integer, Quartet> quartetMap) {
 		int csat = 0;
-	    char quartetScore;
+	    //char quartetScore;
 	    for (Quartet quartet : quartetMap.values()) {
-			quartetScore = iCheckQuartet(quartet);
-			if(quartetScore == 's')
+			//quartetScore = iCheckQuartet(quartet);
+			//if(quartetScore == 's')
+			if(quartet.status == 's')
 	        {
 	        	csat += quartet.getQFrequency();
 	        }
@@ -973,9 +969,9 @@ public class Routines {
 		System.out.println("**********************Quartet List********************************");
 		for(Quartet quartets : quartetList) {
 			
-			System.out.println("quartet"+" : "+quartets.getT1().getName()+","+quartets.getT2().getName()+"|"
-					+quartets.getT3().getName()+","+quartets.getT4().getName()+":"+quartets.getQFrequency()+"->"
-					+quartets.isIncreaseFrequency()+" -> "+ quartets.getStatus()+"\n");
+			System.out.println("quartet"+" : "+quartets.t1.name+","+quartets.t2.name+"|"
+					+quartets.t3.name+","+quartets.t4.name+":"+quartets.getQFrequency()+"->"
+					+quartets.isIncreaseFrequency()+" -> "+ quartets.status+"\n");
 		}
 		System.out.println("*********************End of Printing Quartet**********************");
 		
@@ -984,7 +980,7 @@ public class Routines {
 	private static void printTaxa(LinkedHashSet<Taxa> taxaList) {
 		System.out.println("**********************Taxa List********************************");
 		for (Taxa taxa : taxaList) {
-			System.out.print(taxa.getName()+"->");
+			System.out.print(taxa.name+"->");
 		}
 		System.out.println("end");
 	
@@ -995,7 +991,7 @@ public class Routines {
 		String s = "(";
 		int taxaCount = taxaList.size(), count = 0;
 		for (Taxa taxa : taxaList) {
-			 s += taxa.getName();
+			 s += taxa.name;
 			 count++;
 			 if (count == taxaCount) {
 				 s += ")";
@@ -1012,15 +1008,11 @@ public class Routines {
 			LinkedHashMap<Integer, Quartet> quartetMap) {
 		//String taxaToMove = null;
 		boolean loopAgain = true;
-		
-//		for (Quartet quartet : quartetMap.values()) {
-//			//quartet.fillUpInitialRelaventQuartetID();
-//			quartet.fillUpSVDtableMapWithInitialRelaventQuartetID();
+
+//		for (int quartetID : quartetMap.keySet()) {
+//			Quartet quartet = quartetMap.get(quartetID);
+//			quartet.fillUpSVDtableMapWithInitialRelaventQuartetID(quartetID);
 //		}
-		for (int quartetID : quartetMap.keySet()) {
-			Quartet quartet = quartetMap.get(quartetID);
-			quartet.fillUpSVDtableMapWithInitialRelaventQuartetID(quartetID);
-		}
 		while (loopAgain) {
 			boolean iterationMore = true; int iteration = 0;
 			int ca = partA.size();
@@ -1122,27 +1114,27 @@ public class Routines {
 				
 				int partitionIndex = 0;
 				for (Taxa taxaA : partA) {
-					if (iteration == 1) {
-						//taxaA.getSvdTable().clear();
-						taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
-						taxaA.mCalculateScore(quartetMap, prevS, prevV, prevScore);
-					} else {
-						taxaA.mCalculateScore2(quartetMap, prevS, prevV, prevScore);
-					}
+//					if (iteration == 1) {
+//						//taxaA.getSvdTable().clear();
+//						//taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+//						taxaA.mCalculateScore(quartetMap, prevS, prevV, prevScore);
+//					} else {
+						taxaA.mCalculateScore(prevS, prevV, prevScore);
+					//}
 					partitionIndex += 1;
 					taxaA.partitionIndex = partitionIndex;
 				}
 
 				 partitionIndex = 0;
 				for (Taxa taxaB : partB) {
-					if (iteration == 1) {
-						//taxaA.getSvdTable().clear();
-						//System.out.println("Taxa B = "+taxaB.getName());
-						taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
-						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
-					} else {
-						taxaB.mCalculateScore2(quartetMap, prevS, prevV, prevScore);
-					}
+//					if (iteration == 1) {
+//						//taxaA.getSvdTable().clear();
+//						//System.out.println("Taxa B = "+taxaB.getName());
+//						//taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+//						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
+//					} else {
+						taxaB.mCalculateScore(prevS, prevV, prevScore);
+					//}
 					partitionIndex += 1;
 					taxaB.partitionIndex = partitionIndex;
 				}
@@ -1325,6 +1317,7 @@ public class Routines {
 				int glPart = taxa_to_move.getPartition();
 				prevScore = prevS - prevV;//partition score
 				if (glPart != -1) {
+					taxa_to_move.locked = true;
 					//System.out.println("Moved Taxa = "+taxa_to_move.getName());
 //					if (gainList.size() == 1) {
 ////						mCalculateScore(null,partB,quartetList,"null",0,0,0);
@@ -1356,8 +1349,9 @@ public class Routines {
 					for (int qid : taxa_to_move.svdTableMap.keySet()) {
 						Quartet q = quartetMap.get(qid);
 						SVD_Log svd = taxa_to_move.svdTableMap.get(qid);
-						q.setStatus(svd.getqStat());
-						q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(qid);
+						q.status=svd.getqStat();
+						//q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(qid);
+						q.updateSVD_for_moving_taxa(qid);
 						//rQuartetList.add(q);
 					}
 					
@@ -1398,7 +1392,7 @@ public class Routines {
 			int backIndex = -1, bi = 0;
 			boolean isMove = false;
 			for (GainList ml : movedList) {
-				cumulativeGain += ml.getVal();
+				cumulativeGain += ml.val;
 				if (cumulativeGain >= gainMax) {
 					gainMax = cumulativeGain;
 					//back = ml.getTaxa().getName();
@@ -1419,7 +1413,8 @@ public class Routines {
 //            boolean revrs = true;
 			if (isMove) {
 				for (int i = backIndex + 1; i < movedList.size(); i++) {
-					Taxa moveTaxa = movedList.get(i).getTaxa();
+					Taxa moveTaxa = movedList.get(i).taxa;
+					moveTaxa.resetTaxa();
 	            
 					if (moveTaxa.getPartition() == 1) {
 	        			moveTaxa.setPartition(0);
@@ -1436,7 +1431,8 @@ public class Routines {
 					
 				}
 				for (int i = backIndex; i >= 0; i--) {
-					Taxa moveTaxa = movedList.get(i).getTaxa();
+					Taxa moveTaxa = movedList.get(i).taxa;
+					moveTaxa.resetTaxa();
 	            
 					if (moveTaxa.getPartition() == 1) {
 	        			partB.add(moveTaxa);
@@ -1525,16 +1521,18 @@ public class Routines {
 	private static int[] iCalculateScore(LinkedHashMap<Integer, Quartet> quartetMap) {
 		//initial_calculate_score
 		int[] scores = {0,0,0,0};
-	    char  qStat;
-	    	 
-	    for (Quartet q : quartetMap.values()) {
-            //q.setStatus("");
-            qStat  = iCheckQuartet(q);
+	    
+
+	    for (int quartetID : quartetMap.keySet()) {
+			Quartet q = quartetMap.get(quartetID);
+			q.fillUpSVDmapInitiallyWithRelaventQIDandScore(quartetID);
+			char qStat  = q.status;
             if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
             else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
             else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
-	        
-	    	
+            
+            
+			
 		}
 	    scores[0]=(scores[1] - scores[2]);//partitionScore = (s-v);
 	
@@ -1579,14 +1577,14 @@ public class Routines {
 //
 //	}
 	private static char iCheckQuartet(Quartet q) {
-		//int a = 0, b = 0, c = 0, d = 0;
+		char qstat= iCheckQuartet2(q.t1.getPartition(), q.t2.getPartition(), q.t3.getPartition(), q.t4.getPartition());
+	    q.status=qstat;
+		return qstat;
+
+	}
+	public static char iCheckQuartet2(int a, int b, int c, int d) {
 		char qstat;
 
-		int a = q.getT1().getPartition();
-		int b = q.getT2().getPartition();
-		int c = q.getT3().getPartition();
-		int d = q.getT4().getPartition();
-		
 		if (a==b && c==d && b==c) // totally on one side
 	    {	
 	        qstat = 'b';
@@ -1605,11 +1603,9 @@ public class Routines {
 	        qstat = 'd';
 	    }
 
-	    q.setStatus(qstat);
 		return qstat;
 
 	}
-	
 	//////////////////////////////
 
     private static String mergeUsingJAR(String s1, String s2, String extra) {

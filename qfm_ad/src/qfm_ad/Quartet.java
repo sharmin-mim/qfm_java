@@ -3,11 +3,11 @@ package qfm_ad;
 import java.util.Objects;
 
 public class Quartet {
-	private Taxa t1;
-	private Taxa t2;
-	private Taxa t3;
-	private Taxa t4;
-	private char status;
+	public Taxa t1;
+	public Taxa t2;
+	public Taxa t3;
+	public Taxa t4;
+	public char status;
 	//private char status;
 	private int qFrequency;
 	private boolean increaseFrequency;
@@ -27,34 +27,7 @@ public class Quartet {
 		//this.quartetID = -1;
 	}
 
-	public Taxa getT1() {
-		return t1;
-	}
-
-	public Taxa getT2() {
-		return t2;
-	}
-
-	public Taxa getT3() {
-		return t3;
-	}
-
-	public Taxa getT4() {
-		return t4;
-	}
 	
-	public void setT1(Taxa t1) {
-		this.t1 = t1;
-	}
-	public void setT2(Taxa t2) {
-		this.t2 = t2;
-	}
-	public void setT3(Taxa t3) {
-		this.t3 = t3;
-	}
-	public void setT4(Taxa t4) {
-		this.t4 = t4;
-	}
 	public int getQFrequency() {
 		return qFrequency;
 	}
@@ -64,110 +37,98 @@ public class Quartet {
 	}
 	
 
-//	public int getQuartetID() {
-//		return quartetID;
-//	}
-//	public void setQuartetID(int quartetID) {
-//		this.quartetID = quartetID;
-//	}
-//	public char getStatus() {
-//		return status;
-//	}
-//	public void setStatus(char status) {
-//		this.status = status;
-//	}
-	public char getStatus() {
-		return status;
-	}
-	public void setStatus(char initStatus) {
-		this.status = initStatus;
-	}
+	
 	public boolean isIncreaseFrequency() {
 		return increaseFrequency;
 	}
 	public void setIncreaseFrequency(boolean increaseFrequency) {
 		this.increaseFrequency = increaseFrequency;
 	}
-	public void fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(int quartetID) {
-		t1.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
-		t2.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
-		t3.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
-		t4.relaventQuartetIDOfCorrespondingMovedTaxa.add(quartetID);
-	}
 
-	public void fillUpSVDtableMapWithInitialRelaventQuartetID(int quartetID) {
-		t1.svdTableMap.put(quartetID, new SVD_Log());
-		t2.svdTableMap.put(quartetID, new SVD_Log());
-		t3.svdTableMap.put(quartetID, new SVD_Log());
-		t4.svdTableMap.put(quartetID, new SVD_Log());
-	}
-	public char mCheckQuartet(String tempTaxa) {
-		//int a = 0, b = 0, c = 0, d = 0;
-		char quartet_state;
-
+	public void fillUpSVDmapInitiallyWithRelaventQIDandScore(int quartetID) {
 		int a = t1.getPartition();
 		int b = t2.getPartition();
 		int c = t3.getPartition();
 		int d = t4.getPartition();
-
-		if(tempTaxa.contentEquals(t1.getName())) a = 1 - a;
-	    else if(tempTaxa.contentEquals(t2.getName())) b = 1-b;
-	    else if(tempTaxa.contentEquals(t3.getName())) c = 1-c;
-	    else if(tempTaxa.contentEquals(t4.getName())) d = 1-d;
-
+		this.status = Routines.iCheckQuartet2(a, b, c, d);
 		
-		if (a==b && c==d && b==c) // totally on one side
-	    {	
-			quartet_state = 'b';
-	    }
-	    else if( a==b && c==d) //satisfied
-	    {
-	    	quartet_state = 's';
-	    }
-	    else if ((a==c && b==d) || (a==d && b==c)) // violated
-	    {
-	    	quartet_state = 'v';
-
-	    }
-	    else //deffered
-	    {
-	    	quartet_state = 'd';
-	    }
-
-	    //q.setStatus(qstat);
-		return quartet_state;
-
-	}
-	
-//	@Override
-//	public int hashCode() {
-//		return Objects.hash(t1, t2, t3, t4);
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj) {
-//			//increase_count();
-//			//System.out.println("increased");
-//			return true;
-//		}
-//		if (!(obj instanceof Quartet))
-//			return false;
-//		Quartet other = (Quartet) obj;
-//		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2) && Objects.equals(t3, other.t3)
-//				&& Objects.equals(t4, other.t4)) {
-//			if (other.isIncreaseFrequency()) {
-//				other.setQFrequency(other.getQFrequency()+1);
-//			}
-//			return true;
+//		if (this.status=='d') {
+			this.t1.fillUpSVDmap(quartetID, statusWRTmovingTaxa(1-a,b,c,d));
+			this.t2.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,1-b,c,d));
+			this.t3.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,b,1-c,d));
+			this.t4.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,b,c,1-d));
+  
 //		} else {
-//			return false;
-//
+//	
+//		    
+//		    SVD_Log svd = this.cq();
+//		    
+//			this.t1.fillUpSVDmap(quartetID, svd);
+//			System.out.println("Mim");
+//			this.t2.fillUpSVDmap(quartetID, svd);
+//			this.t3.fillUpSVDmap(quartetID, svd);
+//			this.t4.fillUpSVDmap(quartetID, svd);
+//			
 //		}
-//	
+		
+		
+
+
+	
+	}
+//	public SVD_Log cq() {
+//		int[] sv = {0,0};
+//	    if(this.status=='s'){ sv[0] = - this.qFrequency;}// d =  q.getQFrequency();} // s d
+//
+//        else if(this.status=='v'){sv[1] = - this.qFrequency;}//d = q.getQFrequency();}  // v d
+//	    return new SVD_Log(sv[0], sv[1], 'd');
 //	}
-//	
-	/////////////////////////////////////////
+	public void updateSVD_for_moving_taxa(int quartetID) {
+		int a = t1.getPartition();
+		int b = t2.getPartition();
+		int c = t3.getPartition();
+		int d = t4.getPartition();
+		
+		
+		if (!t1.locked) {
+			
+			t1.updateSVDmap(quartetID, statusWRTmovingTaxa(1-a,b,c,d));
+		}
+		if (!t2.locked) {
+			t2.updateSVDmap(quartetID, statusWRTmovingTaxa(a,1-b,c,d));
+		}
+		if (!t3.locked) {
+			t3.updateSVDmap(quartetID, statusWRTmovingTaxa(a,b,1-c,d));
+		}
+		if (!t4.locked) {
+			t4.updateSVDmap(quartetID, statusWRTmovingTaxa(a,b,c,1-d));
+		}
+	
+	}
+	public SVD_Log statusWRTmovingTaxa(int a, int b, int c, int d) {
+
+    	char qStat; 
+    	int[] sv = {0,0};
+    	//if quartet status is satisfied, violated or b, then moving taxa from its current partition will must make q status deffered
+    	//But if quartet status is deffered, then we must have to check its status with respect to moving taxa
+    	if (this.status=='d') {
+    		qStat  = Routines.iCheckQuartet2(a, b, c, d);
+    		if(qStat == 'v'){sv[1] = this.qFrequency;} // d v
+
+            else if(qStat == 's'){sv[0] = this.qFrequency;} // d s
+  
+		} else {
+			
+			qStat  = 'd';
+		    if(this.status=='s'){ sv[0] = - this.qFrequency;}// d =  q.getQFrequency();} // s d
+
+	        else if(this.status=='v'){sv[1] = - this.qFrequency;}//d = q.getQFrequency();}  // v d
+			
+		}
+    	return new SVD_Log(sv[0],sv[1],qStat);
+	}
+
+	
 
 	@Override
 	public int hashCode() {
