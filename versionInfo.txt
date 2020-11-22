@@ -186,3 +186,26 @@ version 2.1.11 (Final Version (non-threaded))
 	
 	
 Future Step: Threading condition needs to change. 
+Future Step: Threading condition needs to change. 
+version 2.1.12 (Final Version (non-threaded))
+	Date: Oct 10, 2020
+	Commit ID: 
+	Commit: 
+	Commit message: Version 2.1.12 -> space complexiety better than previous one
+	Changes: Lots of changes
+	
+	
+Future Step: Threading condition needs to change. 
+
+version 2.1.13 (Threaded version)
+	Date: Nov 22, 2020
+	Commit ID: 9dae40f
+	Commit: 9dae40f89526c011e4103d51aa89322708942cfc
+	Commit message: Version 2.1.13 -> FM() is optimized. parallelStream is used in diff parts
+	Changes: qfm_ad.Routines.MFM_algo(LinkedHashSet<Taxa>, LinkedHashSet<Taxa>, LinkedHashMap<Integer, Quartet>): parallel stream is used
+		 qfm_ad.Routines.iCalculateScore(LinkedHashMap<Integer, Quartet>): parallel stream is used
+		 qfm_ad.Routines.countSatisfiedQuartets(LinkedHashMap<Integer, Quartet>): parallel stream is used
+		 qfm_ad.Routines.FM(LinkedHashSet<Taxa>, LinkedHashMap<Integer, Quartet>): optimized
+	
+	
+Future Step: Threading condition needs to change.
