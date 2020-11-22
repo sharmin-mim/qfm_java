@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -81,6 +82,7 @@ public class Routines {
 					quartetList.add(new Quartet(t[0], t[1], t[2], t[3]));
 					//count++;
 					qc++;
+					//System.out.println("qc = "+qc);
 				}
 				
 								
@@ -356,7 +358,7 @@ public class Routines {
 	        
 	       // System.out.println("One divide step complete");
 	        quartetMap.clear();
-//	        if (extraTaxa == 1001) {
+	        if (extraTaxa == 1001) {
 //	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
 //	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
 //	        //if (estimatedTime > 30000) {//if estimatedTime > 30000 miliseconds
@@ -366,28 +368,28 @@ public class Routines {
 //	        //if (estimatedTime > 1000) {//if estimatedTime > 1000 miliseconds
 //	        //if (estimatedTime > 500) {//if estimatedTime > 500 miliseconds
 //	        //if (estimatedTime > 100) {//if estimatedTime > 100 miliseconds
-//	        	final int ext = extraTaxa, psc = partSatCount;
-//	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
-//	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
-//	   	        String s1 = null;
-//	   			try {
-//	   				s1 = cf.get();
-//	   			} catch (InterruptedException e) {
-//	   				//e.printStackTrace();
-//	   			} catch (ExecutionException e) {
-//	   				//e.printStackTrace();
-//	   			}
-//
-//	   			//s = merge(s1,s2,extra);
-//	   		    s = mergeUsingJAR(s1,s2,extra);
-//			} else {
+	        	final int ext = extraTaxa, psc = partSatCount;
+	   	        CompletableFuture<String> cf = CompletableFuture.supplyAsync(() -> SQP(quartetA, partA, ext, psc));
+	   	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
+	   	        String s1 = null;
+	   			try {
+	   				s1 = cf.get();
+	   			} catch (InterruptedException e) {
+	   				//e.printStackTrace();
+	   			} catch (ExecutionException e) {
+	   				//e.printStackTrace();
+	   			}
+
+	   			//s = merge(s1,s2,extra);
+	   		    s = mergeUsingJAR(s1,s2,extra);
+			} else {
 				String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 		        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);  
 		       // s = merge(s1,s2,extra);
 		        //s = mergeUnrootedTrees(s1,s2,extra);
 		        s = mergeUsingJAR(s1,s2,extra);
 		        
-			//}
+			}
 	       
 //	        //String s1 = SQP(quartetA, partA, extraTaxa, partSatCount);
 //	        String s2 = SQP(quartetB, partB, extraTaxa, partSatCount);
@@ -672,7 +674,8 @@ public class Routines {
 	private static MultiReturnType FM(LinkedHashSet<Taxa> taxaList, LinkedHashMap<Integer, Quartet> quartetMap) {
 		LinkedHashSet<Taxa> partA = new LinkedHashSet<Taxa>();
 		LinkedHashSet<Taxa> partB = new LinkedHashSet<Taxa>();
-		int ca = 0, cb = 0;
+		
+		//int partitionIndexNumber = 0;
 		for (Quartet quartet : quartetMap.values()) {
 			int tcount = 0;
 			if (taxaList.isEmpty()) {
@@ -728,58 +731,120 @@ public class Routines {
 			        ///This section can create problem in multithreading
 					quartet.t1.setPartition(0);
 					partA.add(quartet.t1);
-			        a= 0; ca++;
+			        //a= 0; //ca++;
 			        quartet.t2.setPartition(0);
 					partA.add(quartet.t2);
-			        b= 0; ca++;
+			        //b= 0; 
+					//ca += 2;
 			        quartet.t3.setPartition(1);
 					partB.add(quartet.t3);
-			        c= 0; cb++;
+			        //c= 0; //cb++;
 			        quartet.t4.setPartition(1);
 					partB.add(quartet.t4);
-			        d= 0; cb++;
+			        //d= 0; 
+					//cb += 2;
+			        
+//			        partitionIndexNumber++;
+//			        quartet.t1.partitionIndex = partitionIndexNumber;
+//			        partitionIndexNumber++;
+//			        quartet.t2.partitionIndex = partitionIndexNumber;
+//			        partitionIndexNumber++;
+//			        quartet.t3.partitionIndex = partitionIndexNumber;
+//			        partitionIndexNumber++;
+//			        quartet.t4.partitionIndex = partitionIndexNumber;
 			     
 			    }else {
 			    	if(a==-1)
 			        {	
-			            if(b!=-1){
-			                if(b==0) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
-			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
+//			    		partitionIndexNumber++;
+//			    		quartet.t1.partitionIndex = partitionIndexNumber;				       
+			    		if(b!=-1){
+			                if(b==0) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0;// ca++;
+			                }
+			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; //cb++;
+			                }
 			            }
 			            else if(c!=-1){
-			                if(c==1) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
-			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
+			                if(c==1) {
+			                	quartet.t1.setPartition(0); partA.add(quartet.t1); a=0;// ca++;
+			                	quartet.t2.setPartition(0); partA.add(quartet.t2); b=0; 
+			                	//a += 2;
+			                }
+			                else {
+			                	quartet.t1.setPartition(1); partB.add(quartet.t1); a=1;// cb++;
+			                	quartet.t2.setPartition(1); partB.add(quartet.t2); b=1; 
+			                	//cb+=2;
+			                }
 			            }
 			            else if(d!=-1)
 			            {
-			                if(d==1) {quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; ca++;}
-			                else {quartet.t1.setPartition(1); partB.add(quartet.t1); a=1; cb++;}
+			                if(d==1) {
+			                	quartet.t1.setPartition(0); partA.add(quartet.t1); a=0; //ca++;
+			                	quartet.t2.setPartition(0); partA.add(quartet.t2); b=0; 
+			                	//ca +=2;
+			                }
+			                else {
+			                	quartet.t1.setPartition(1); partB.add(quartet.t1); a=1;// cb++;
+			                	quartet.t2.setPartition(1); partB.add(quartet.t2); b=1;
+			                	//cb+=2;
+			              
+			                }
 			            }
 			
 			        }
 			        if(b==-1)
 			        {
 			
-			            if(a==0) {quartet.t2.setPartition(0); partA.add(quartet.t2); b=0; ca++;}
-			            else {quartet.t2.setPartition(1); partB.add(quartet.t2); b=1; cb++;}
+//			        	partitionIndexNumber++;
+//				        quartet.t2.partitionIndex = partitionIndexNumber;
+			        	if(a==0) {
+			        		quartet.t2.setPartition(0); partA.add(quartet.t2);// b=0; 
+			        		//ca++;
+			        	}
+			            else {
+			            	quartet.t2.setPartition(1); partB.add(quartet.t2); //b=1; 
+			            	//cb++;
+			            }
 			
 			        }
 			        if(c==-1)
 			        {
-			            if(d!=-1)
+//			        	partitionIndexNumber++;
+//				        quartet.t3.partitionIndex = partitionIndexNumber;
+			        	if(d!=-1)
 			            {
-			                if(d==0) {quartet.t3.setPartition(0); partA.add(quartet.t3); c=0; ca++;}
-			                else {quartet.t3.setPartition(1); partB.add(quartet.t3); c=1; cb++;}
+			                if(d==0) {
+			                	quartet.t3.setPartition(0); partA.add(quartet.t3); //c=0; 
+			                	//ca++;
+			                	
+			                }
+			                else {
+			                	quartet.t3.setPartition(1); partB.add(quartet.t3); //c=1; 
+			                	//cb++;
+			                }
 			            }
 			            else{
-			                if(a==1) {quartet.t3.setPartition(0); partA.add(quartet.t3); c=0; ca++;}
-			                else {quartet.t3.setPartition(1); partB.add(quartet.t3); c=1;cb++;}
+			                if(a==1) {
+			                	quartet.t3.setPartition(0); partA.add(quartet.t3);// c=0;
+			                	quartet.t4.setPartition(0); partA.add(quartet.t4); d=0; 
+			                	//ca += 2;
+			                	}
+			                else {
+			                	quartet.t3.setPartition(1); partB.add(quartet.t3);// c=1;
+			                	quartet.t4.setPartition(1); partB.add(quartet.t4); d=1;
+			                	//cb++;
+			                	
+			                }
 			            }
 			        }
 			        if(d==-1)
 			        {
-			            if(c==0) {quartet.t4.setPartition(0); partA.add(quartet.t4); d=0;ca++;}
-			            else {quartet.t4.setPartition(1); partB.add(quartet.t4); d=1; cb++;}
+//			        	partitionIndexNumber++;
+//				        quartet.t4.partitionIndex = partitionIndexNumber;
+			        	if(c==0) {quartet.t4.setPartition(0); partA.add(quartet.t4); //ca++;
+			        	}
+			            else {quartet.t4.setPartition(1); partB.add(quartet.t4); //cb++;
+			            }
 			        }
 			
 				}
@@ -787,12 +852,14 @@ public class Routines {
 				
 		}
 		int c = 0;
+		int ca = partA.size(), cb = partB.size();
 //		System.out.println("*********FM taxalist*********");
 //		printTaxa(taxaList);
 		if (!taxaList.isEmpty()) {
 			
 			for (Taxa taxa : taxaList) {
-				
+//				partitionIndexNumber++;
+//		        taxa.partitionIndex = partitionIndexNumber;
 				if(ca<cb)
 	                c=2;
 	            else if(cb<ca)
@@ -828,17 +895,27 @@ public class Routines {
 	
 	
 	private static int countSatisfiedQuartets(LinkedHashMap<Integer, Quartet> quartetMap) {
-		int csat = 0;
+		//int csat = 0;
+		int[] sat = {0};
 	    //char quartetScore;
-	    for (Quartet quartet : quartetMap.values()) {
-			//quartetScore = iCheckQuartet(quartet);
-			//if(quartetScore == 's')
-			if(quartet.status == 's')
+//	    for (Quartet quartet : quartetMap.values()) {
+//			//quartetScore = iCheckQuartet(quartet);
+//			//if(quartetScore == 's')
+//			if(quartet.status == 's')
+//	        {
+//	        	csat += quartet.getQFrequency();
+//	        }
+//		}
+	    quartetMap.values().parallelStream().forEach(quartet -> {
+	    	if(quartet.status == 's')
 	        {
-	        	csat += quartet.getQFrequency();
+	        	
+	        	sat[0] += quartet.getQFrequency();
+	      
 	        }
-		}
-	    return csat;
+	    });
+	   
+	    return sat[0];
 	}
 
 	/*private static int[] calculateScore(LinkedHashSet<Taxa> partB, LinkedHashSet<Quartet> quartetList, String tempTaxa,
@@ -1111,33 +1188,57 @@ public class Routines {
 //					
 //				};
 //				tA.start();
-				
+				//////////////////parrallel stream///////////////////
+				final int prevSF = prevS;
+				final int prevVF = prevV;
+				final int prevScoreF = prevScore;
+				partA.parallelStream().forEach(taxa -> {
+					taxa.mCalculateScore(prevSF, prevVF, prevScoreF);
+				});
+				partB.parallelStream().forEach(taxa -> {
+					taxa.mCalculateScore(prevSF, prevVF, prevScoreF);
+				});
+				/////////////////////////////////////////////////////
+				//////////Folowing chunk of code is useless. But um doing this to match java's result with c++ result
 				int partitionIndex = 0;
-				for (Taxa taxaA : partA) {
-//					if (iteration == 1) {
-//						//taxaA.getSvdTable().clear();
-//						//taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
-//						taxaA.mCalculateScore(quartetMap, prevS, prevV, prevScore);
-//					} else {
-						taxaA.mCalculateScore(prevS, prevV, prevScore);
-					//}
-					partitionIndex += 1;
-					taxaA.partitionIndex = partitionIndex;
+				for (Taxa taxa : partA) {
+					partitionIndex++;
+					taxa.partitionIndex = partitionIndex;
 				}
-
-				 partitionIndex = 0;
-				for (Taxa taxaB : partB) {
-//					if (iteration == 1) {
-//						//taxaA.getSvdTable().clear();
-//						//System.out.println("Taxa B = "+taxaB.getName());
-//						//taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
-//						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
-//					} else {
-						taxaB.mCalculateScore(prevS, prevV, prevScore);
-					//}
-					partitionIndex += 1;
-					taxaB.partitionIndex = partitionIndex;
+				partitionIndex = 0;
+				for (Taxa taxa : partB) {
+					partitionIndex++;
+					taxa.partitionIndex = partitionIndex;
 				}
+				////////////////////////////Parallel Steam //////////////////////
+//				int partitionIndex = 0;
+//				for (Taxa taxaA : partA) {
+////					if (iteration == 1) {
+////						//taxaA.getSvdTable().clear();
+////						//taxaA.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+////						taxaA.mCalculateScore(quartetMap, prevS, prevV, prevScore);
+////					} else {
+//						taxaA.mCalculateScore(prevS, prevV, prevScore);
+//					//}
+////					partitionIndex += 1;
+////					taxaA.partitionIndex = partitionIndex;
+//				}
+				////////////////////////////Parallel Steam //////////////////////
+//				 partitionIndex = 0;
+//				for (Taxa taxaB : partB) {
+////					if (iteration == 1) {
+////						//taxaA.getSvdTable().clear();
+////						//System.out.println("Taxa B = "+taxaB.getName());
+////						//taxaB.relaventQuartetIDOfCorrespondingMovedTaxa.clear();
+////						taxaB.mCalculateScore(quartetMap, prevS, prevV, prevScore);
+////					} else {
+//						taxaB.mCalculateScore(prevS, prevV, prevScore);
+//					//}
+////					partitionIndex += 1;
+////					taxaB.partitionIndex = partitionIndex;
+//				}
+				////////////////////////////Parallel Steam //////////////////////
+				
 //				Taxa maxGainTaxaPartB = null;
 //				if (!partB.isEmpty() && cb > 2) {
 //					maxGainTaxaPartB = partB.stream().max(Comparator.comparing(Taxa::getVal).thenComparing(Taxa::getSat)).get();
@@ -1346,14 +1447,25 @@ public class Routines {
 					//rQuartetList.clear();
 					
 					
-					for (int qid : taxa_to_move.svdTableMap.keySet()) {
+					////////////////Parallel Stream//////////////
+					final Taxa final_taxa_to_move = taxa_to_move;				
+					taxa_to_move.svdTableMap.keySet().parallelStream().forEach(qid -> {
 						Quartet q = quartetMap.get(qid);
-						SVD_Log svd = taxa_to_move.svdTableMap.get(qid);
+						SVD_Log svd = final_taxa_to_move.svdTableMap.get(qid);
 						q.status=svd.getqStat();
 						//q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(qid);
 						q.updateSVD_for_moving_taxa(qid);
-						//rQuartetList.add(q);
-					}
+				    });
+					////////////////Parallel Stream//////////////
+					
+//					for (int qid : taxa_to_move.svdTableMap.keySet()) {
+//						Quartet q = quartetMap.get(qid);
+//						SVD_Log svd = taxa_to_move.svdTableMap.get(qid);
+//						q.status=svd.getqStat();
+//						//q.fillUpRelaventQuartetIDOfCorrespondingMovedTaxa(qid);
+//						q.updateSVD_for_moving_taxa(qid);
+//						//rQuartetList.add(q);
+//					}
 					
 					//taxa_to_move.svdTableMap.clear();
 					//taxa_to_move.relaventQuartet.clear();
@@ -1522,19 +1634,35 @@ public class Routines {
 		//initial_calculate_score
 		int[] scores = {0,0,0,0};
 	    
-
-	    for (int quartetID : quartetMap.keySet()) {
+		quartetMap.keySet().parallelStream().forEach(quartetID -> {
+	
 			Quartet q = quartetMap.get(quartetID);
 			q.fillUpSVDmapInitiallyWithRelaventQIDandScore(quartetID);
+			
 			char qStat  = q.status;
             if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
             else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
             else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
-            
-            
-			
-		}
+	    });
+		
+//	    for (int quartetID : quartetMap.keySet()) {
+//			Quartet q = quartetMap.get(quartetID);
+////			q.fillUpSVDmapInitiallyWithRelaventQIDandScore(quartetID);
+//			char qStat  = q.status;
+//            if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
+//            else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
+//            else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
+//            
+//            
+//			
+//		}
+	    
+	    
+	    
 	    scores[0]=(scores[1] - scores[2]);//partitionScore = (s-v);
+	    
+	    
+	    
 	
 		return scores;
 	 

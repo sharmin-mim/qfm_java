@@ -52,24 +52,24 @@ public class Quartet {
 		int d = t4.getPartition();
 		this.status = Routines.iCheckQuartet2(a, b, c, d);
 		
-//		if (this.status=='d') {
-			this.t1.fillUpSVDmap(quartetID, statusWRTmovingTaxa(1-a,b,c,d));
-			this.t2.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,1-b,c,d));
-			this.t3.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,b,1-c,d));
-			this.t4.fillUpSVDmap(quartetID, statusWRTmovingTaxa(a,b,c,1-d));
+		if (this.status=='d') {
+			this.t1.fillUpSVDmap(quartetID, statusWRTmovingTaxaI(1-a,b,c,d));
+			this.t2.fillUpSVDmap(quartetID, statusWRTmovingTaxaI(a,1-b,c,d));
+			this.t3.fillUpSVDmap(quartetID, statusWRTmovingTaxaI(a,b,1-c,d));
+			this.t4.fillUpSVDmap(quartetID, statusWRTmovingTaxaI(a,b,c,1-d));
   
-//		} else {
-//	
-//		    
-//		    SVD_Log svd = this.cq();
-//		    
-//			this.t1.fillUpSVDmap(quartetID, svd);
-//			System.out.println("Mim");
-//			this.t2.fillUpSVDmap(quartetID, svd);
-//			this.t3.fillUpSVDmap(quartetID, svd);
-//			this.t4.fillUpSVDmap(quartetID, svd);
-//			
-//		}
+		} else {
+			int[] sv = {0,0};
+		    if(this.status=='s'){ sv[0] = - this.qFrequency;}// d =  q.getQFrequency();} // s d
+	
+	        else if(this.status=='v'){sv[1] = - this.qFrequency;}//d = q.getQFrequency();}  // v d
+
+			this.t1.fillUpSVDmap(quartetID, new SVD_Log(sv[0], sv[1], 'd'));
+			this.t2.fillUpSVDmap(quartetID, new SVD_Log(sv[0], sv[1], 'd'));
+			this.t3.fillUpSVDmap(quartetID, new SVD_Log(sv[0], sv[1], 'd'));
+			this.t4.fillUpSVDmap(quartetID, new SVD_Log(sv[0], sv[1], 'd'));
+			
+		}
 		
 		
 
@@ -125,6 +125,22 @@ public class Quartet {
 	        else if(this.status=='v'){sv[1] = - this.qFrequency;}//d = q.getQFrequency();}  // v d
 			
 		}
+    	return new SVD_Log(sv[0],sv[1],qStat);
+	}
+	
+	
+	public SVD_Log statusWRTmovingTaxaI(int a, int b, int c, int d) {
+
+    	 
+    	int[] sv = {0,0};
+    	//if quartet status is satisfied, violated or b, then moving taxa from its current partition will must make q status deffered
+    	//But if quartet status is deffered, then we must have to check its status with respect to moving taxa
+    
+    	char qStat  = Routines.iCheckQuartet2(a, b, c, d);
+		if(qStat == 'v'){sv[1] = this.qFrequency;} // d v
+
+        else if(qStat == 's'){sv[0] = this.qFrequency;} // d s
+  
     	return new SVD_Log(sv[0],sv[1],qStat);
 	}
 

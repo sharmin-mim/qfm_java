@@ -93,13 +93,13 @@ public class Taxa {
 	}
 
 
-	public void fillUpSVDmap(int index, SVD_Log single_log) {
-
+	public synchronized void fillUpSVDmap(int index, SVD_Log single_log) {
+		//SVD_Log single_log = single_log1;
 		svdTableMap.put(index, single_log);
 	    sumOfSatOfSVDmap += single_log.getSat();
 	    sumOfVatOfSVDmap += single_log.getVat();	
 	}
-	public void updateSVDmap(int index, SVD_Log single_log) {
+	public synchronized void updateSVDmap(int index, SVD_Log single_log) {
 
 		SVD_Log svd = svdTableMap.get(index);        
 	    sumOfSatOfSVDmap = sumOfSatOfSVDmap + single_log.getSat() - svd.getSat();
@@ -108,7 +108,7 @@ public class Taxa {
 
 	
 	}
-	public void mCalculateScore(int prevS, int prevV, int prevScore) {
+	public synchronized void mCalculateScore(int prevS, int prevV, int prevScore) {
 
         sat = prevS + sumOfSatOfSVDmap;
         vat = prevV + sumOfVatOfSVDmap;

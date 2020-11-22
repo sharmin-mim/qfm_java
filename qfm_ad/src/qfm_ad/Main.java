@@ -12,7 +12,7 @@ public class Main {
 //		//String fileName = "t25_q125_80_qmc.txt";
 //		//String fileName = "27_ecoli.txt";
 //		//String fileName = "sample.txt";
-//		//String s= Routines.readQuartetQMC("sample300.txt");
+//		String s= Routines.readQuartetQMC("sample300.txt");
 		//String s= Routines.readQuartetQMC("27_ecoli.txt");
 		String s= Routines.readQuartetQMC(args[0]);
 		//String s = Routines.newickQuartetWeightAsFrequency(args[0]);
