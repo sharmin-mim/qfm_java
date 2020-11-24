@@ -212,8 +212,8 @@ Future Step: Threading condition needs to change.
 
 version 2.1.14 (Threaded version)
 	Date: Nov 22, 2020
-	Commit ID: 9dae40f
-	Commit: 9dae40f89526c011e4103d51aa89322708942cfc
+	Commit ID: 39040c8
+	Commit: 39040c8ad56ccae22ca090b19242299595a104bf
 	Commit message: Version 2.1.14 -> quartet reading function is optimized.
 	Changes: qfm_ad.Routines.readQuartetQMC: map is used for taxalist instead of hashSet
 		 qfm_ad.Routines.readQuartetWeightAsFrequency: map is used for taxalist instead of hashSet
