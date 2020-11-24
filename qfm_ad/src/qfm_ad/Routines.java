@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 //import java.util.Random;
 import java.util.Scanner;
 import java.util.TreeSet;
@@ -31,9 +32,13 @@ public class Routines {
 	
 	
 	
+
 	public static String readQuartetQMC(String fileName) { // count will be done at the time of reading
 
-		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
+		
+		Map<String, Taxa> taxList = new HashMap<String, Taxa>();
+		
+		
 		
 		
 		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
@@ -50,12 +55,18 @@ public class Routines {
 				
 				Taxa[] t = new Taxa[4];
 				for (int i = 0; i < 4; i++) {
-					t[i] = new Taxa(qq[i]);
-					//taxaList.add(t[i]);
-					///////////recent change
-					if (!taxaList.add(t[i])) {
-						final String taxaName = t[i].name;
-						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
+//					t[i] = new Taxa(qq[i]);
+//					//taxaList.add(t[i]);
+//					///////////recent change
+//					if (!taxaList.add(t[i])) {
+//						final String taxaName = t[i].name;
+//						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
+//					}
+					if (taxList.containsKey(qq[i])) {
+						t[i] = taxList.get(qq[i]);
+					} else {
+						t[i] = new Taxa(qq[i]);
+						taxList.put(qq[i], t[i]);
 					}
 					////recent change/////////
 				}
@@ -92,7 +103,7 @@ public class Routines {
 			}
 			System.out.println("number of quartet = "+ qc);
 			System.out.println("number of unique quartet = "+quartetList.size());
-			System.out.println("number of Taxa = "+taxaList.size());
+			System.out.println("number of Taxa = "+taxList.size());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -116,6 +127,7 @@ public class Routines {
 		
 		
 		//long startTime1 = System.currentTimeMillis();
+		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>(taxList.values());
 		String s = SQP(quartetMap, taxaList, 1000, 0);
 		//long estimatedTime1 = System.currentTimeMillis() - startTime1;
 		//System.out.println("SQP function Total Time : "+ estimatedTime1 + " miliseconds");
@@ -142,8 +154,9 @@ public class Routines {
 		//and quartet is in newick format i.e ((a,b),(c,d)); Frequency
 		//Then use this function.
 		
-		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>();
+		
 		ArrayList<Quartet> qr = new ArrayList<Quartet>();
+		Map<String, Taxa> taxList = new HashMap<String, Taxa>();
 			
 		//LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
 		long startTime = System.currentTimeMillis();
@@ -161,13 +174,22 @@ public class Routines {
 			
 				int frequency = Integer.parseInt(qq[6]); //for qfm, frequency means number of quartet. Frequency must be integer
 				Taxa[] t = new Taxa[4];
+//				for (int i = 0; i < 4; i++) {
+//					t[i] = new Taxa(qq[i+1]);
+//					//taxaList.add(t[i]);
+//					///////////recent change
+//					if (!taxaList.add(t[i])) {
+//						final String taxaName = t[i].name;
+//						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
+//					}
+//				}
 				for (int i = 0; i < 4; i++) {
-					t[i] = new Taxa(qq[i+1]);
-					//taxaList.add(t[i]);
-					///////////recent change
-					if (!taxaList.add(t[i])) {
-						final String taxaName = t[i].name;
-						t[i] = taxaList.stream().filter(j -> j.name.contentEquals(taxaName)).findAny().get();
+					int newIndex = i+1;
+					if (taxList.containsKey(qq[newIndex])) {
+						t[i] = taxList.get(qq[newIndex]);
+					} else {
+						t[i] = new Taxa(qq[newIndex]);
+						taxList.put(qq[newIndex], t[i]);
 					}
 					////recent change/////////
 				}
@@ -202,7 +224,7 @@ public class Routines {
 				
 			//System.out.println("number of quartet = "+ qc);
 			System.out.println("number of quartet = "+qr.size());
-			System.out.println("number of Taxa = "+taxaList.size());
+			System.out.println("number of Taxa = "+taxList.size());
 			
 				
 		} catch (Exception e) {
@@ -227,7 +249,7 @@ public class Routines {
 		}
 		qr.clear();
 		
-		
+		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>(taxList.values());
 		String s = SQP(quartetMap, taxaList, 1000, 0);
 
 		if (s == null) {
