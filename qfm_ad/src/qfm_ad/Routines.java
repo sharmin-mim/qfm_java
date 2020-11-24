@@ -119,7 +119,7 @@ public class Routines {
 		int qID = 0;
 		for (Quartet quartet : qr) {
 			qID++;
-			quartet.setIncreaseFrequency(false);
+			//quartet.setIncreaseFrequency(false);
 			//quartet.setQuartetID(qID);;
 			quartetMap.put(qID, quartet);
 		}
@@ -243,7 +243,7 @@ public class Routines {
 		int qID = 0;
 		for (Quartet quartet : qr) {
 			qID++;
-			quartet.setIncreaseFrequency(false);
+			//quartet.setIncreaseFrequency(false);
 			//quartet.setQuartetID(qID);;
 			quartetMap.put(qID, quartet);
 		}
@@ -323,52 +323,87 @@ public class Routines {
 	        LinkedHashMap<Integer, Quartet> quartetA = new LinkedHashMap<Integer, Quartet>();
 	        LinkedHashMap<Integer, Quartet> quartetB = new LinkedHashMap<Integer, Quartet>();
 	        
+	        LinkedHashSet<Quartet> quartetSetA = new LinkedHashSet<Quartet>();
+	        LinkedHashSet<Quartet> quartetSetB = new LinkedHashSet<Quartet>();
+	        
 
 	        
-	        int numOfBDQ = 0; //number of b and deferred quartet
-
+	        //int numOfBDQ = 0; //number of b and deferred quartet
 	        for (Quartet q : quartetMap.values()) {
 	        	char c = q.status;
 
 				
 				if (c == 'b' || c == 'd' ) {
-					numOfBDQ++;
-					//q.setQuartetID(numOfBDQ);
+					//numOfBDQ++;
 					if (c == 'b') {
-						//numOfB++;
-						//if (partA.contains(q.getT1())) {
+				
 						if (q.t1.getPartition() == 0) {
-							quartetA.put(numOfBDQ, q);
+							quartetSetA.add(q);
+							//quartetA.put(numOfBDQ, q);
 							
 						} else {
-							quartetB.put(numOfBDQ, q);
+							quartetSetB.add(q);
+							//quartetB.put(numOfBDQ, q);
 
 						}
 					} else {
 						//numOfD++;
 						//int dcount = 0;
 						int dcount = q.t1.getPartition() + q.t2.getPartition() + q.t3.getPartition();
-//						if (partA.contains(q.getT1()))dcount++;
-//						if (partA.contains(q.getT2()))dcount++;
-//						if (partA.contains(q.getT3()))dcount++;
-						//if (partA.contains(q.getT4()))dcount++;
-//						System.out.println("Quartet = "+ q.getT1().getName()+","+q.getT2().getName()
-//								+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
-//						System.out.println("dcount = "+ dcount);
+
 						
 						if (dcount > 1) {
 							if(q.t1.getPartition() == 0)q.t1 =extraB;
 							else if(q.t2.getPartition() == 0)q.t2 = extraB;
 							else if(q.t3.getPartition() == 0)q.t3 = extraB;
 							else q.t4 = extraB;
-							quartetB.put(numOfBDQ, q);
+							
+							if (quartetSetB.contains(new Quartet(q.t2, q.t1, q.t3, q.t4, q.getQFrequency()))) {
+						    //System.out.println("contains");
+							}else if (quartetSetB.contains(new Quartet(q.t1, q.t2, q.t4, q.t3, q.getQFrequency()))) {
+						
+							}else if (quartetSetB.contains(new Quartet(q.t2, q.t1, q.t4, q.t3, q.getQFrequency()))) {
+					
+							}else if (quartetSetB.contains(new Quartet(q.t3, q.t4, q.t1, q.t2, q.getQFrequency()))) {
+					
+							}else if (quartetSetB.contains(new Quartet(q.t3, q.t4, q.t2, q.t1, q.getQFrequency()))) {
+						
+							}else if (quartetSetB.contains(new Quartet(q.t4, q.t3, q.t1, q.t2, q.getQFrequency()))) {
+						
+							}else if (quartetSetB.contains(new Quartet(q.t4, q.t3, q.t2, q.t1, q.getQFrequency()))) {
+						
+							}else {
+								quartetSetB.add(q);
+							
+							}
+							//quartetB.put(numOfBDQ, q);
 
 						} else {
 							if(q.t1.getPartition() == 1)q.t1 = extraA;
 							else if(q.t2.getPartition() == 1)q.t2 = extraA;
 							else if(q.t3.getPartition() == 1)q.t3 = extraA;
 							else q.t4 = extraA;
-							quartetA.put(numOfBDQ, q);
+							
+							if (quartetSetA.contains(new Quartet(q.t2, q.t1, q.t3, q.t4, q.getQFrequency()))) {
+						    //System.out.println("contains");
+							}else if (quartetSetA.contains(new Quartet(q.t1, q.t2, q.t4, q.t3, q.getQFrequency()))) {
+						
+							}else if (quartetSetA.contains(new Quartet(q.t2, q.t1, q.t4, q.t3, q.getQFrequency()))) {
+					
+							}else if (quartetSetA.contains(new Quartet(q.t3, q.t4, q.t1, q.t2, q.getQFrequency()))) {
+					
+							}else if (quartetSetA.contains(new Quartet(q.t3, q.t4, q.t2, q.t1, q.getQFrequency()))) {
+						
+							}else if (quartetSetA.contains(new Quartet(q.t4, q.t3, q.t1, q.t2, q.getQFrequency()))) {
+						
+							}else if (quartetSetA.contains(new Quartet(q.t4, q.t3, q.t2, q.t1, q.getQFrequency()))) {
+						
+							}else {
+								quartetSetA.add(q);
+							
+							}
+							//quartetSetA.add(q);
+							//quartetA.put(numOfBDQ, q);
 
 
 						}
@@ -376,10 +411,94 @@ public class Routines {
 					}
 				}
 			}
+	        quartetMap.clear();
+	        
+//	        System.out.println("size of quartetA :"+quartetA.size());
+//	        System.out.println("size of quartetSetA :"+quartetSetA.size());
+//	        System.out.println("size of quartetB :"+quartetB.size());
+//	        System.out.println("size of quartetSetB :"+quartetSetB.size());
+	        
+	        ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetSetA);
+	        quartetSetA.clear();
+			qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
+			int qID = 0;
+			for (Quartet quartet : qr) {
+				qID++;
+				//quartet.setIncreaseFrequency(false);
+				//quartet.setQuartetID(qID);;
+				quartetA.put(qID, quartet);
+			}
+			qr.clear();
+			qr = new ArrayList<Quartet>(quartetSetB);
+			quartetSetB.clear();
+			qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
+			qID = 0;
+			for (Quartet quartet : qr) {
+				qID++;
+				//quartet.setIncreaseFrequency(false);
+				//quartet.setQuartetID(qID);;
+				quartetB.put(qID, quartet);
+			}
+			qr.clear();
+	        
+//	        Quartet qq = quartetSetA.stream().findFirst().get();
+//	        System.out.println(qq.t1.name+","+qq.t2.name+"|"+qq.t3.name+","+qq.t4.name+":"+qq.getQFrequency());
+	        //System.out.println("============================================");
+	        
+
+//	        for (Quartet q : quartetMap.values()) {
+//	        	char c = q.status;
+//
+//				
+//				if (c == 'b' || c == 'd' ) {
+//					numOfBDQ++;
+//					//q.setQuartetID(numOfBDQ);
+//					if (c == 'b') {
+//						//numOfB++;
+//						//if (partA.contains(q.getT1())) {
+//						if (q.t1.getPartition() == 0) {
+//							quartetA.put(numOfBDQ, q);
+//							
+//						} else {
+//							quartetB.put(numOfBDQ, q);
+//
+//						}
+//					} else {
+//						//numOfD++;
+//						//int dcount = 0;
+//						int dcount = q.t1.getPartition() + q.t2.getPartition() + q.t3.getPartition();
+////						if (partA.contains(q.getT1()))dcount++;
+////						if (partA.contains(q.getT2()))dcount++;
+////						if (partA.contains(q.getT3()))dcount++;
+//						//if (partA.contains(q.getT4()))dcount++;
+////						System.out.println("Quartet = "+ q.getT1().getName()+","+q.getT2().getName()
+////								+"|"+q.getT3().getName()+","+q.getT4().getName()+":"+q.getQFrequency()+"->"+q.getStatus());
+////						System.out.println("dcount = "+ dcount);
+//						
+//						if (dcount > 1) {
+//							if(q.t1.getPartition() == 0)q.t1 =extraB;
+//							else if(q.t2.getPartition() == 0)q.t2 = extraB;
+//							else if(q.t3.getPartition() == 0)q.t3 = extraB;
+//							else q.t4 = extraB;
+//							quartetB.put(numOfBDQ, q);
+//
+//						} else {
+//							if(q.t1.getPartition() == 1)q.t1 = extraA;
+//							else if(q.t2.getPartition() == 1)q.t2 = extraA;
+//							else if(q.t3.getPartition() == 1)q.t3 = extraA;
+//							else q.t4 = extraA;
+//							quartetA.put(numOfBDQ, q);
+//
+//
+//						}
+//
+//					}
+//				}
+//			}
 	       
 	        
 	       // System.out.println("One divide step complete");
-	        quartetMap.clear();
+	        
 	        if (extraTaxa == 1001) {
 //	        //if (estimatedTime > 50000) {//if estimatedTime > 50000 miliseconds
 //	        //if (estimatedTime > 40000) {//if estimatedTime > 40000 miliseconds
@@ -1070,7 +1189,7 @@ public class Routines {
 			
 			System.out.println("quartet"+" : "+quartets.t1.name+","+quartets.t2.name+"|"
 					+quartets.t3.name+","+quartets.t4.name+":"+quartets.getQFrequency()+"->"
-					+quartets.isIncreaseFrequency()+" -> "+ quartets.status+"\n");
+					+" -> "+ quartets.status+"\n");
 		}
 		System.out.println("*********************End of Printing Quartet**********************");
 		

@@ -10,7 +10,7 @@ public class Quartet {
 	public char status;
 	//private char status;
 	private int qFrequency;
-	private boolean increaseFrequency;
+	//private boolean increaseFrequency;
 	//private int quartetID;
 	public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
 		this(t1, t2, t3, t4, 1);
@@ -23,7 +23,7 @@ public class Quartet {
 		this.t3 = t3;
 		this.t4 = t4;
 		this.qFrequency = qFrequency;
-		this.increaseFrequency = true;
+		//this.increaseFrequency = true;
 		//this.quartetID = -1;
 	}
 
@@ -38,12 +38,12 @@ public class Quartet {
 	
 
 	
-	public boolean isIncreaseFrequency() {
-		return increaseFrequency;
-	}
-	public void setIncreaseFrequency(boolean increaseFrequency) {
-		this.increaseFrequency = increaseFrequency;
-	}
+//	public boolean isIncreaseFrequency() {
+//		return increaseFrequency;
+//	}
+//	public void setIncreaseFrequency(boolean increaseFrequency) {
+//		this.increaseFrequency = increaseFrequency;
+//	}
 
 	public void fillUpSVDmapInitiallyWithRelaventQIDandScore(int quartetID) {
 		int a = t1.getPartition();
@@ -159,10 +159,10 @@ public class Quartet {
 		Quartet other = (Quartet) obj;
 		if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
 				&& Objects.equals(t3, other.t3) && Objects.equals(t4, other.t4)) {
-			if (other.isIncreaseFrequency()) {
+			//if (other.isIncreaseFrequency()) {
 				//other.setQFrequency(other.getQFrequency()+1);
 				other.setQFrequency(other.getQFrequency()+this.qFrequency);
-			}
+			//}
 			return true;
 		} else {
 			return false;
