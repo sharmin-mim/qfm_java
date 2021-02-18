@@ -211,7 +211,7 @@ version 2.1.13 (Threaded version)
 Future Step: Threading condition needs to change.
 
 version 2.1.14 (Threaded version)
-	Date: Nov 22, 2020
+	Date: Nov 24, 2020
 	Commit ID: 39040c8
 	Commit: 39040c8ad56ccae22ca090b19242299595a104bf
 	Commit message: Version 2.1.14 -> quartet reading function is optimized.
@@ -220,3 +220,29 @@ version 2.1.14 (Threaded version)
 
 	
 Future Step: Threading condition needs to change.
+
+quartet.increase frequency true kore rakhsi
+
+version 2.1.15 (Threaded version)
+	Date: Nov 24, 2020
+	Commit ID: 
+	Commit: 
+	Commit message: Version 2.1.15 -> counting is added in sqp()
+	Changes: qfm_ad.Routines.sqp(): counting and sorting is used
+		
+	
+Future Step: Threading condition needs to change.
+
+quartet.increase frequency true kore rakhsi
+
+version 2.1.16 (Threaded version) It is the final version
+	Date: Feb 18, 2021
+	Commit ID: 49813d0
+	Commit: 49813d01ad01cc571af1847ce77504d23fc599ec
+	Commit message: Version 2.1.16 -> It is the final version
+	Changes: qfm_ad.Routines.sqp(): counting and sorting is used
+                 qfm_ad : svd table is eliminated. instead of svd table, quartets attributes will be used. 
+                 States of each 4 taxa of a quartet will be saved in quartet class
+		
+	
+Future Step: Threading condition needs to change. More optimization. Memory efiiciency
