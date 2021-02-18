@@ -2,7 +2,9 @@ package qfm_ad;
 
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 
 
@@ -14,7 +16,8 @@ public class Taxa {
     public boolean locked;//dont need to lock anymore
     //Taxa tnext;
     //private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
-    public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
+    //public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
+    public List<Integer> relaventQIDs = new ArrayList<>();
 
 
     
@@ -24,8 +27,8 @@ public class Taxa {
 	private int vat;
 	//private int def;
 	public int partitionIndex;//it's for taxa serial number in partition
-	private int sumOfSatOfSVDmap;
-	private int sumOfVatOfSVDmap;
+	public int sumOfSatOfSVDmap=0;
+	public int sumOfVatOfSVDmap=0;
     /////For threading
 
 	public int getPartitionIndex() {
@@ -91,23 +94,33 @@ public class Taxa {
 	public void setVat(int vat) {
 		this.vat = vat;
 	}
-
-
-	public synchronized void fillUpSVDmap(int index, SVD_Log single_log) {
-		//SVD_Log single_log = single_log1;
-		svdTableMap.put(index, single_log);
-	    sumOfSatOfSVDmap += single_log.getSat();
-	    sumOfVatOfSVDmap += single_log.getVat();	
-	}
-	public synchronized void updateSVDmap(int index, SVD_Log single_log) {
-
-		SVD_Log svd = svdTableMap.get(index);        
-	    sumOfSatOfSVDmap = sumOfSatOfSVDmap + single_log.getSat() - svd.getSat();
-	    sumOfVatOfSVDmap = sumOfVatOfSVDmap + single_log.getVat() - svd.getVat();
-	    svd.setSVD(single_log.getSat(), single_log.getVat(), single_log.getqStat());
-
 	
+	public synchronized void addSatScoresWRTmovingTaxa(int satisfied) {
+		//System.out.println("taxa "+ name+" : satScore = "+sumOfSatOfSVDmap+" , satisfied = "+satisfied);
+		sumOfSatOfSVDmap += satisfied;
+		//System.out.println("taxa "+ name+" : After calculation satScore = "+sumOfSatOfSVDmap+" ,vatScore = "+sumOfVatOfSVDmap  );
 	}
+	public synchronized void addVatScoresWRTmovingTaxa(int violated) {
+		//System.out.println("taxa "+ name+" : vatScore = "+sumOfVatOfSVDmap+" , violated = "+violated);
+	    sumOfVatOfSVDmap += violated;
+	   // System.out.println("taxa "+ name+" : After calculation satScore = "+sumOfSatOfSVDmap+" ,vatScore = "+sumOfVatOfSVDmap  );
+	}
+
+
+//	public synchronized void fillUpSVDmap(int index, SVD_Log single_log) {
+//		svdTableMap.put(index, single_log);
+//	    sumOfSatOfSVDmap += single_log.getSat();
+//	    sumOfVatOfSVDmap += single_log.getVat();	
+//	}
+//	public synchronized void updateSVDmap(int index, SVD_Log single_log) {
+//
+//		SVD_Log svd = svdTableMap.get(index);        
+//	    sumOfSatOfSVDmap = sumOfSatOfSVDmap + single_log.getSat() - svd.getSat();
+//	    sumOfVatOfSVDmap = sumOfVatOfSVDmap + single_log.getVat() - svd.getVat();
+//	    svd.setSVD(single_log.getSat(), single_log.getVat(), single_log.getqStat());
+//
+//	
+//	}
 	public synchronized void mCalculateScore(int prevS, int prevV, int prevScore) {
 
         sat = prevS + sumOfSatOfSVDmap;
@@ -118,7 +131,7 @@ public class Taxa {
 	}
 	public void resetTaxa() {
 		locked = false;
-		svdTableMap.clear();
+		//svdTableMap.clear();
 		sumOfSatOfSVDmap = 0;
 		sumOfVatOfSVDmap = 0;
 	}
