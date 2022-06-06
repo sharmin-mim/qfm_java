@@ -19,7 +19,7 @@ Sample input and output files are given in [sample IO](https://github.com/sharmi
 ### Input
 This application takes set of quartets as input.
 The default format of input quartet is `a,b|c,d`. 
-Here a, b, c and d are three species. 
+Here a, b, c and d are four species. 
 ### Output
 A phylogenetic tree in newick format.
 ## Instruction to Run the Application
