@@ -22,6 +22,8 @@ The default format of input quartet is `a,b|c,d`.
 Here a, b, c and d are four species. 
 ### Output
 A phylogenetic tree in newick format.
+## Execution Dependencies
+- Java (required to run the QFM-F and QFM-FI application).
 ## Instruction to Run the Application
 ### To run QFM-F
 At first, unzip the [QFM-F.zip](https://github.com/sharmin-mim/qfm_java/blob/master/QFM-F.zip). Then run following code.
