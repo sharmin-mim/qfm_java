@@ -246,3 +246,12 @@ version 2.1.16 (Threaded version) It is the final version
 		
 	
 Future Step: Threading condition needs to change. More optimization. Memory efiiciency
+
+version 2.1.17 (Threaded version) It is the final version. Minor changes.
+	Date: June 06, 2022
+	Commit ID: 8406089
+	Commit: 8406089452ccdef53d8bea606ede3555f16e27fa
+	Commit message: Version 2.1.17 -> It is the final version. Minor changes.
+	Changes: minor changes
+	
+Future Step: Threading condition needs to change. More optimization. Memory efiiciency
