@@ -8,6 +8,8 @@ import java.io.IOException;
 
 
 
+
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -20,13 +22,22 @@ public class Main {
 		String s = "";
 		switch (quartetType) {
 		case "1":
+			System.out.println("Quartet Format: QMC i.e 1,2|3,4");
 			s= Routines.readQuartetQMC(args[0]);
 			break;
 		case "2":
+			//eta change korte hobe. non weighted newick quartet er jonno ekta function likhte hobe.
+			System.out.println("Quartet Format: Newick i.e ((1,2),(3,4)); Frequency");
+			//s = Routines.readNewickQuartet(args[0]);
 			s = Routines.newickQuartetWeightAsFrequency(args[0]);
 			break;
 		case "3":
+			System.out.println("Quartet Format: QMC, Quartet Generation Method: SVDquartet(qweight = none) i.e 1,2|3,4:1");
 			s = Routines.readSVDquartet(args[0]);
+			break;
+		case "4":
+			System.out.println("Quartet Format: Newick i.e ((1,2),(3,4)); Frequency");
+			s = Routines.newickQuartetWeightAsFrequency(args[0]);
 			break;
 		default:
 			s= Routines.readQuartetQMC(args[0]);

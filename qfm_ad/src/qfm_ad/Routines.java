@@ -41,11 +41,8 @@ public class Routines {
 
 		
 		Map<String, Taxa> taxList = new HashMap<String, Taxa>();
-		
-		
-		
-		
-		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>();
+		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>(251100000);
+
 		long startTime = System.currentTimeMillis();
 		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
 			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
@@ -84,6 +81,7 @@ public class Routines {
 					qc++;
 				}else {
 					quartetList.add(new Quartet(t[0], t[1], t[2], t[3]));
+					
 					//count++;
 					qc++;
 					//System.out.println("qc = "+qc);
@@ -103,7 +101,10 @@ public class Routines {
 		}
 		long estimatedTime = System.currentTimeMillis() - startTime;
 		System.out.println("Quartet Reading Time : "+ estimatedTime/1000 + " seconds");
-		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList.size());
+		qr.addAll(quartetList);
+		
+		//ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
 		quartetList.clear();
 		qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
 		long sortingTime = System.currentTimeMillis() - startTime - estimatedTime;
@@ -285,7 +286,8 @@ public class Routines {
 			return s;
 		}
 		//quartetList.size() == 0 diye check korte hobe
-		if (quartetMap.isEmpty() || taxacount <3) {
+		if (quartetMap.isEmpty() || taxacount <4) {
+		//if (taxacount <4) {
 //			System.out.println("Quartet list is empty");
 			s = depthOneTree(taxaList);
 		} else {
@@ -299,26 +301,26 @@ public class Routines {
 //			System.out.println("*****************PartB**************************");
 //			printTaxa(partB);
 			//printQuartet(quartetList);
-			int partSat = countSatisfiedQuartets(quartetMap); // It returns # of satisfied quartets
-			//System.out.println("partSat = "+ partSat);
-
-			if(partSat==0){
-
-	            partSatCount++;
-	            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
-	            {	
-	            	//System.out.println("partSatCount value = "+ partSatCount);
-	            	partSatCount = 0;
-	                s = depthOneTree(taxaList);
-	                //long t2 = System.currentTimeMillis() - t0;
-	        		//System.out.println(taxacount+","+ quartetList.size()+","+t2);
-	                return s;
-	            }
-	        }
-	        else partSatCount=0;
+//			int partSat = countSatisfiedQuartets(quartetMap); // It returns # of satisfied quartets
+//			//System.out.println("partSat = "+ partSat);
+//
+//			if(partSat==0){
+//
+//	            partSatCount++;
+//	            if(partSatCount>100) //mc dependant step. No. of sat quartets = 0 in successive 20 iterations
+//	            {	
+//	            	System.out.println("partSatCount value = "+ partSatCount);
+//	            	partSatCount = 0;
+//	                s = depthOneTree(taxaList);
+//	                //long t2 = System.currentTimeMillis() - t0;
+//	        		//System.out.println(taxacount+","+ quartetList.size()+","+t2);
+//	                return s;
+//	            }
+//	        }
+//	        else partSatCount=0;
 	        
 			extra = "extra"+ extraTaxa;
-//	        System.out.println("extra = "+ extra);
+	        //System.out.println("extra = "+ extra);
 	        extraTaxa++;
 	        for (Taxa taxa : partA) {
 
@@ -346,12 +348,12 @@ public class Routines {
 	        
 	        //int numOfBDQ = 0; //number of b and deferred quartet
 	        for (Quartet q : quartetMap) {
-	        	char c = q.status;
+	        	byte c = q.status;
 
 				
-				if (c == 'b' || c == 'd' ) {
+				if (c == 4 || c == 3 ) {
 					//numOfBDQ++;
-					if (c == 'b') {
+					if (c == 4) {
 				
 						if (q.t1.getPartition() == 0) {
 							quartetSetA.add(q);
@@ -1048,7 +1050,7 @@ public class Routines {
 //	        }
 //		}
 	    quartetMap.parallelStream().forEach(quartet -> {
-	    	if(quartet.status == 's')
+	    	if(quartet.status == 2)
 	        {
 	        	
 	        	sat[0] += quartet.getQFrequency();
@@ -1555,10 +1557,10 @@ public class Routines {
 				for (int qid = getChunkStartInclusive(chunkID, chunkSize); qid < getChunkEndExclusive(chunkID, chunkSize,nElements); qid++) {
 					Quartet q = quartetMap.get(qid);
 					q.initialSatVatCalculation();
-					char qStat  = q.status;
-		            if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
-		            else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
-		            else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
+					byte qStat  = q.status;
+		            if(qStat == 2) scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
+		            else if(qStat == 1) scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
+		            else if(qStat == 3) scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
 				}
 			});
 
@@ -1566,10 +1568,10 @@ public class Routines {
 		} else {
 			for (Quartet q : quartetMap) {
 				q.initialSatVatCalculation();
-				char qStat  = q.status;
-	            if(qStat == 's') scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
-	            else if(qStat == 'v') scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
-	            else if(qStat == 'd') scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
+				byte qStat  = q.status;
+	            if(qStat == 2) scores[1] = scores[1] + q.getQFrequency();//number of satisfied quartet, s
+	            else if(qStat == 1) scores[2] = scores[2] + q.getQFrequency();//number of violated quartet, v
+	            else if(qStat == 3) scores[3] = scores[3] + q.getQFrequency();//number of deferred quartet, d
 			}
 		}
 		
@@ -1584,31 +1586,31 @@ public class Routines {
 	 
 	}
 
-	private static char iCheckQuartet(Quartet q) {
-		char qstat= iCheckQuartet2(q.t1.getPartition(), q.t2.getPartition(), q.t3.getPartition(), q.t4.getPartition());
+	private static byte iCheckQuartet(Quartet q) {
+		byte qstat= iCheckQuartet2(q.t1.getPartition(), q.t2.getPartition(), q.t3.getPartition(), q.t4.getPartition());
 	    q.status=qstat;
 		return qstat;
 
 	}
-	public static char iCheckQuartet2(int a, int b, int c, int d) {
-		char qstat;
+	public static byte iCheckQuartet2(int a, int b, int c, int d) {
+		byte qstat;
 
 		if (a==b && c==d && b==c) // totally on one side
 	    {	
-	        qstat = 'b';
+	        qstat = 4;
 	    }
 	    else if( a==b && c==d) //satisfied
 	    {
-	        qstat = 's';
+	        qstat = 2;
 	    }
 	    else if ((a==c && b==d) || (a==d && b==c)) // violated
 	    {
-	        qstat = 'v';
+	        qstat = 1;
 
 	    }
 	    else //deffered
 	    {
-	        qstat = 'd';
+	        qstat = 3;
 	    }
 
 		return qstat;

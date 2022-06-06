@@ -2,6 +2,7 @@ package qfm_ad;
 
 
 
+
 import java.util.Objects;
 
 public class Quartet {
@@ -9,11 +10,17 @@ public class Quartet {
 	public Taxa t2;
 	public Taxa t3;
 	public Taxa t4;
-	public char status;
-	public char t1_status;
-	public char t2_status;
-	public char t3_status;
-	public char t4_status;
+	public byte status;
+	public byte t1_status;
+	public byte t2_status;
+	public byte t3_status;
+	public byte t4_status;
+	/*violated v = 1 only one taxa of each partition are in their accurate position wrt a partition
+	 * satisfied s = 2 that means 2 taxa of each quartet are in their accurate position wrt a partition
+	 *                 that also means all 4 taxa are in their accurate position
+	 * deferred d = 3 that means 3 taxa of a quartet are in same part
+	 * deferred b = 4 that means all 4 taxa of a quartet are in same part*/
+	
 	//private char status;
 	private int qFrequency;
 	//private boolean increaseFrequency;
@@ -63,31 +70,31 @@ public class Quartet {
 		int d = t4.getPartition();
 		this.status = Routines.iCheckQuartet2(a, b, c, d);
 		
-		if (this.status=='d') {
+		if (this.status==3) {
 			t1_status = statusWRTmovingTaxaI(t1, 1-a,b,c,d);
 			t2_status = statusWRTmovingTaxaI(t2, a,1-b,c,d);
 			t3_status = statusWRTmovingTaxaI(t3, a,b,1-c,d);
 			t4_status = statusWRTmovingTaxaI(t4, a,b,c,1-d);
   
 		} else {
-		    if(this.status=='s'){ 
+		    if(this.status==2){ 
 		    	t1.addSatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t2.addSatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t3.addSatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t4.addSatScoresWRTmovingTaxa(-this.qFrequency);
 		    }// d =  q.getQFrequency();} // s d
 	
-	        else if(this.status=='v'){
+	        else if(this.status==1){
 		    	t1.addVatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t2.addVatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t3.addVatScoresWRTmovingTaxa(-this.qFrequency);
 		    	t4.addVatScoresWRTmovingTaxa(-this.qFrequency);
 	        }//d = q.getQFrequency();}  // v d
 
-			t1_status = 'd';
-			t2_status = 'd';
-			t3_status = 'd';
-			t4_status = 'd';
+			t1_status = 3;
+			t2_status = 3;
+			t3_status = 3;
+			t4_status = 3;
 
 		}
 		
@@ -100,7 +107,7 @@ public class Quartet {
 		int c = t3.getPartition();
 		int d = t4.getPartition();
 	
-		if (this.status=='d') {
+		if (this.status==3) {
 
 			this.status = Routines.iCheckQuartet2(a, b, c, d);
 			//System.out.println("q status "+ this.status);
@@ -124,8 +131,8 @@ public class Quartet {
 			}
 
   
-		} else if(this.status=='s'){ 
-			this.status = 'd';
+		} else if(this.status==2){ 
+			this.status = 3;
 	    	if (!t1.locked) {
 	    		t1.addSatScoresWRTmovingTaxa(this.qFrequency);
 	    		t1_status = statusWRTmovingTaxaI(t1, 1-a,b,c,d);
@@ -144,8 +151,8 @@ public class Quartet {
 	    	}
 		    }// d =  q.getQFrequency();} // s d
 	
-        else if(this.status=='v'){
-        	this.status = 'd';
+        else if(this.status==1){
+        	this.status = 3;
 	    	if (!t1.locked) {
 	    		t1.addVatScoresWRTmovingTaxa(this.qFrequency);
 	    		t1_status = statusWRTmovingTaxaI(t1, 1-a,b,c,d);
@@ -166,9 +173,9 @@ public class Quartet {
         }//d = q.getQFrequency();}  // v d
 		    
 
-        else if (this.status=='b') {
+        else if (this.status==4) {
 
-			this.status = 'd';
+			this.status = 3;
 			//System.out.println("q status "+ this.status);
 			if (!t1.locked) {
 				//System.out.println("prev t1_status = "+t1_status);
@@ -254,20 +261,20 @@ public class Quartet {
 //		
 //	}
 
-	public char statusWRTmovingTaxaI(Taxa taxa, int a, int b, int c, int d) {
+	public byte statusWRTmovingTaxaI(Taxa taxa, int a, int b, int c, int d) {
     	//if quartet status is satisfied, violated or b, then moving taxa from its current partition will must make q status deffered
     	//But if quartet status is deffered, then we must have to check its status with respect to moving taxa
     
-    	char qStat  = Routines.iCheckQuartet2(a, b, c, d);
+    	byte qStat  = Routines.iCheckQuartet2(a, b, c, d);
     	statusComparison(taxa, qStat, this.qFrequency);
     	return qStat;
 	}
-	public char statusWRTmovingTaxa(Taxa taxa, int a, int b, int c, int d) {
+	public byte statusWRTmovingTaxa(Taxa taxa, int a, int b, int c, int d) {
 
-    	char qStat; 
+    	byte qStat; 
     	//if quartet status is satisfied, violated or b, then moving taxa from its current partition will must make q status deffered
     	//But if quartet status is deffered, then we must have to check its status with respect to moving taxa
-    	if (this.status=='d') {
+    	if (this.status==3) {
     		qStat  = statusWRTmovingTaxaI(taxa, a, b, c, d);
     		
 //    		qStat  = Routines.iCheckQuartet2(a, b, c, d);
@@ -275,16 +282,16 @@ public class Quartet {
 //
 //            else if(qStat == 's'){sv[0] = this.qFrequency;} // d s
 		} else {
-			qStat  = 'd';
+			qStat  = 3;
 			statusComparison(taxa, this.status, -qFrequency);
 			
 		}
     	return qStat;
 	}
-	public void statusComparison(Taxa taxa, char qStat, int frequency) {
-		if(qStat == 'v'){taxa.addVatScoresWRTmovingTaxa(frequency);} // d v
+	public void statusComparison(Taxa taxa, byte qStat, int frequency) {
+		if(qStat == 1){taxa.addVatScoresWRTmovingTaxa(frequency);} // d v
 
-        else if(qStat == 's'){taxa.addSatScoresWRTmovingTaxa(frequency);} // d s
+        else if(qStat == 2){taxa.addSatScoresWRTmovingTaxa(frequency);} // d s
 	}
 
 	

@@ -2,6 +2,8 @@ package qfm_ad;
 
 import java.util.LinkedHashSet;
 
+
+
 public class MultiReturnType {
 	private LinkedHashSet<Taxa> partA;
 	private LinkedHashSet<Taxa> partB;
