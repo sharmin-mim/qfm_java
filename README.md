@@ -15,6 +15,7 @@ This version is named as QFM Fast and Improved (in short QFM-FI).
 The source code for this version are in [qfm_ad](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_ad) directory.
 
 ## Input and Output
+Sample input and output files are given in [sample IO](https://github.com/sharmin-mim/qfm_java/tree/master/sample%20IO) folder.
 ### Input
 This application takes set of quartets as input.
 The default format of input quartet is `a,b|c,d`. 
