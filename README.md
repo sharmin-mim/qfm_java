@@ -52,6 +52,24 @@ For large number of taxa, increasing the memory available to Java is recommended
 
 java -Xmx6000M -jar QFM-FI.jar "input-file-name" "output-file-name"
 ```
+
+## Datasets
+| Simulated Dataset |       Total Model Conditions       | Number of Replicates |
+|:-----------------:|:----------------------------------:|:--------------------:|
+|     Dataset-I     |   150 (120 noisy + 30 noiseless)   |          20          |
+|        SATe       |        22 out of 37 are used       |          20          |
+|      37-taxon     |                 14                 |          20          |
+|     100-taxon     | 1 (1000 true gene trees are used)  |          10          |
+
+| Biological Dataset | Taken from | Number of Taxon |
+|:------------------:|:----------:|:---------------:|
+|        Plant       |  [Wickett et al.](https://doi.org/10.1073/pnas.1323926111)  |       103       |
+|       Amniota      |  [Chiari et al.](https://doi.org/10.1186/1741-7007-10-65)  |        16       |
+|        Avian       |  [Mahbub et al.](https://doi.org/10.1093/bioinformatics/btab428)  |        48       |
+|     Angiosperm     |  [Xi et al.](https://doi.org/10.1093/sysbio/syu055)  |        42       |
+|    Mammal mtDNA    |  [Anjum et al.](https://doi.org/10.1109/TCBB.2021.3136792) |        41       |
+
+
 ## Acknowledgements
 
  - For rerooting a tree with respect to an outgroup, both QFM-F and QFM-FI uses some methods in the [PhyloNet](https://bioinfocs.rice.edu/phylonet) package. 
