@@ -69,6 +69,9 @@ java -Xmx6000M -jar QFM-FI.jar "input-file-name" "output-file-name"
 |     Angiosperm     |  [Xi et al.](https://doi.org/10.1093/sysbio/syu055)  |        42       |
 |    Mammal mtDNA    |  [Anjum et al.](https://doi.org/10.1109/TCBB.2021.3136792) |        41       |
 
+All the biological datasets and dataset-I are availabe [here](https://drive.google.com/drive/folders/1-hqakFYh5J5qQv2WJgcOakkapsY8Tiu4?usp=sharing).
+SATe dataset is available [here](https://sites.google.com/eng.ucsd.edu/datasets/alignment/sate-i?authuser=0).
+37-taxon and 100-taxon dataset are available [here](https://drive.google.com/drive/folders/1IYKYWG81Sld8QwzZNO5D71mOulGVd7ax?usp=sharing).
 
 ## Acknowledgements
 
