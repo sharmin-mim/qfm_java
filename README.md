@@ -73,11 +73,28 @@ All the biological datasets and dataset-I are availabe [here](https://drive.goog
 SATe dataset is available [here](https://sites.google.com/eng.ucsd.edu/datasets/alignment/sate-i?authuser=0).
 37-taxon and 100-taxon dataset are available [here](https://drive.google.com/drive/folders/1IYKYWG81Sld8QwzZNO5D71mOulGVd7ax?usp=sharing).
 
+## Reproducing the result of QFM-FI paper
+To reproduce the result of QFM-FI paper, follow the instruction of [reproducing_the_result_qfm_fi_paper.md](https://github.com/sharmin-mim/qfm_java/blob/master/reproducing_the_result_qfm_fi_paper.md).
+
+
 ## Acknowledgements
 
  - For rerooting a tree with respect to an outgroup, both QFM-F and QFM-FI uses some methods in the [PhyloNet](https://bioinfocs.rice.edu/phylonet) package. 
     
-    C. Than, D. Ruths, L. Nakhleh (2008) PhyloNet: A software package for analyzing and reconstructing reticulate evolutionary histories, BMC Bioinformatics 9:322.
+	C. Than, D. Ruths, L. Nakhleh (2008). PhyloNet: A software package for analyzing and reconstructing reticulate evolutionary histories, BMC Bioinformatics 9:322. 
+	
+ - To generate model species tree for Dataset-I, [r8s](https://doi.org/10.1093/bioinformatics/19.2.301) software is used. 
+    
+	Sanderson, M. J. (2003). r8s: inferring absolute rates of molecular evolution and divergence times in the absence of a molecular clock. Bioinformatics, 19(2):301–302.
+	
+ - To generate quartets (both weighted and unweighted) for Dataset-I, some scripts of [wQMC](http://research.haifa.ac.il/~ssagi/software/wQMC.tar.gz) package is used. 
+    
+    Avni, E., Cohen, R., and Snir, S. (2014). Weighted Quartets Phylogenetics. Systematic Biology, 64(2):233–242.
+
+ - Two scripts (convertForWQMC_BufferedReader.jar and convertBack.jar) of [wQFM](https://github.com/Mahim1997/wQFM-2020) package is used. 
+    
+    Mahbub, M., Wahab, Z., Reaz, R., Rahman, M. S., and Bayzid, M. S. (2021). wQFM: highly accurate genome-scale species tree estimation from weighted quartets. Bioinformatics, 37(21):3734–3743.
+	
   
 ## License
 
