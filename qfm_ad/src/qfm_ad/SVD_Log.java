@@ -6,15 +6,10 @@ package qfm_ad;
  * 
  * */
 
-//import java.util.Objects;
 public class SVD_Log {
-    //private Quartet quartet;
-    //private int quertetID;
-
-    private int sat;//number of satisfied quartet
-    private int vat;//number of violated quartet
-    //private int def;//number of deferred quartet
-    private char qStat;//status of quartet
+    private int sat;    //number of satisfied quartet
+    private int vat;    //number of violated quartet
+    private char qStat; //status of quartet
 
     public SVD_Log(int sat, int vat, char qStat) {
         super();
@@ -33,9 +28,6 @@ public class SVD_Log {
         this.qStat = qStat;
     }
 
-//	public int getQuartetID() {
-//		return quertetID;
-//	}
     public int getSat() {
         return sat;
     }
@@ -43,5 +35,4 @@ public class SVD_Log {
     public int getVat() {
         return vat;
     }
-
 }

@@ -1,19 +1,13 @@
 package qfm_ad;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class Taxa {
 
-    public String name; // node name
-    private byte partition; //0 = A, 1 = B
-    //private int state; //0 = unmoved, 1 = moved
-    //private int taxaScore;
-    public boolean locked;//dont need to lock anymore
-    //Taxa tnext;
-    //private HashSet<SVD_Log> svdTable;//later i'll change it to hashSet cz now order doesn't matter
-    //public HashMap<Integer, SVD_Log> svdTableMap = new HashMap<Integer, SVD_Log>();
+    public String name;         // node name
+    private byte partition;     // 0 = A, 1 = B
+    public boolean locked;      // dont need to lock anymore
     public List<Integer> relaventQIDs = new ArrayList<>();
 
     /////For threading
@@ -49,13 +43,6 @@ public class Taxa {
         this.partition = (byte) partition;
     }
 
-//	public int getState() {
-//		return state;
-//	}
-//
-//	public void setState(int state) {
-//		this.state = state;
-//	}
     public int getVal() {
         return val;
     }
@@ -81,31 +68,13 @@ public class Taxa {
     }
 
     public synchronized void addSatScoresWRTmovingTaxa(int satisfied) {
-        //System.out.println("taxa "+ name+" : satScore = "+sumOfSatOfSVDmap+" , satisfied = "+satisfied);
         sumOfSatOfSVDmap += satisfied;
-        //System.out.println("taxa "+ name+" : After calculation satScore = "+sumOfSatOfSVDmap+" ,vatScore = "+sumOfVatOfSVDmap  );
     }
 
     public synchronized void addVatScoresWRTmovingTaxa(int violated) {
-        //System.out.println("taxa "+ name+" : vatScore = "+sumOfVatOfSVDmap+" , violated = "+violated);
         sumOfVatOfSVDmap += violated;
-        // System.out.println("taxa "+ name+" : After calculation satScore = "+sumOfSatOfSVDmap+" ,vatScore = "+sumOfVatOfSVDmap  );
     }
 
-//	public synchronized void fillUpSVDmap(int index, SVD_Log single_log) {
-//		svdTableMap.put(index, single_log);
-//	    sumOfSatOfSVDmap += single_log.getSat();
-//	    sumOfVatOfSVDmap += single_log.getVat();	
-//	}
-//	public synchronized void updateSVDmap(int index, SVD_Log single_log) {
-//
-//		SVD_Log svd = svdTableMap.get(index);        
-//	    sumOfSatOfSVDmap = sumOfSatOfSVDmap + single_log.getSat() - svd.getSat();
-//	    sumOfVatOfSVDmap = sumOfVatOfSVDmap + single_log.getVat() - svd.getVat();
-//	    svd.setSVD(single_log.getSat(), single_log.getVat(), single_log.getqStat());
-//
-//	
-//	}
     public synchronized void mCalculateScore(int prevS, int prevV, int prevScore) {
 
         sat = prevS + sumOfSatOfSVDmap;
@@ -116,7 +85,6 @@ public class Taxa {
 
     public void resetTaxa() {
         locked = false;
-        //svdTableMap.clear();
         sumOfSatOfSVDmap = 0;
         sumOfVatOfSVDmap = 0;
     }
@@ -147,5 +115,4 @@ public class Taxa {
         }
         return true;
     }
-
 }
