@@ -21,18 +21,49 @@ public class Quartet {
 
     private int qFrequency;
 
+    private void swap(Taxa[] rgTaxa, int i, int j) {
+        Taxa temp = rgTaxa[i];
+        rgTaxa[i] = rgTaxa[j];
+        rgTaxa[j] = temp;
+    }
+        
+    private void initUnweightedQuartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
+        Taxa[] rgTaxa = new Taxa[4];
+
+        rgTaxa[0] = t1;
+        rgTaxa[1] = t2;
+        rgTaxa[2] = t3;
+        rgTaxa[3] = t4;
+
+        if (rgTaxa[0].getName().compareTo(rgTaxa[1].getName()) > 0) {
+            swap(rgTaxa, 0, 1);
+        }
+        if (rgTaxa[2].getName().compareTo(rgTaxa[3].getName()) > 0) {
+            swap(rgTaxa, 2, 3);
+        }
+
+        if (rgTaxa[0].getName().compareTo(rgTaxa[2].getName()) > 0) {
+            swap(rgTaxa, 0, 2);
+            swap(rgTaxa, 1, 3);
+        }
+
+        this.t1 = rgTaxa[0];
+        this.t2 = rgTaxa[1];
+        this.t3 = rgTaxa[2];
+        this.t4 = rgTaxa[3];
+
+        status = 1;
+    }
+        
     public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
-        this(t1, t2, t3, t4, 1);
+        initUnweightedQuartet(t1, t2, t3, t4);
     }
 
     public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4, int qFrequency) {
 
-        this.t1 = t1;
-        this.t2 = t2;
-        this.t3 = t3;
-        this.t4 = t4;
+        initUnweightedQuartet(t1, t2, t3, t4);
         this.qFrequency = qFrequency;
-    }
+   }
 
     public int getQFrequency() {
         return qFrequency;

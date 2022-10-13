@@ -22,7 +22,6 @@ public class Main {
             case "2":
                 //eta change korte hobe. non weighted newick quartet er jonno ekta function likhte hobe.
                 System.out.println("Quartet Format: Newick i.e ((1,2),(3,4)); Frequency");
-                //s = Routines.readNewickQuartet(args[0]);
                 s = Routines.newickQuartetWeightAsFrequency(args[0]);
                 break;
             case "3":
@@ -38,12 +37,6 @@ public class Main {
                 break;
         }
 
-        //String s= Routines.readQuartetQMC("r1_qrt_n500_c70_qf2.qrt");
-        //String s= Routines.readQuartetQMC(args[0]);
-        //String s = Routines.newickQuartetWeightAsFrequency(args[0]);
-//		String s= Routines.readQuartetQMC("27_ecoli.txt");
-//		System.out.println(s);
-//		try(BufferedWriter bw = new BufferedWriter(new FileWriter("gene101Out.txt"))) {//args[1] is output file
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(args[1]))) {//args[1] is output file
             bw.write(s);
         } catch (IOException e) {

@@ -44,23 +44,10 @@ public class Routines {
 
                 if (quartetList.contains(new Quartet(t[1], t[0], t[2], t[3]))) {
                     qc++;
-                } else if (quartetList.contains(new Quartet(t[0], t[1], t[3], t[2]))) {
-                    qc++;
-                } else if (quartetList.contains(new Quartet(t[1], t[0], t[3], t[2]))) {
-                    qc++;
-                } else if (quartetList.contains(new Quartet(t[2], t[3], t[0], t[1]))) {
-                    qc++;
-                } else if (quartetList.contains(new Quartet(t[2], t[3], t[1], t[0]))) {
-                    qc++;
-                } else if (quartetList.contains(new Quartet(t[3], t[2], t[0], t[1]))) {
-                    qc++;
-                } else if (quartetList.contains(new Quartet(t[3], t[2], t[1], t[0]))) {
-                    qc++;
                 } else {
                     quartetList.add(new Quartet(t[0], t[1], t[2], t[3]));
                     qc++;
                 }
-
             }
             System.out.println("number of quartet = " + qc);
             System.out.println("number of unique quartet = " + quartetList.size());

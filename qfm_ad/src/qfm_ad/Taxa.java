@@ -20,6 +20,10 @@ public class Taxa {
     public int sumOfVatOfSVDmap = 0;
     /////For threading
 
+    public String getName() {
+        return name;
+    }
+
     public int getPartitionIndex() {
         return partitionIndex;
     }
