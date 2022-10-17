@@ -1,5 +1,6 @@
 package qfm_ad;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Quartet {
@@ -21,13 +22,13 @@ public class Quartet {
 
     private int qFrequency;
 
-    private void swap(Taxa[] rgTaxa, int i, int j) {
+    private static void swap(Taxa[] rgTaxa, int i, int j) {
         Taxa temp = rgTaxa[i];
         rgTaxa[i] = rgTaxa[j];
         rgTaxa[j] = temp;
     }
-        
-    private void initUnweightedQuartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
+    
+    private static Taxa[] toCanonicalForm(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
         Taxa[] rgTaxa = new Taxa[4];
 
         rgTaxa[0] = t1;
@@ -47,22 +48,32 @@ public class Quartet {
             swap(rgTaxa, 1, 3);
         }
 
-        this.t1 = rgTaxa[0];
-        this.t2 = rgTaxa[1];
-        this.t3 = rgTaxa[2];
-        this.t4 = rgTaxa[3];
+        return rgTaxa;
+    }
 
-        status = 1;
+        
+    private void initQuartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4, int freq) {
+//        Taxa[] rgTaxa = toCanonicalForm(t1, t2, t3, t4);
+//
+//        this.t1 = rgTaxa[0];
+//        this.t2 = rgTaxa[1];
+//        this.t3 = rgTaxa[2];
+//        this.t4 = rgTaxa[3];
+
+        this.t1 = t1;
+        this.t2 = t2;
+        this.t3 = t3;
+        this.t4 = t4;
+        this.qFrequency = freq;
     }
         
     public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4) {
-        initUnweightedQuartet(t1, t2, t3, t4);
+        initQuartet(t1, t2, t3, t4, 1);
     }
 
     public Quartet(Taxa t1, Taxa t2, Taxa t3, Taxa t4, int qFrequency) {
 
-        initUnweightedQuartet(t1, t2, t3, t4);
-        this.qFrequency = qFrequency;
+        initQuartet(t1, t2, t3, t4, qFrequency);
    }
 
     public int getQFrequency() {
@@ -234,30 +245,50 @@ public class Quartet {
             taxa.addSatScoresWRTmovingTaxa(frequency);
         } // d s
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(t1, t2, t3, t4);
+        
+        return Arrays.hashCode(toCanonicalForm(t1, t2, t3, t4));
+        //return Objects.hash(t1, t2, t3, t4);
     }
 
     @Override
     public boolean equals(Object obj) {
+        boolean fEquals = false;
+        int i;
+        
         if (this == obj) {
             return true;
         }
         if (!(obj instanceof Quartet)) {
             return false;
         }
+        
         Quartet other = (Quartet) obj;
-        if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
-                && Objects.equals(t3, other.t3) && Objects.equals(t4, other.t4)) {
-            //if (other.isIncreaseFrequency()) {
-            //other.setQFrequency(other.getQFrequency()+1);
-            other.setQFrequency(other.getQFrequency() + this.qFrequency);
-            //}
-            return true;
-        } else {
-            return false;
+        
+        Taxa[] rgTaxa_this = toCanonicalForm(this.t1, this.t2, this.t3, this.t4);
+        Taxa[] rgTaxa_obj  = toCanonicalForm(other.t1, other.t2, other.t3, other.t4);
+
+        for (i = 0; i < rgTaxa_this.length; i++) {
+            if (!Objects.equals(rgTaxa_this[i], rgTaxa_obj[i])) {
+                break;
+            }
         }
+        
+        if (i == rgTaxa_this.length) {
+            other.setQFrequency(other.getQFrequency() + this.qFrequency);
+            fEquals = true;
+        }
+        
+//        if (Objects.equals(t1, other.t1) && Objects.equals(t2, other.t2)
+//                && Objects.equals(t3, other.t3) && Objects.equals(t4, other.t4)) {
+//            other.setQFrequency(other.getQFrequency() + this.qFrequency);
+//            fEquals = true;
+//        } else {
+//            fEquals =  false;
+//        }
+
+        return fEquals;
     }
 }
