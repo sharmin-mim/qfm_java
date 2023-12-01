@@ -1,3 +1,7 @@
+/*
+ * Author: Sharmin Akter Mim
+ * Code for QFM-FI
+ * */
 package qfm_ad;
 
 
@@ -44,7 +48,7 @@ public class Routines {
 		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>(251100000);
 
 		long startTime = System.currentTimeMillis();
-		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
+		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName),104857600))){
 			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
 			int qc = 0;
 			while (scanner.hasNext()) {
@@ -291,7 +295,7 @@ public class Routines {
 //			System.out.println("Quartet list is empty");
 			s = depthOneTree(taxaList);
 		} else {
-			MultiReturnType mrt = FM(taxaList, quartetMap);
+			MultiReturnType mrt = cFM(taxaList, quartetMap);
 			LinkedHashSet<Taxa> partA = mrt.getPartA();
 			LinkedHashSet<Taxa> partB = mrt.getPartB();
 			
@@ -815,6 +819,8 @@ public class Routines {
 
 
 	private static MultiReturnType FM(LinkedHashSet<Taxa> taxaList, ArrayList<Quartet> quartetMap) {
+		
+		
 		LinkedHashSet<Taxa> partA = new LinkedHashSet<Taxa>();
 		LinkedHashSet<Taxa> partB = new LinkedHashSet<Taxa>();
 		
@@ -1638,6 +1644,7 @@ public class Routines {
 
 	private static String rerootTreeUsingJARAndProcessing(String newickTree, String outGroupNode) {
 		STITree tree = null;
+//		System.out.println("..................Tree: "+newickTree +".........."+outGroupNode);
 		  try {
 	            tree = new STITree(newickTree);
 	            tree.rerootTreeAtNode(tree.getNode(outGroupNode));
@@ -1656,6 +1663,271 @@ public class Routines {
 	      return rootedTree;
 		
 	}
+public static String readQuartetAndEdge(String fileName) { // count will be done at the time of reading
+
+		
+		Map<String, Taxa> taxList = new HashMap<String, Taxa>();
+		LinkedHashSet<Quartet> quartetList = new LinkedHashSet<Quartet>(251100000);
+
+		long startTime = System.currentTimeMillis();
+		try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(fileName)))){
+			//int count=0, qc = 0;//count-> only counts unique quartet. qc-> counts all quartet
+			int qc = 0;
+			while (scanner.hasNext()) {
+				
+				String singleQuartet = scanner.next();	
+				//String[] qq = singleQuartet.split(",|\\|");/// for quartet format q1,q2|q3,q4
+				String[] qq = singleQuartet.split(",|\\||:");// For both quartet format q1,q2|q3,q4 and q1,q2|q3,q4:weight
+				//Taxa t1, t2, t3, t4;
+				
+				Taxa[] t = new Taxa[4];
+				for (int i = 0; i < 4; i++) {
+					if (taxList.containsKey(qq[i])) {
+						t[i] = taxList.get(qq[i]);
+					} else {
+						t[i] = new Taxa(qq[i]);
+						taxList.put(qq[i], t[i]);
+					}
+					////recent change/////////
+				}
+
+				if (quartetList.contains(new Quartet(t[1], t[0], t[2], t[3]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[0], t[1], t[3], t[2]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[1], t[0], t[3], t[2]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[2], t[3], t[0], t[1]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[2], t[3], t[1], t[0]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[3], t[2], t[0], t[1]))) {
+					qc++;
+				}else if (quartetList.contains(new Quartet(t[3], t[2], t[1], t[0]))) {
+					qc++;
+				}else {
+					quartetList.add(new Quartet(t[0], t[1], t[2], t[3]));
+					
+					//count++;
+					qc++;
+					//System.out.println("qc = "+qc);
+				}
+				
+								
+				
+				
+				
+			}
+			System.out.println("number of quartet = "+ qc);
+			System.out.println("number of unique quartet = "+quartetList.size());
+			System.out.println("number of Taxa = "+taxList.size());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		long estimatedTime = System.currentTimeMillis() - startTime;
+		System.out.println("Quartet Reading Time : "+ estimatedTime/1000 + " seconds");
+		ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList.size());
+		qr.addAll(quartetList);
+		
+		//ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+		quartetList.clear();
+		qr.sort(Comparator.comparing(Quartet::getQFrequency, Collections.reverseOrder()));
+		long sortingTime = System.currentTimeMillis() - startTime - estimatedTime;
+		System.out.println("Sorting Time : "+ sortingTime/1000 + " seconds");
+
+		LinkedHashSet<Taxa> taxaList = new LinkedHashSet<Taxa>(taxList.values());
+		taxList.clear();
+		String s = SQP(qr, taxaList, 1000, 0);
+
+		if (s == null) {
+			s = "null";
+		}
+		
+		return s;
+		//return null;
+	
+		
+	}
+	
+
+private static MultiReturnType cFM(LinkedHashSet<Taxa> taxaList, ArrayList<Quartet> quartetMap) {
+	LinkedHashSet<Taxa> partA = new LinkedHashSet<Taxa>();
+	LinkedHashSet<Taxa> partB = new LinkedHashSet<Taxa>();
+	
+	LinkedHashSet<Edge> edge = new LinkedHashSet<Edge>();
+//	ArrayList<Quartet> qMap = new ArrayList<Quartet>();
+//	qMap.add(new Quartet(new Taxa("a"), new Taxa("b"), new Taxa("c"), new Taxa("d")));
+//	qMap.add(new Quartet(new Taxa("a"), new Taxa("b"), new Taxa("c"), new Taxa("d")));
+//	qMap.add(new Quartet(new Taxa("a"), new Taxa("c"), new Taxa("b"), new Taxa("d")));
+//	System.out.println();
+//	System.out.println();
+//	printTaxa(taxaList);
+	Taxa lastTaxa = new Taxa("");
+	
+	for (Quartet q: quartetMap) {
+//		System.out.println(q.t1.name+","+q.t2.name+"|"+q.t3.name+","+q.t4.name+":"+q.getQFrequency());
+		if (!edge.contains(new Edge(q.t3, q.t1, q.getQFrequency()))) {
+			edge.add(new Edge(q.t1, q.t3, q.getQFrequency()));
+//			System.out.println(q.t1.name +"--"+q.t3.name);
+		} 
+		if (!edge.contains(new Edge(q.t4, q.t1, q.getQFrequency()))) {
+			edge.add(new Edge(q.t1, q.t4, q.getQFrequency()));
+//			System.out.println(q.t1.name +"--"+q.t4.name);
+		}
+		if (!edge.contains(new Edge(q.t3, q.t2, q.getQFrequency()))) {
+			edge.add(new Edge(q.t2, q.t3, q.getQFrequency()));
+//			System.out.println(q.t2.name +"--"+q.t3.name);
+		} 
+		if (!edge.contains(new Edge(q.t4, q.t2, q.getQFrequency()))) {
+			edge.add(new Edge(q.t2, q.t4, q.getQFrequency()));
+//			System.out.println(q.t2.name +"--"+q.t4.name);
+		}
+		
+	}
+
+	ArrayList<Edge> edgeList = new ArrayList<Edge>(edge.size());
+	edgeList.addAll(edge);
+	
+	//ArrayList<Quartet> qr = new ArrayList<Quartet>(quartetList);
+	edge.clear();
+	edgeList.sort(Comparator.comparing(Edge::getCutFrequency, Collections.reverseOrder()));
+//	System.out.println(".................. List of Edges...............");
+//	for (Edge edge2 : edgeList ) {
+//		System.out.println(edge2);
+//	}
+//	System.out.println(".................. List of Edges...............");
+
+	
+	//int partitionIndexNumber = 0;
+	for (Edge singelEdge : edgeList ) {
+		int tcount = 0;
+		if (taxaList.isEmpty()) {
+//			System.out.println("Finished");
+			break;
+		} else {
+			if(taxaList.contains(singelEdge.t1)) {
+				lastTaxa = singelEdge.t1;
+				taxaList.remove(singelEdge.t1);
+				tcount ++;
+				
+			}
+			if(taxaList.contains(singelEdge.t2)) {
+				lastTaxa = singelEdge.t2;
+				taxaList.remove(singelEdge.t2);
+				tcount ++;
+			}
+		}
+		if (tcount > 0) {
+			int a = -1, b = -1;
+//			if (partA.contains(quartet.getT1())) a = 0;
+//			if (partA.contains(quartet.getT2())) b = 0;
+//			if (partA.contains(quartet.getT3())) c = 0;
+//			if (partA.contains(quartet.getT4())) d = 0;
+//			
+//			if (partB.contains(quartet.getT1())) a = 1;
+//			if (partB.contains(quartet.getT2())) b = 1;
+//			if (partB.contains(quartet.getT3())) c = 1;
+//			if (partB.contains(quartet.getT4())) d = 1;
+	///ei khane ekta else if condition use kora jay. if partA contains, then we wont have to chk partB
+			//I will chk this later
+			if (partA.contains(singelEdge.t1)) a = 0;
+			else if (partB.contains(singelEdge.t1)) a = 1;
+			
+			if (partA.contains(singelEdge.t2)) b = 0;
+			else if (partB.contains(singelEdge.t2)) b = 1;
+		
+			
+	
+			
+			if(a==-1 && b==-1) //all new
+		    {
+		        ///This section can create problem in multithreading
+				singelEdge.t1.setPartition(0);
+				partA.add(singelEdge.t1);
+		        //a= 0; //ca++;
+				singelEdge.t2.setPartition(1);
+				partB.add(singelEdge.t2);
+
+		    }else {
+
+		    	if(a==-1)
+		        {	
+
+		    		if (b == 1) {
+		    			singelEdge.t1.setPartition(0); partA.add(singelEdge.t1);a=0;
+					} else {
+						singelEdge.t1.setPartition(1); partB.add(singelEdge.t1);a=1;
+					}
+		    	}
+		    	if(b==-1)
+		        {	
+
+		    		if (a == 1) {
+		    			singelEdge.t2.setPartition(0); partA.add(singelEdge.t2);b=0;
+					} else {
+						singelEdge.t2.setPartition(1); partB.add(singelEdge.t2);a=1;
+					}
+		    	}
+		
+		    }
+		}
+			
+	}
+	int c = 0;
+	int ca = partA.size(), cb = partB.size();
+//	System.out.println("*********FM taxalist*********");
+//	printTaxa(taxaList);
+	if (!taxaList.isEmpty()) {
+		
+		for (Taxa taxa : taxaList) {
+//			partitionIndexNumber++;
+//	        taxa.partitionIndex = partitionIndexNumber;
+			if(ca<cb)
+                c=2;
+            else if(cb<ca)
+                c=1;
+            else c++;
+			
+            if(c%2==0){
+            	taxa.setPartition(0);
+            	partA.add(taxa);
+            	//taxaList.remove(taxa);
+            	ca++;
+            }else {
+            	taxa.setPartition(1);
+            	partB.add(taxa);
+            	//taxaList.remove(taxa);
+            	cb++;
+            }
+
+		}
+	}
+	
+    
+	//printQuartet(quartetList);
+//	System.out.println("............................FM...........................");
+//	printTaxa(partA);
+//	printTaxa(partB);
+	if (partA.size() < 2) {
+		partA.add(lastTaxa);
+		partB.remove(lastTaxa);
+		lastTaxa.setPartition(0);
+	}
+	if (partB.size() < 2) {
+		partB.add(lastTaxa);
+		partA.remove(lastTaxa);
+		lastTaxa.setPartition(1);
+	}
+//	//return null;
+//	printTaxa(partA);
+//	printTaxa(partB);
+
+	return MFM_algo(partA, partB, quartetMap);
+	//return FM_algo(partA, partB, quartetList);
+}
+
+
 
 
 	////////////////////////////////////////////

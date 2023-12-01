@@ -1,3 +1,7 @@
+/*
+ * Author: Sharmin Akter Mim
+ * Code for QFM-FI
+ * */
 package qfm_ad;
 /*
  * This class contains  Quartet_Id and its corresponding values of satisfied, violated and deferred quartets
