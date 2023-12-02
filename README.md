@@ -1,7 +1,11 @@
-
 # QFM-FI
 
-This repository contains the official implementation of our paper "Quartet Fiduccia-Mattheyses Revisited for Larger Phylogenetic Studies" submitted in Bioinformatics, 2022.
+This repository contains the official implementation of our paper ["Quartet Fiduccia-Mattheyses Revisited for Larger Phylogenetic Studies"](https://doi.org/10.1093/bioinformatics/btad332) published in Bioinformatics, 2023. The codebase for the QFM-FI algorithm is available in [qfm_fi](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_fi) directory.
+
+## Important Notice!!
+- The source code for the QFM-FI algorithm, which was detailed in our [paper](https://doi.org/10.1093/bioinformatics/btad332), can be found in the [qfm_fi](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_fi) directory. 
+- Codebase has been slightly updated (on December, 2022) to firther improve the runtime of QFM-FI. 
+- Both [qfm_fi](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_fi) and [qfm_ad](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_ad) directory contain same codebase of QFM-FI algorithm. We have added [qfm_fi](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_fi) directory (on December 02, 2023) to eliminate any confusion regarding the source code of QFM-FI algorithm which was described in our [paper](https://doi.org/10.1093/bioinformatics/btad332).
 
 ## Brief Description
 We have modified the [QFM algorithm](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0104008) which was implemented by Reaz et al.
@@ -12,7 +16,7 @@ We named this faster version as QFM Fast (in short QFM-F).
 ### QFM-FI (QFM Fast and Improved)
 We have also enhanced the tree quality of resultant species tree. 
 This version is named as QFM Fast and Improved (in short QFM-FI).
-The source code for this version are in [qfm_ad](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_ad) directory.
+The source code for this version are in [qfm_fi](https://github.com/sharmin-mim/qfm_java/tree/master/qfm_fi) directory.
 
 ## Input and Output
 Sample input and output files are given in [sample IO](https://github.com/sharmin-mim/qfm_java/tree/master/sample%20IO) folder.
@@ -40,7 +44,7 @@ java -Xmx6000M -jar QFM-F.jar "input-file-name" "output-file-name"
 ```
 
 ### To run QFM-FI
-At first, unzip the [QFM-F.zip](https://github.com/sharmin-mim/qfm_java/blob/master/QFM-FI.zip). Then run following code.
+At first, unzip the [QFM-FI.zip](https://github.com/sharmin-mim/qfm_java/blob/master/QFM-FI.zip). Then run following code.
 ```bash
 java -jar QFM-FI.jar "input-file-name" "output-file-name"
 ```
@@ -110,3 +114,26 @@ We are constantly searching for ways to improve our codebase.
 For any bugs, please post on [issues](https://github.com/sharmin-mim/qfm_java/issues) page.
 
 Alternatively, you can email at `sharmin133mim@gmail.com`.
+
+## Citation (BibTeX)
+Please do not hesitate to cite our paper if you wish to use any portion of this repository.
+```
+@article{10.1093/bioinformatics/btad332,
+    author = {Mim, Sharmin Akter and Zarif-Ul-Alam, Md and Reaz, Rezwana and Bayzid, Md Shamsuzzoha and Rahman, Mohammad Saifur},
+    title = "{Quartet Fiduccia–Mattheyses revisited for larger phylogenetic studies}",
+    journal = {Bioinformatics},
+    volume = {39},
+    number = {6},
+    pages = {btad332},
+    year = {2023},
+    month = {06},
+    abstract = "{With the recent breakthroughs in sequencing technology, phylogeny estimation at a larger scale has become a huge opportunity. For accurate estimation of large-scale phylogeny, substantial endeavor is being devoted in introducing new algorithms or upgrading current approaches. In this work, we endeavor to improve the Quartet Fiduccia and Mattheyses (QFM) algorithm to resolve phylogenetic trees of better quality with better running time. QFM was already being appreciated by researchers for its good tree quality, but fell short in larger phylogenomic studies due to its excessively slow running time.We have re-designed QFM so that it can amalgamate millions of quartets over thousands of taxa into a species tree with a great level of accuracy within a short amount of time. Named “QFM Fast and Improved (QFM-FI)”, our version is 20 000× faster than the previous version and 400× faster than the widely used variant of QFM implemented in PAUP* on larger datasets. We have also provided a theoretical analysis of the running time and memory requirements of QFM-FI. We have conducted a comparative study of QFM-FI with other state-of-the-art phylogeny reconstruction methods, such as QFM, QMC, wQMC, wQFM, and ASTRAL, on simulated as well as real biological datasets. Our results show that QFM-FI improves on the running time and tree quality of QFM and produces trees that are comparable with state-of-the-art methods.QFM-FI is open source and available at https://github.com/sharmin-mim/qfm\_java.}",
+    issn = {1367-4811},
+    doi = {10.1093/bioinformatics/btad332},
+    url = {https://doi.org/10.1093/bioinformatics/btad332},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/39/6/btad332/50587781/btad332.pdf},
+}
+
+
+```
+
