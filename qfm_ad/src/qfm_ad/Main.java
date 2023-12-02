@@ -2,7 +2,7 @@
  * Author: Sharmin Akter Mim
  * Code for QFM-FI
  * */
-package qfm_fi;
+package qfm_ad;
 
 
 import java.io.BufferedWriter;
