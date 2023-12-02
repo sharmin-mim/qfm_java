@@ -2,17 +2,12 @@
  * Author: Sharmin Akter Mim
  * Code for QFM-FI
  * */
-package qfm_ad;
+package qfm_fi;
 
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-
-
-
-
-
 
 public class Main {
 
