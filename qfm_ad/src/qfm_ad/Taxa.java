@@ -14,7 +14,9 @@ import java.util.List;
 
 
 
+
 public class Taxa {
+
 	public String name; // node name
 	private byte partition; //0 = A, 1 = B
     //private int state; //0 = unmoved, 1 = moved
@@ -141,6 +143,28 @@ public class Taxa {
 		sumOfSatOfSVDmap = 0;
 		sumOfVatOfSVDmap = 0;
 	}
+	
+
+	public String getName() {
+		return name;
+	}
+
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public List<Integer> getRelaventQIDs() {
+		return relaventQIDs;
+	}
+
+	public int getSumOfSatOfSVDmap() {
+		return sumOfSatOfSVDmap;
+	}
+
+	public int getSumOfVatOfSVDmap() {
+		return sumOfVatOfSVDmap;
+	}
 
 	@Override
 	public int hashCode() {
@@ -164,6 +188,7 @@ public class Taxa {
 			return false;
 		return true;
 	}
+
 
 
 
